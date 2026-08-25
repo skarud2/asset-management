@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.via.shinvia.client.card.mapper.CardMapper">
+
+    <!-- 목서버 카드 목록 응답의 institution_id는 bank_code_std를 10자리로 LPAD해서 내려주므로('004' -> '0000000004'),
+         financial_institution.org_code('004')와 문자열로는 안 맞을 수 있다. 숫자로 정규화해서 비교한다. -->
+    <select id="findInstitutionIdByOrgCode" resultType="long">
+        SELECT institution_id
+        FROM financial_institution
+        WHERE CAST(org_code AS UNSIGNED) = CAST(#{orgCode} AS UNSIGNED)
+    </select>
+
+    <select id="findConnectionIdByUserId" resultType="long">
+        SELECT connection_id
+        FROM mydata_connection
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertConnection">
+        INSERT INTO mydata_connection (user_id)
+        VALUES (#{userId})
+    </insert>
+
+    <select id="findByExternalCardKey" resultType="com.via.shinvia.client.card.entity.CardAccount">
+        SELECT
+            card_account_id, user_id,
+            external_card_key, card_name,institution_id, connection_id, card_number_masked,
+            payment_day, updated_at, issued_at, data_as_of_at
+        FROM card_account
+        WHERE external_card_key = #{externalCardKey}
+    </select>
+
+    <insert id="insertCardAccount" useGeneratedKeys="true" keyProperty="cardAccountId">
+        INSERT INTO card_account (
+            user_id, institution_id, connection_id, external_card_key,
+            card_name, card_number_masked,
+            payment_day, updated_at, issued_at, data_as_of_at
+        ) VALUES (
+            #{userId}, #{institutionId}, #{connectionId}, #{externalCardKey},
+            #{cardName}, #{cardNumberMasked},
+            #{paymentDay}, #{updatedAt}, #{issuedAt}, #{dataAsOfAt}
+        )
+    </insert>
+
+    <update id="updateCardAccount">
+        UPDATE card_account
+        SET
+            user_id = #{userId},
+            institution_id = #{institutionId},
+            connection_id = #{connectionId},
+            card_name = #{cardName},
+            card_number_masked = #{cardNumberMasked},
+            payment_day = #{paymentDay},
+            updated_at = #{updatedAt},
+            issued_at = #{issuedAt},
+            data_as_of_at = #{dataAsOfAt}
+        WHERE card_account_id = #{cardAccountId}
+    </update>
+
+    <select id="findCardAccountIdByExternalCardKey" resultType="long">
+        SELECT card_account_id
+        FROM card_account
+        WHERE external_card_key = #{externalCardKey}
+    </select>
+
+    <insert id="upsertCardTransactions">
+        INSERT INTO card_transaction (
+            card_account_id, external_transaction_id, transaction_at, amount, merchant_name
+        ) VALUES
+        <foreach collection="transactions" item="t" separator=",">
+            (#{t.cardAccountId}, #{t.externalTransactionId}, #{t.transactionAt}, #{t.amount}, #{t.merchantName})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            transaction_at = VALUES(transaction_at),
+            amount = VALUES(amount),
+            merchant_name = VALUES(merchant_name)
+    </insert>
+
+    <insert id="upsertCardBills">
+        INSERT INTO card_bill (
+            user_id,
+            connection_id,
+            seqno,
+            charge_amount,
+            charge_day,
+            charge_month,
+            paid_out_date
+        )
+        VALUES
+        <foreach collection="cardBills" item="bill" separator=",">
+            (
+                #{bill.userId},
+                #{bill.connectionId},
+                #{bill.seqno},
+                #{bill.chargeAmount},
+                #{bill.chargeDay},
+                #{bill.chargeMonth},
+                #{bill.paidOutDate}
+            )
+        </foreach>
+
+        ON DUPLICATE KEY UPDATE
+            charge_amount = VALUES(charge_amount),
+            charge_day = VALUES(charge_day),
+            paid_out_date = VALUES(paid_out_date),
+            updated_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <select id="sumChargeAmountByUserAndMonth"
+            resultType="java.math.BigDecimal">
+
+        SELECT COALESCE(SUM(charge_amount), 0)
+        FROM card_bill
+        WHERE user_id = #{userId}
+        AND charge_month = #{chargeMonth}
+
+    </select>
+
+    <select id="findAllByConnectionId"
+            resultType="com.via.shinvia.client.card.entity.CardAccount">
+
+        SELECT
+            card_account_id,
+            user_id,
+            institution_id,
+            connection_id,
+            external_card_key,
+            card_name,
+            card_number_masked,
+            payment_day,
+            updated_at,
+            issued_at,
+            data_as_of_at
+        FROM card_account
+        WHERE connection_id = #{connectionId}
+        ORDER BY card_account_id ASC
+
+    </select>
+</mapper>

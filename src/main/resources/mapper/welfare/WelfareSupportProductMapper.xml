@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.via.shinvia.welfare.mapper.WelfareSupportProductMapper">
+
+    <select id="findAll" resultType="com.via.shinvia.welfare.dto.WelfareServiceDto">
+        SELECT * FROM bokjiro WHERE active = TRUE ORDER BY id ASC
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM bokjiro WHERE active = TRUE
+    </select>
+
+    <select id="findByServId" resultType="com.via.shinvia.welfare.dto.WelfareServiceDto">
+        SELECT * FROM bokjiro WHERE serv_id = #{servId} AND active = TRUE
+    </select>
+
+    <insert id="upsert">
+        INSERT INTO bokjiro (
+            serv_id, serv_nm, jur_mnof_nm, jur_org_nm, inq_num,
+            serv_dgst, serv_dtl_link, svcfrst_reg_ts, life_array, intrs_thema_array,
+            trgter_indvdl_array, sprt_cyc_nm, srv_pvsn_nm, rprs_ctadr, onap_psblt_yn,
+            wlfare_info_outl_cn, crtr_yr, tgtr_dtl_cn, slct_crit_cn, alw_serv_cn,
+            active, synced_at
+        ) VALUES (
+            #{servId}, #{servNm}, #{jurMnofNm}, #{jurOrgNm}, #{inqNum},
+            #{servDgst}, #{servDtlLink}, #{svcfrstRegTs}, #{lifeArray}, #{intrsThemaArray},
+            #{trgterIndvdlArray}, #{sprtCycNm}, #{srvPvsnNm}, #{rprsCtadr}, #{onapPsbltYn},
+            #{wlfareInfoOutlCn}, #{crtrYr}, #{tgtrDtlCn}, #{slctCritCn}, #{alwServCn},
+            #{active}, #{syncedAt}
+        )
+        ON DUPLICATE KEY UPDATE
+            serv_nm = VALUES(serv_nm),
+            jur_mnof_nm = VALUES(jur_mnof_nm),
+            jur_org_nm = VALUES(jur_org_nm),
+            inq_num = VALUES(inq_num),
+            serv_dgst = VALUES(serv_dgst),
+            serv_dtl_link = VALUES(serv_dtl_link),
+            svcfrst_reg_ts = VALUES(svcfrst_reg_ts),
+            life_array = VALUES(life_array),
+            intrs_thema_array = VALUES(intrs_thema_array),
+            trgter_indvdl_array = VALUES(trgter_indvdl_array),
+            sprt_cyc_nm = VALUES(sprt_cyc_nm),
+            srv_pvsn_nm = VALUES(srv_pvsn_nm),
+            rprs_ctadr = VALUES(rprs_ctadr),
+            onap_psblt_yn = VALUES(onap_psblt_yn),
+            wlfare_info_outl_cn = VALUES(wlfare_info_outl_cn),
+            crtr_yr = VALUES(crtr_yr),
+            tgtr_dtl_cn = VALUES(tgtr_dtl_cn),
+            slct_crit_cn = VALUES(slct_crit_cn),
+            alw_serv_cn = VALUES(alw_serv_cn),
+            active = VALUES(active),
+            synced_at = VALUES(synced_at)
+    </insert>
+
+    <update id="deactivateAll">
+        UPDATE bokjiro SET active = FALSE WHERE active = TRUE
+    </update>
+
+</mapper>

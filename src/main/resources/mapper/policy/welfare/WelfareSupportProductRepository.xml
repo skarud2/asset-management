@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.via.shinvia.policy.welfare.repository.WelfareSupportProductRepository">
+    <sql id="conditions">
+        WHERE p.active = TRUE
+        <if test="search.keyword != null and search.keyword != ''">
+            AND CONCAT_WS(' ', p.product_name, p.institution_name, p.support_target,
+                p.age_condition, p.welfare_type, p.support_content,
+                p.application_method, p.responsible_institution)
+                LIKE CONCAT('%',
+                    REPLACE(REPLACE(REPLACE(#{search.keyword}, '=', '=='), '%', '=%'), '_', '=_'),
+                    '%') ESCAPE '='
+        </if>
+        <if test="search.targets != null and !search.targets.isEmpty()">
+            AND (<foreach collection="search.targets" item="value" separator=" OR ">
+                p.support_target LIKE CONCAT('%', #{value}, '%')
+            </foreach>)
+        </if>
+        <if test="search.ages != null and !search.ages.isEmpty()">
+            AND (<foreach collection="search.ages" item="value" separator=" OR ">
+                p.age_condition LIKE CONCAT('%', #{value}, '%')
+            </foreach>)
+        </if>
+    </sql>
+
+    <select id="search" resultType="com.via.shinvia.policy.welfare.entity.WelfareSupportProduct">
+        SELECT p.* FROM welfare_support_product p
+        <include refid="conditions"/>
+        ORDER BY p.welfare_support_product_id
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM welfare_support_product p
+        <include refid="conditions"/>
+    </select>
+
+    <select id="findByExternalId" resultType="com.via.shinvia.policy.welfare.entity.WelfareSupportProduct">
+        SELECT * FROM welfare_support_product WHERE external_id = #{externalId} AND active = TRUE
+    </select>
+
+    <insert id="upsert">
+        INSERT INTO welfare_support_product (
+            external_id, product_name, institution_name, support_target, age_condition,
+            welfare_type, support_content, application_method, responsible_institution,
+            related_url, source_type, region_sido, region_sigungu, support_cycle,
+            support_method, contact_info, online_apply_yn,
+            active, source_updated_at, synced_at
+        ) VALUES (
+            #{externalId}, #{productName}, #{institutionName}, #{supportTarget}, #{ageCondition},
+            #{welfareType}, #{supportContent}, #{applicationMethod}, #{responsibleInstitution},
+            #{relatedUrl}, COALESCE(#{sourceType}, 'KINFA'), #{regionSido}, #{regionSigungu},
+            #{supportCycle}, #{supportMethod}, #{contactInfo}, #{onlineApplyYn},
+            #{active}, #{sourceUpdatedAt}, #{syncedAt}
+        )
+        ON DUPLICATE KEY UPDATE
+            product_name = VALUES(product_name), institution_name = VALUES(institution_name),
+            support_target = VALUES(support_target), age_condition = VALUES(age_condition),
+            welfare_type = VALUES(welfare_type), support_content = VALUES(support_content),
+            application_method = VALUES(application_method), responsible_institution = VALUES(responsible_institution),
+            related_url = VALUES(related_url), source_type = VALUES(source_type),
+            region_sido = VALUES(region_sido), region_sigungu = VALUES(region_sigungu),
+            support_cycle = VALUES(support_cycle), support_method = VALUES(support_method),
+            contact_info = VALUES(contact_info), online_apply_yn = VALUES(online_apply_yn),
+            active = VALUES(active),
+            source_updated_at = VALUES(source_updated_at), synced_at = VALUES(synced_at)
+    </insert>
+
+    <update id="deactivateAll">
+        UPDATE welfare_support_product SET active = FALSE WHERE active = TRUE
+    </update>
+
+    <update id="deactivateBySourceType">
+        UPDATE welfare_support_product
+        SET active = FALSE
+        WHERE source_type = #{sourceType}
+          AND active = TRUE
+    </update>
+
+    <select id="findLifecycleCandidates"
+            resultType="com.via.shinvia.policy.welfare.entity.WelfareSupportProduct">
+        SELECT *
+        FROM welfare_support_product
+        WHERE active = TRUE
+
+        <if test="keywords != null and !keywords.isEmpty()">
+            AND (
+                <foreach collection="keywords" item="keyword" separator=" OR ">
+                    CONCAT_WS(' ',
+                        product_name,
+                        institution_name,
+                        support_target,
+                        age_condition,
+                        welfare_type,
+                        support_content,
+                        application_method,
+                        responsible_institution,
+                        support_cycle,
+                        support_method
+                    ) LIKE CONCAT('%', #{keyword}, '%')
+                </foreach>
+            )
+        </if>
+
+        <if test="regionSido != null and regionSido != ''">
+            AND (
+                source_type != 'BOKJIRO_LOCAL'
+                OR region_sido IS NULL
+                OR region_sido = #{regionSido}
+            )
+        </if>
+
+        <if test="regionSigungu != null and regionSigungu != ''">
+            AND (
+                source_type != 'BOKJIRO_LOCAL'
+                OR region_sigungu IS NULL
+                OR region_sigungu = #{regionSigungu}
+            )
+        </if>
+
+        ORDER BY
+            CASE
+                WHEN source_type = 'BOKJIRO_LOCAL'
+                     AND region_sido = #{regionSido}
+                     AND region_sigungu = #{regionSigungu}
+                    THEN 1
+                WHEN source_type = 'BOKJIRO_LOCAL'
+                     AND region_sido = #{regionSido}
+                    THEN 2
+                WHEN source_type = 'BOKJIRO_NATIONAL'
+                    THEN 3
+                ELSE 4
+            END,
+            welfare_support_product_id DESC
+    </select>
+</mapper>

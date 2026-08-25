@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>개인 재무 스트레스테스트 | Via</title>
+</head>
+<body>
+<main class="page-shell">
+    <link rel="stylesheet" th:href="@{/css/loan-ratesimulation-common.css}">
+    <link rel="stylesheet" th:href="@{/css/stresstest-personal.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <header class="page-header">
+        <h1>개인 재무 스트레스테스트</h1>
+        <p class="hint">
+            금리 상승 + 소득 감소 + 예상치 못한 지출을 동시에 가정했을 때, 몇 개월을 버틸 수 있는지 계산합니다. (로컬 테스트 전용 페이지)
+        </p>
+    </header>
+
+    <p class="banner banner-warning">
+        유동자산은 실시간 계좌 잔액이 아니라 재무 프로필에 등록된 값을 사용해요.
+        재무 프로필(연소득/유동자산)이 등록돼 있지 않으면 생존 가능 개월수(runway)는 계산되지 않아요.
+    </p>
+
+    <section class="scenario-section" aria-labelledby="stressTestFormTitle">
+        <div class="scenario-section-heading">
+            <div>
+                <h2 id="stressTestFormTitle">시나리오 조건 입력</h2>
+                <p>스트레스 조건을 입력한 후 실행하기 버튼을 눌러 주세요.</p>
+            </div>
+            <span><b>*</b> 필수 입력</span>
+        </div>
+
+        <form id="stressTestForm" class="scenario-form">
+            <div class="scenario-form-row">
+                <label for="rateDeltaPercent">금리 상승폭 <b>*</b></label>
+                <div class="scenario-field field-with-unit">
+                    <input type="number" id="rateDeltaPercent" name="rateDeltaPercent" min="0" max="5" step="0.25" value="1.0" required>
+                    <span>%p</span>
+                </div>
+
+                <label for="incomeDropPercent">소득 감소율 <b>*</b></label>
+                <div class="scenario-field field-with-unit">
+                    <input type="number" id="incomeDropPercent" name="incomeDropPercent" min="0" max="100" step="5" value="20" required>
+                    <span>%</span>
+                </div>
+            </div>
+
+            <div class="scenario-form-row">
+                <label for="unexpectedExpenseAmount">예상치 못한 지출</label>
+                <div class="scenario-field field-with-unit">
+                    <input type="number" id="unexpectedExpenseAmount" name="unexpectedExpenseAmount" min="0" step="any" value="0" required>
+                    <span>원</span>
+                </div>
+
+                <label for="simulationMonths">시뮬레이션 기간 <b>*</b></label>
+                <div class="scenario-field field-with-unit">
+                    <input type="number" id="simulationMonths" name="simulationMonths" min="1" max="120" step="1" value="24" required>
+                    <span>개월</span>
+                </div>
+            </div>
+
+            <div class="scenario-actions">
+                <button type="button" id="resetButton" class="scenario-button secondary">초기화</button>
+                <button type="submit" id="submitButton" class="scenario-button primary">실행하기</button>
+            </div>
+        </form>
+
+        <p id="errorMessage" class="banner banner-error hidden"></p>
+    </section>
+
+    <section id="resultArea" class="card hidden">
+        <h2 class="card-title">결과</h2>
+
+        <div class="runway-hero">
+            <span class="runway-label">생존 가능 개월수</span>
+            <span id="runwayValue" class="runway-value">-</span>
+            <p id="runwayReason" class="banner banner-neutral hidden"></p>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-tile">
+                <span class="stat-label">스트레스 적용 대출 월상환액</span>
+                <span class="stat-value"><span id="resultStressedLoanPayment">-</span><span class="unit">원</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">현재 대출 월상환액</span>
+                <span class="stat-value"><span id="resultCurrentLoanPayment">-</span><span class="unit">원</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">월평균 지출 추정치</span>
+                <span class="stat-value"><span id="resultLivingExpense">-</span><span class="unit">원</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">유동자산(계좌 잔액)</span>
+                <span class="stat-value"><span id="resultLiquidAssets">데이터 없음</span></span>
+            </div>
+        </div>
+
+        <p id="livingExpenseDisclaimer" class="banner banner-neutral"></p>
+
+        <div id="chartSection" class="hidden">
+            <h3 class="section-title">유동자산 잔액 추이</h3>
+            <div class="chart-card">
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <script th:src="@{/js/stresstest-personal.js}"></script>
+</main>
+</body>
+</html>

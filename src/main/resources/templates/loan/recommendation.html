@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>대출 상품 추천 | SHINVIA</title>
+</head>
+<body>
+<th:block th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+    <main class="policy-container bank-policy-page loan-recommendation-page">
+        <section class="page-header loan-recommendation-header">
+            <p class="page-label loan-recommendation-eyebrow">LOAN PRODUCT MATCHING</p>
+            <h1>대출 상품 추천</h1>
+
+            <p class="page-description">
+                대출 목적과 확인 가능한 상품 조건으로 후보를 필터링하고,
+                동일한 희망금액과 기간을 기준으로 예상금리, 월 납입액 및 총상환액을 비교합니다.
+            </p>
+        </section>
+
+        <div class="loan-recommendation-notice">
+            본 결과는 금융기관의 승인 여부를 예측하는 여신심사 결과가 아닙니다.
+            금감원 공시정보와 입력조건으로 계산한 비교 결과이며 실제 금리/한도/가입 가능 여부는 금융기관 심사에 따라 달라질 수 있습니다.
+        </div>
+
+        <section class="loan-recommendation-panel loan-profile-panel">
+            <div class="section-heading-row">
+                <div>
+                    <h2>내 금융정보</h2>
+                    <p>로그인 사용자와 연결된 금융 프로필을 자동으로 사용합니다.</p>
+                </div>
+                <span class="data-source-badge">마이데이터 프로필</span>
+            </div>
+
+            <div th:if="${profile != null}" class="loan-profile-grid">
+                <div class="profile-stat">
+                    <span>이름</span>
+                    <strong th:text="${profile.userName}">사용자</strong>
+                </div>
+                <div class="profile-stat">
+                    <span>연소득</span>
+                    <strong>
+                        <span th:text="${#numbers.formatInteger(profile.annualIncome, 1, 'COMMA')}">0</span>원
+                    </strong>
+                </div>
+                <div class="profile-stat">
+                    <span>신용점수</span>
+                    <strong th:text="${profile.creditScore != null ? profile.creditScore + '점' : '미등록'}">845점</strong>
+                </div>
+                <div class="profile-stat">
+                    <span>고용상태</span>
+                    <strong th:text="${profile.employmentStatus}">EMPLOYED</strong>
+                </div>
+                <div class="profile-stat">
+                    <span>소득유형</span>
+                    <strong th:text="${profile.incomeType}">SALARY</strong>
+                </div>
+                <div class="profile-stat">
+                    <span>유동자산</span>
+                    <strong>
+                        <span th:text="${#numbers.formatInteger(profile.liquidAssetAmount, 1, 'COMMA')}">0</span>원
+                    </strong>
+                </div>
+            </div>
+
+            <div th:if="${profile == null}" class="loan-profile-empty">
+                로그인 계정과 연결된 <code>user_financial_profile</code> 데이터가 없습니다.
+                금융 프로필을 먼저 등록해야 추천할 수 있습니다.
+            </div>
+        </section>
+
+        <section class="loan-recommendation-panel loan-condition-panel">
+            <div class="section-heading-row">
+                <div>
+                    <h2>추천 조건 입력</h2>
+                    <p>목적·희망금액·기간은 필수이며, 상품 선호조건은 선택한 경우 비교 필터로 사용합니다.</p>
+
+                </div>
+                <span class="required-guide">* 필수 입력</span>
+            </div>
+
+            <form class="loan-recommendation-form"
+                  th:action="@{/loans/recommendations}"
+                  th:object="${request}"
+                  method="post">
+
+                <div class="recommendation-form-grid">
+                    <label class="recommendation-field recommendation-field-wide">
+                        <span>대출 목적 <em>*</em></span>
+                        <select id="loanPurpose" th:field="*{loanPurpose}" required="required">
+                            <option th:each="purpose : ${loanPurposes}"
+                                    th:value="${purpose.code}"
+                                    th:text="${purpose.displayLabel}"
+                                    th:attr="data-loan-type=${purpose.loanType}">
+                                생활자금 · 신용대출
+                            </option>
+                        </select>
+                        <small>
+                            상품 상환방식은 공시상품 필터이며,
+                            비용 계산 방식은 상품 간 비교를 위한 동일 계산 가정입니다.
+                        </small>
+                    </label>
+
+                    <label class="recommendation-field">
+                        <span>희망 대출금액 <em>*</em></span>
+                        <div class="input-with-unit">
+                            <input type="number"
+                                   th:field="*{requestedAmount}"
+                                   min="100000"
+                                   max="10000000000"
+                                   step="100000"
+                                   required="required">
+                            <b>원</b>
+                        </div>
+                        <small>숫자형 최대한도가 공시된 상품은 희망금액 충족 여부를 판정합니다.</small>
+                    </label>
+
+                    <label class="recommendation-field">
+                        <span>희망 상환기간 <em>*</em></span>
+                        <div class="input-with-unit">
+                            <input type="number"
+                                   th:field="*{termMonths}"
+                                   min="1"
+                                   max="600"
+                                   step="1"
+                                   required="required">
+                            <b>개월</b>
+                        </div>
+                        <small>숫자형 최대기간이 공시된 상품은 기간 충족 여부를 판정합니다.</small>
+                    </label>
+
+                    <label class="recommendation-field recommendation-field-wide">
+                        <span>비용 계산 방식 <em>*</em></span>
+                        <select th:field="*{calculationMethod}" required="required">
+                            <option th:each="method : ${calculationMethods}"
+                                    th:value="${method.code}"
+                                    th:text="${method.label}">
+                                원리금균등
+                            </option>
+                        </select>
+
+                        <small>모든 상품을 동일한 상환 가정으로 계산하여 월 납입액과 총상환액을 비교합니다.</small>
+                    </label>
+
+                    <label class="recommendation-field housing-condition">
+                        <span>선호 금리유형</span>
+                        <select th:field="*{preferredRateTypeCode}">
+                            <option value="">상관없음</option>
+                            <option th:each="option : ${rateTypeOptions}"
+                                    th:value="${option.code}"
+                                    th:text="${option.name + ' (' + option.code + ')'}">
+                                금리유형
+                            </option>
+                        </select>
+                        <small>선택하면 해당 금리유형을 제공하지 않는 상품은 제외합니다.</small>
+                    </label>
+
+                    <label class="recommendation-field housing-condition">
+                        <span>상품 상환방식</span>
+                        <select th:field="*{preferredRepaymentTypeCode}">
+                            <option value="">상관없음</option>
+                            <option th:each="option : ${repaymentTypeOptions}"
+                                    th:value="${option.code}"
+                                    th:text="${option.name + ' (' + option.code + ')'}">
+                                상환방식
+                            </option>
+                        </select>
+                        <small>금감원 상품 옵션상의 상환방식 필터이며 비용 계산 방식과 별도입니다.</small>
+                    </label>
+
+                    <label class="recommendation-field mortgage-condition">
+                        <span>담보 유형</span>
+                        <select th:field="*{preferredCollateralTypeCode}">
+                            <option value="">상관없음</option>
+                            <option th:each="option : ${collateralTypeOptions}"
+                                    th:value="${option.code}"
+                                    th:text="${option.name + ' (' + option.code + ')'}">
+                                담보유형
+                            </option>
+                        </select>
+                        <small>주택담보대출 상품에만 적용합니다.</small>
+                    </label>
+                </div>
+
+                <div class="recommendation-form-actions">
+                    <a class="secondary-button secondary-action" th:href="@{/loans/recommendations}">초기화</a>
+                    <button class="primary-button primary-action"
+                            type="submit"
+                            th:disabled="${profile == null}">
+                        조건에 맞는 상품 비교하기
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <div th:if="${errorMessage != null}"
+             class="recommendation-error"
+             th:text="${errorMessage}">
+            추천 처리 중 오류가 발생했습니다.
+        </div>
+
+        <section th:if="${result != null}" class="loan-recommendation-panel loan-result-panel">
+            <div class="section-heading-row">
+                <div>
+                    <h2>추천 결과</h2>
+                    <p>
+                        비교 가능한 상품을 동일한 금액·기간·계산방식으로 계산한 뒤
+                        예상 총상환액이 낮은 순으로 정렬했습니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="recommendation-summary-grid">
+                <div>
+                    <span>대출 목적</span>
+                    <strong th:text="${result.loanPurposeLabel}">생활자금</strong>
+                </div>
+                <div>
+                    <span>희망금액</span>
+                    <strong>
+                        <span th:text="${#numbers.formatInteger(result.requestedAmount, 1, 'COMMA')}">30,000,000</span>원
+                    </strong>
+                </div>
+                <div>
+                    <span>상환기간·방식</span>
+                    <strong th:text="${result.termMonths + '개월 · ' + result.calculationMethodLabel}">36개월 · 원리금균등</strong>
+                </div>
+                <div>
+                    <span>원본 상품</span>
+                    <strong th:text="${result.sourceProductCount + '개'}">0개</strong>
+                </div>
+                <div>
+                    <span>비교 가능</span>
+                    <strong th:text="${result.eligibleProductCount + '개'}">0개</strong>
+                </div>
+                <div>
+                    <span>비교 제외</span>
+                    <strong th:text="${result.excludedProductCount + '개'}">0개</strong>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(result.recommendations)}" class="recommendation-empty">
+                입력조건으로 비교 가능한 상품이 없습니다. 아래 제외 사유를 확인해 주세요.
+            </div>
+
+            <div th:unless="${#lists.isEmpty(result.recommendations)}" class="recommendation-card-list">
+                <article class="loan-recommendation-card recommendation-card"
+                         th:each="item : ${result.recommendations}">
+                    <div class="recommendation-card-rank" th:text="${item.rank}">1</div>
+
+                    <div class="recommendation-card-main">
+                        <div class="recommendation-card-topline">
+                            <span class="recommendation-badge" th:text="${item.badge}">총상환액 최소</span>
+                            <span class="recommendation-institution" th:text="${item.institutionName}">금융기관</span>
+                        </div>
+
+                        <h3 th:text="${item.productName}">대출상품명</h3>
+
+                        <div class="recommendation-cost-grid">
+                            <div>
+                                <span>예상 비교금리</span>
+                                <strong>
+                                    <span th:text="${#numbers.formatDecimal(item.recommendedRate, 1, 3)}">0.000</span>%
+                                </strong>
+                            </div>
+                            <div>
+                                <span th:text="${item.paymentLabel}">월 예상 납입액</span>
+                                <strong>
+                                    <span th:text="${#numbers.formatInteger(item.estimatedMonthlyPayment, 1, 'COMMA')}">0</span>원
+                                </strong>
+                            </div>
+                            <div>
+                                <span>예상 총이자</span>
+                                <strong>
+                                    <span th:text="${#numbers.formatInteger(item.estimatedTotalInterest, 1, 'COMMA')}">0</span>원
+                                </strong>
+                            </div>
+                            <div>
+                                <span>예상 총상환액</span>
+                                <strong>
+                                    <span th:text="${#numbers.formatInteger(item.estimatedTotalCost, 1, 'COMMA')}">0</span>원
+                                </strong>
+                            </div>
+                        </div>
+
+                        <p class="calculation-assumption"
+                           th:text="${item.calculationMethodLabel + ' · 입력한 ' + item.requestedTermMonths + '개월 기준 예상값'}">
+                            원리금균등 · 36개월 기준 예상값
+                        </p>
+
+                        <p class="calculation-assumption">
+                            예상 총상환액은 입력한 대출원금과 현재 비교금리를 기준으로 계산한
+                            원금 및 예상 이자의 합계입니다.
+                            중도상환수수료, 보증료, 인지세와 기타 부대비용은 포함하지 않습니다.
+                        </p>
+
+                        <dl class="recommendation-option-list">
+                            <div>
+                                <dt th:text="${item.loanType == 'CREDIT'
+        ? '공시 금리범위'
+        : '적용 옵션 금리범위'}">
+                                    공시 금리범위
+                                </dt>
+                                <dd>
+                                <span th:text="${
+                                    item.optionMinRate != null
+                                        ? #numbers.formatDecimal(item.optionMinRate, 1, 3)
+                                        : (item.catalogMinRate != null
+                                            ? #numbers.formatDecimal(item.catalogMinRate, 1, 3)
+                                            : '-')
+                                }">-</span> ~
+                            <span th:text="${
+                                    item.optionMaxRate != null
+                                        ? #numbers.formatDecimal(item.optionMaxRate, 1, 3)
+                                        : (item.catalogMaxRate != null
+                                            ? #numbers.formatDecimal(item.catalogMaxRate, 1, 3)
+                                            : '-')
+                                }">-</span>%
+                                    </dd>
+                            </div>
+                            <div>
+                                <dt>금리 적용 근거</dt>
+                                <dd th:text="${item.rateBasis}">공시금리</dd>
+                            </div>
+                            <div th:if="${item.rateTypeName != null}">
+                                <dt>금리유형</dt>
+                                <dd th:text="${item.rateTypeName}">변동금리</dd>
+                            </div>
+                            <div th:if="${item.repaymentTypeName != null}">
+                                <dt>상품 상환방식</dt>
+                                <dd th:text="${item.repaymentTypeName}">분할상환</dd>
+                            </div>
+                            <div th:if="${item.collateralTypeName != null}">
+                                <dt>담보유형</dt>
+                                <dd th:text="${item.collateralTypeName}">아파트</dd>
+                            </div>
+                            <div th:if="${item.joinWay != null and !#strings.isEmpty(item.joinWay)}">
+                                <dt>가입방법</dt>
+                                <dd th:text="${item.joinWay}">인터넷</dd>
+                            </div>
+                            <div th:if="${item.requestedPreferenceCount > 0}">
+                                <dt>선택조건 일치</dt>
+                                <dd th:text="${item.preferenceMatchCount + ' / ' + item.requestedPreferenceCount}">2 / 2</dd>
+                            </div>
+                            <div th:if="${item.calculationMethodLabel == '원금균등'}">
+                                <dt>평균 월 납입액</dt>
+                                <dd>
+                                    <span th:text="${#numbers.formatInteger(item.averageMonthlyPayment, 1, 'COMMA')}">0</span>원
+                                </dd>
+                            </div>
+                        </dl>
+
+                        <div class="recommendation-reason">
+                            <strong>추천 사유</strong>
+                            <p th:text="${item.reason}">추천 근거 설명</p>
+                        </div>
+
+                        <div class="qualification-note">
+                            <strong>비교 판정 범위</strong>
+                            <p th:text="${item.qualificationNote}">
+                                확인되지 않은 조건은 금융기관 확인이 필요합니다.
+                            </p>
+                        </div>
+
+                        <details class="recommendation-extra-detail"
+                                 th:if="${item.loanLimitText != null or item.targetDescription != null}">
+                            <summary>상품 공시정보 더보기</summary>
+                            <p th:if="${item.targetDescription != null}">
+                                <strong>상품 대상:</strong>
+                                <span th:text="${item.targetDescription}">대상 설명</span>
+                            </p>
+                            <p th:if="${item.loanLimitText != null}">
+                                <strong>한도 안내:</strong>
+                                <span th:text="${item.loanLimitText}">한도 설명</span>
+                            </p>
+                        </details>
+                    </div>
+                </article>
+            </div>
+
+            <details class="excluded-product-panel"
+                     th:if="${!#lists.isEmpty(result.exclusions)}">
+                <summary>
+                    비교에서 제외된 상품과 사유
+                    <strong th:text="${result.excludedProductCount + '개'}">0개</strong>
+                </summary>
+
+                <div class="excluded-product-list">
+                    <article class="excluded-product-item"
+                             th:each="item : ${result.exclusions}">
+                        <div>
+                            <strong th:text="${item.productName}">상품명</strong>
+                            <span th:text="${item.institutionName}">금융기관</span>
+                        </div>
+                        <ul>
+                            <li th:each="reason : ${item.reasons}"
+                                th:text="${reason}">
+                                제외 사유
+                            </li>
+                        </ul>
+                    </article>
+                </div>
+            </details>
+
+            <div class="recommendation-next-step">
+                <div>
+                    <strong>추천 결과와 별도로 상환여력을 확인할 수 있습니다.</strong>
+                    <p>
+                        기존 대출과 소득을 반영한 DSR 분석은
+                        금융 진단센터의 별도 기능에서 제공합니다.
+                    </p>
+                </div>
+                <span class="next-step-status">상환여력 별도 분석</span>
+            </div>
+        </section>
+    </main>
+</th:block>
+</body>
+</html>

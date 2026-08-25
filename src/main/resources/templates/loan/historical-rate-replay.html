@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>과거 금리인상기 재현 테스트 | Via</title>
+</head>
+<body>
+<main class="page-shell">
+    <link rel="stylesheet" th:href="@{/css/loan-ratesimulation-common.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <header class="page-header">
+        <h1>과거 금리인상기 재현 테스트</h1>
+        <p class="hint">
+            실제 한국은행 기준금리 변동 이력을 그대로 재생해서, 이 대출의 월상환액이 어떻게 변했을지 보여줍니다. (로컬 테스트 전용 페이지)
+        </p>
+        <p class="hint">
+            예시: 2021-08-01 ~ 2023-01-31은 0.50%에서 3.50%까지 10차례 인상된 실제 금리인상기입니다
+        </p>
+    </header>
+
+    <section class="card my-loans-card" id="myLoansSection"
+              data-target-input="loanId"
+              th:attr="data-active-loan-id=${loanId}">
+        <h2 class="card-title">내 보유 대출</h2>
+        <div id="myLoansList" class="my-loans-list">
+            <p class="my-loans-empty">불러오는 중...</p>
+        </div>
+    </section>
+
+    <section class="scenario-section" aria-labelledby="replayFormTitle">
+        <div class="scenario-section-heading">
+            <div>
+                <h2 id="replayFormTitle">시나리오 조건 입력</h2>
+                <p>재현할 기간을 입력한 후 실행하기 버튼을 눌러 주세요.</p>
+            </div>
+            <span><b>*</b> 필수 입력</span>
+        </div>
+
+        <form id="replayForm" class="scenario-form">
+            <input type="hidden" id="loanId" name="loanId" th:value="${loanId}" required min="1">
+
+            <div class="scenario-form-row">
+                <label for="startDate">시작일 <b>*</b></label>
+                <div class="scenario-field">
+                    <input type="date" id="startDate" name="startDate" value="2021-08-01" required>
+                </div>
+
+                <label for="endDate">종료일 <b>*</b></label>
+                <div class="scenario-field">
+                    <input type="date" id="endDate" name="endDate" value="2023-01-31" required>
+                </div>
+            </div>
+
+            <div class="scenario-actions">
+                <button type="button" id="resetButton" class="scenario-button secondary">초기화</button>
+                <button type="submit" id="submitButton" class="scenario-button primary">실행하기</button>
+            </div>
+        </form>
+
+        <p id="errorMessage" class="banner banner-error hidden"></p>
+    </section>
+
+    <section id="resultArea" class="card hidden">
+        <h2 class="card-title">결과</h2>
+
+        <div class="result-heading">
+            <div class="loan-label">
+                <span id="resultLoanType"></span>
+                <span class="rate-type">· <span id="resultRateType"></span></span>
+            </div>
+            <span id="resultStatusBadge" class="badge"></span>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-tile">
+                <span class="stat-label">초기 금리</span>
+                <span class="stat-value"><span id="resultInitialRate">-</span><span class="unit">%</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">초기 월상환액</span>
+                <span class="stat-value"><span id="resultInitialMonthlyPayment">-</span><span class="unit">원</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">금리 변경 횟수</span>
+                <span class="stat-value"><span id="resultChangePointCount">-</span><span class="unit">회</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">구간이자 합계</span>
+                <span class="stat-value"><span id="resultTotalSegmentInterest">-</span><span class="unit">원</span></span>
+            </div>
+        </div>
+
+        <p id="resultTruncated" class="banner banner-warning hidden">
+            대출 만기가 이 시점 이전에 도래해서 계산을 중단했어요.
+        </p>
+
+        <h3 class="section-title">월상환액 변화</h3>
+        <div class="chart-card">
+            <canvas id="monthlyPaymentChart"></canvas>
+        </div>
+
+        <h3 class="section-title">상세 내역</h3>
+        <div class="table-wrap">
+            <table id="resultTable">
+                <thead>
+                <tr>
+                    <th>경과개월</th>
+                    <th>적용금리</th>
+                    <th>잔액</th>
+                    <th>월상환액</th>
+                    <th>구간이자</th>
+                </tr>
+                </thead>
+                <tbody id="resultTableBody"></tbody>
+            </table>
+        </div>
+
+        <p id="resultDisclaimer" class="banner banner-neutral"></p>
+    </section>
+
+    <script th:src="@{/js/my-loans-widget.js}"></script>
+    <script th:src="@{/js/historical-rate-replay.js}"></script>
+</main>
+</body>
+</html>

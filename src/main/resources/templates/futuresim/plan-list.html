@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>저장된 계획 목록 | 미래 금융 시뮬레이터 | Via</title>
+</head>
+<body>
+<main class="futuresim-goal-preset-page">
+    <link rel="stylesheet" th:href="@{/css/lifecycle-survey.css}">
+    <link rel="stylesheet" th:href="@{/css/futuresim-current-status.css}">
+
+    <header class="lifecycle-survey-header">
+        <span>미래 금융 시뮬레이터</span>
+        <h1>저장된 계획 목록</h1>
+        <p>이름 붙여 저장해둔 실행 계획을 불러와서 이어서 조정할 수 있어요</p>
+    </header>
+
+    <section class="fcs-panel">
+        <p class="fp-lever-loading" id="planListLoading">불러오는 중…</p>
+        <p class="fp-plan-list-empty hidden" id="planListEmpty">아직 저장된 계획이 없어요. 5단계 "나만의 실행 계획"에서 이름을 붙여 저장해보세요.</p>
+        <ul class="fp-plan-list hidden" id="planList"></ul>
+
+        <div class="fcs-continue-row">
+            <a th:href="@{/futuresim/combo}" class="fcs-back-button">나만의 실행 계획으로</a>
+        </div>
+    </section>
+
+    <script th:src="@{/js/futuresim-plan-list.js}"></script>
+</main>
+</body>
+</html>

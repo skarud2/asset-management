@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>목표 설정 | 미래 금융 시뮬레이터 | Via</title>
+</head>
+<body>
+<main class="futuresim-goal-preset-page">
+    <link rel="stylesheet" th:href="@{/css/lifecycle-survey.css}">
+    <link rel="stylesheet" th:href="@{/css/futuresim-current-status.css}">
+
+    <header class="lifecycle-survey-header">
+        <span>미래 금융 시뮬레이터 · 2단계</span>
+        <h1>목표를 설정해볼까요</h1>
+        <p>1단계에서 확인한 내용을 바탕으로 목표를 골라보세요</p>
+    </header>
+
+    <!-- current-status.html과 동일한 스테퍼 — 1단계는 완료(completed), 2단계가 현재(active) -->
+    <nav class="futuresim-step-nav" aria-label="미래 금융 시뮬레이터 진행 단계">
+        <div class="futuresim-step-track">
+            <a th:href="@{/futuresim}" class="futuresim-step completed"><span>1</span>지금 내 상태</a>
+            <a th:href="@{/futuresim/goal}" class="futuresim-step active" aria-current="step"><span>2</span>목표 설정</a>
+            <a th:if="${goalAmountSaved}" th:href="@{/futuresim/growth}" class="futuresim-step"><span>3</span>성장 곡선</a>
+            <span th:unless="${goalAmountSaved}" class="futuresim-step locked" aria-disabled="true"><span>3</span>성장 곡선</span>
+            <a th:if="${goalAmountSaved}" th:href="@{/futuresim/levers}" class="futuresim-step"><span>4</span>목표 앞당기기</a>
+            <span th:unless="${goalAmountSaved}" class="futuresim-step locked" aria-disabled="true"><span>4</span>목표 앞당기기</span>
+            <a th:if="${goalAmountSaved}" th:href="@{/futuresim/combo}" class="futuresim-step"><span>5</span>나만의 실행 계획</a>
+            <span th:unless="${goalAmountSaved}" class="futuresim-step locked" aria-disabled="true"><span>5</span>나만의 실행 계획</span>
+        </div>
+    </nav>
+
+    <!-- 1단계에서 가구원별 기준을 선택한 경우에만 보여주는 요약 카드. 연령별/미선택이면 렌더링 자체를 안 함. -->
+    <section id="householdProfileSummaryCard" class="fcs-panel fcs-summary-card hidden">
+        <p id="householdProfileSummaryText" class="fcs-summary-text"></p>
+    </section>
+
+    <section class="fcs-panel">
+        <h2 class="fcs-panel-title">추천 목표</h2>
+        <p class="fcs-panel-sub">추천 목표를 선택하거나 아래에 금액을 직접 입력해보세요</p>
+
+        <div class="fp-goal-table-wrap">
+            <table class="fp-goal-table" aria-label="추천 목표 비교표">
+                <thead>
+                <tr>
+                    <th scope="col">목표명</th>
+                    <th scope="col">목표 금액</th>
+                    <th scope="col">예상 도달 기간</th>
+                    <th scope="col">상태</th>
+                    <th scope="col">선택</th>
+                </tr>
+                </thead>
+                <tbody id="goalPresetCards"></tbody>
+            </table>
+            </div>
+            <p class="fp-goal-status-guide">상태 기준: <strong>10년 이내 도달</strong> · <strong>10년 초과</strong> · <strong>도달 시점 산정 어려움</strong>(100년 이내) · <strong>저축 여력 부족</strong>(월 저축 가능액 0원 이하)</p>
+
+        <!-- ===== 목표 금액 직접 입력 ===== -->
+        <div class="fp-amount-block">
+            <input type="hidden" id="goalAmountField" value="0">
+            <p class="fp-amount-magnitude">선택한 목표 금액 <strong id="goalAmountMagnitude">0</strong>원</p>
+
+            <div class="fp-amount-quick-actions">
+                <div class="fp-amount-quick-picks" id="goalAmountQuickPicks" role="group" aria-label="목표 금액 추가"></div>
+                <button type="button" class="fp-amount-reset-button" id="goalAmountResetButton">초기화</button>
+            </div>
+        </div>
+
+        <!-- ===== 결과 카드 — 진행률 막대 + 저축 계산 명세(은행 통장정리 형태) ===== -->
+        <section class="fp-pace-card">
+            <div class="fp-pace-header">
+                <span class="fp-pace-label">현재 페이스로</span>
+                <div class="fp-pace-number" id="goalPacePreview">
+                    <span class="fp-pace-number-magnitude" id="goalPaceMagnitude">-</span>
+                    <span class="fp-pace-number-unit" id="goalPaceUnit"></span>
+                </div>
+            </div>
+
+            <div class="fp-pace-progress-track" aria-hidden="true">
+                <span class="fp-pace-progress-fill" id="goalDetailProgressBar"></span>
+            </div>
+            <div class="fp-pace-progress-labels">
+                <span>지금 · <strong id="goalPaceProgressPercent">0%</strong> 달성</span>
+                <span id="goalPaceTimelineEndLabel">목표 도달</span>
+            </div>
+
+            <div class="fp-goal-detail" id="goalDetailPanel" aria-live="polite">
+                <table class="fp-detail-table">
+                    <tbody>
+                    <tr><th scope="row">현재 순자산</th><td id="goalDetailNetWorth">-</td></tr>
+                    <tr><th scope="row">남은 금액</th><td id="goalDetailRemaining">-</td></tr>
+                    <tr><th scope="row">도달 예상 시점</th><td id="goalDetailDate">-</td></tr>
+                    </tbody>
+                </table>
+
+                <!-- 월 저축 가능액이 어떻게 산출됐는지 그대로 보여주는 계산 명세 —
+                     소득/생활비/원리금상환액을 각각 짚어 "왜 이 숫자가 나왔는지" 설명한다. -->
+                <div class="fp-savings-breakdown">
+                    <p class="fp-savings-breakdown-title">월 저축 가능액 계산</p>
+                    <table class="fp-detail-table fp-detail-table-breakdown">
+                        <tbody>
+                        <tr><th scope="row">월 소득</th><td id="goalDetailIncome">-</td></tr>
+                        <tr><th scope="row">− 월 생활비</th><td id="goalDetailExpense">-</td></tr>
+                        <tr><th scope="row">− 월 원리금상환액</th><td id="goalDetailLoanPayment">-</td></tr>
+                        <tr class="fp-detail-table-total"><th scope="row">= 월 저축 가능액</th><td id="goalDetailSavings">-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="fp-goal-detail-note hidden" id="goalDetailNote"></p>
+            </div>
+        </section>
+
+        <!-- ===== 연령대별 순자산 스펙트럼(AGE) / 가구원수별 구성비 막대(HOUSEHOLD) — 1단계 기준에 따라
+             둘 중 하나만 노출된다. 연령대는 "생애주기 흐름"이라 곡선(ridge line)으로,
+             가구원수는 "사회 구성비"라 성격이 달라서 막대(구성비 바)로 — 일부러 다른 차트 문법을 쓴다. ===== -->
+        <section class="fp-pace-card fp-age-spectrum-card hidden" id="goalAgeSpectrumCard">
+            <div class="fp-age-spectrum-header">
+                <span class="fp-pace-label">연령대별 순자산 비교</span>
+                <div class="fp-age-spectrum-toggle" id="goalAgeSpectrumToggle" role="group" aria-label="비교 대상 연령대">
+                    <button type="button" class="fp-age-toggle-btn" data-offset="0">내 나이대</button>
+                    <button type="button" class="fp-age-toggle-btn" data-offset="1">한 단계 위</button>
+                </div>
+            </div>
+
+            <div class="fp-age-comparison-values">
+                <span><strong id="goalAgeBenchmarkAmount">-</strong> 또래 중앙값</span>
+                <span><strong id="goalAgeGoalAmount">-</strong> 내 순자산</span>
+            </div>
+            <div class="fp-age-comparison-track" aria-label="또래 중앙값 대비 내 순자산">
+                <span class="fp-age-comparison-benchmark"></span>
+                <span class="fp-age-comparison-goal" id="goalAgeComparisonGoal"></span>
+            </div>
+
+            <div class="fp-pace-divider"></div>
+
+            <div class="fp-age-spectrum-result">
+                <span class="fp-age-spectrum-percent" id="goalAgeSpectrumPercent">-</span>
+                <span class="fp-age-spectrum-percent-text" id="goalAgeSpectrumPercentText"></span>
+            </div>
+            <p class="fp-age-spectrum-caption" id="goalAgeSpectrumCaption"></p>
+        </section>
+
+        <section class="fp-pace-card fp-household-spectrum-card hidden" id="goalHouseholdSpectrumCard">
+            <div class="fp-age-spectrum-header">
+                <span class="fp-pace-label">가구원수별 순자산 비교</span>
+                <div class="fp-age-spectrum-toggle" id="goalHouseholdSpectrumToggle" role="group" aria-label="비교 대상 가구원수">
+                    <button type="button" class="fp-age-toggle-btn" data-offset="0">내 가구</button>
+                    <button type="button" class="fp-age-toggle-btn" data-offset="1">한 단계 위</button>
+                </div>
+            </div>
+
+            <div class="fp-household-callout" id="goalHouseholdCallout"></div>
+            <div class="fp-household-bar-wrap">
+                <div class="fp-household-bar" id="goalHouseholdBar" role="img" aria-label="가구원수별 전체 가구 비중과 순자산 중앙값, 내 목표 위치">
+                    <div class="fp-household-goal-line" id="goalHouseholdGoalLine">
+                        <span class="fp-household-goal-line-label">내 목표</span>
+                    </div>
+                </div>
+            </div>
+            <div class="fp-household-bar-labels" id="goalHouseholdBarLabels"></div>
+            <p class="fp-household-bar-caption">막대 폭 = 전체 가구 중 비중 · 막대 높이 = 순자산 중앙값 · 점선 = 내 목표 위치</p>
+
+            <div class="fp-pace-divider"></div>
+
+            <div class="fp-age-spectrum-result">
+                <span class="fp-age-spectrum-percent" id="goalHouseholdSpectrumPercent">-</span>
+                <span class="fp-age-spectrum-percent-text" id="goalHouseholdSpectrumPercentText"></span>
+            </div>
+            <p class="fp-age-spectrum-caption" id="goalHouseholdSpectrumCaption"></p>
+        </section>
+
+        <div class="fcs-continue-row">
+            <a th:href="@{/futuresim}" class="fcs-back-button">이전</a>
+            <form th:action="@{/futuresim/goal-amount}" method="post" id="goalAmountForm">
+                <input type="hidden" name="goalAmount" id="goalAmountInput" value="0">
+                <button type="submit" class="fcs-continue-button" id="goalAmountSubmitButton" disabled>다음</button>
+            </form>
+        </div>
+    </section>
+
+    <script th:src="@{/js/futuresim-goal-preset.js}"></script>
+</main>
+</body>
+</html>

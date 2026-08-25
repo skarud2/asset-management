@@ -1,0 +1,257 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: #000;
+    background: #fff;
+    font-family: Pretendard, Arial, sans-serif;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.page {
+    min-height: 100vh;
+    padding: 70px 20px;
+}
+
+.wrap {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+.title {
+    margin: 0;
+    font-size: 35px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.line {
+    width: 100%;
+    height: 2px;
+    margin: 24px 0 30px;
+    background: #000;
+}
+
+.description {
+    margin: 14px 0 0;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* 오류 메시지 */
+
+.error-message {
+    margin: 24px 0 0;
+    padding: 16px;
+    color: #ff3131;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.dsr .box {
+    margin-top: 30px;
+    padding: 38px;
+    border: 2px solid #ccc;
+    background: #fff;
+
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* 기본 입력 영역 */
+
+.form > div,
+.conditional-section > div {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.form label {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.form input,
+.form select {
+    width: 100%;
+    height: 54px;
+    padding: 0 16px;
+    color: #000;
+    border: 1px solid #000;
+    border-radius: 0;
+    background: #fff;
+    outline: none;
+}
+
+.form input::placeholder {
+    color: #000;
+    opacity: 0.45;
+}
+
+.form input:focus,
+.form select:focus {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+}
+
+.form select {
+    cursor: pointer;
+}
+
+/* 대출 종류별 추가 입력 영역 */
+
+.conditional-section {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 24px;
+    border: 1px solid #000;
+    background: #f7f7f7;
+}
+
+.conditional-section h2 {
+    margin: 0;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #000;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* 계산 버튼 */
+
+.submit-button {
+    width: 100%;
+    height: 56px;
+    margin-top: 6px;
+    color: #fff;
+    border: 1px solid #000;
+    border-radius: 0;
+    background: #000;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    color: #000;
+    background: #fff;
+}
+
+/* 계산 결과 */
+
+.result-section {
+    margin-top: 32px;
+    padding: 30px;
+    border: 2px solid #000;
+    background: #fff;
+}
+
+.result-title {
+    margin: 0 0 22px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid #000;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.result-section dl {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    margin: 0;
+}
+
+.result-section dt,
+.result-section dd {
+    margin: 0;
+    padding: 16px 0;
+    border-bottom: 1px solid #ddd;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.result-section dt {
+    padding-right: 20px;
+}
+
+.result-section dd {
+    font-weight: 700;
+    text-align: right;
+}
+
+/* 예상 DSR */
+
+.result-section dt:nth-of-type(5),
+.result-section dd:nth-of-type(5) {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+/* 스트레스 DSR */
+
+.result-section dt:last-of-type,
+.result-section dd:last-of-type {
+    border-bottom: 0;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+/* 모바일 */
+
+@media (max-width: 600px) {
+    .page {
+        padding: 45px 16px;
+    }
+
+    .title {
+        font-size: 34px;
+    }
+
+    .box {
+        padding: 28px 20px;
+    }
+
+    .conditional-section {
+        padding: 20px;
+    }
+
+    .result-section {
+        padding: 24px 20px;
+    }
+
+    .result-section dl {
+        display: block;
+    }
+
+    .result-section dt {
+        padding-bottom: 5px;
+        border-bottom: 0;
+        font-weight: 700;
+    }
+
+    .result-section dd {
+        padding-top: 0;
+        text-align: left;
+    }
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.report.mapper.ReportCardLayoutMapper">
+
+    <select id="findAllByUserIdOrderByDisplayOrder" resultType="com.via.shinvia.report.entity.ReportCardLayout">
+        SELECT * FROM report_card_layout
+        WHERE user_id = #{userId}
+        ORDER BY display_order ASC
+    </select>
+
+    <delete id="deleteByUserId">
+        DELETE FROM report_card_layout WHERE user_id = #{userId}
+    </delete>
+
+    <insert id="insert">
+        INSERT INTO report_card_layout (user_id, card_key, ref_id, display_order)
+        VALUES (#{userId}, #{cardKey}, #{refId}, #{displayOrder})
+    </insert>
+
+</mapper>

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 팀 논의가 필요한 경우
+    url: https://github.com/orgs/Shin-via/discussions
+    about: 버그/기능 제안이 아닌 논의는 여기서 진행해주세요

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic2 :: layout(~{::title}, ~{::main}, ~{::script}, ${serviceName})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <link rel="stylesheet" th:href="@{/css/email.css}">
+    <title>이메일 인증</title>
+</head>
+
+<body>
+<main class="page">
+    <section class="wrap">
+        <h1 class="title">회원가입</h1>
+        <div class="line"></div>
+    <div class="form-group">
+        <label for="loginEmail">이메일</label>
+
+        <div class="input-button-row">
+            <input type="email"
+                   id="loginEmail"
+                   placeholder="example@email.com"
+                   autocomplete="email"
+                   required>
+
+            <button type="button"
+                    id="sendCodeButton"
+                    class="verification-button">
+                인증번호 전송
+            </button>
+        </div>
+
+        <div id="verificationArea"
+             class="input-button-row"
+             hidden>
+            <input type="text"
+                   id="verificationCode"
+                   placeholder="인증번호 입력"
+                   inputmode="numeric"
+                   autocomplete="one-time-code">
+
+            <button type="button"
+                    id="verifyCodeButton"
+                    class="verification-button">
+                인증하기
+            </button>
+        </div>
+
+        <p id="emailVerificationMessage"
+           class="field-error">
+            이메일 인증을 먼저 완료해주세요.
+        </p>
+    </div>
+
+    <button type="button"
+            id="nextButton"
+            class="submit-button"
+            disabled>
+        다음
+    </button>
+    </section>
+</main>
+
+<script th:src="@{/js/email.js}"></script>
+</body>
+</html>

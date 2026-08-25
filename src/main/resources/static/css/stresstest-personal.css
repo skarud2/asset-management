@@ -1,0 +1,24 @@
+/* 개인 재무 스트레스테스트 전용 스타일.
+   카드/폼/버튼/배지/스탯타일 등 공용 컴포넌트는 loan-ratesimulation-common.css를 그대로 쓰고,
+   여기서는 이 페이지에만 있는 runway-hero만 정의한다. */
+
+.runway-hero {
+    text-align: center;
+    padding: 20px 0 28px;
+    border-bottom: 1px solid var(--grid-hairline);
+    margin-bottom: 18px;
+}
+
+.runway-label {
+    display: block;
+    font-size: 14px;
+    color: var(--ink-muted);
+    margin-bottom: 8px;
+}
+
+.runway-value {
+    display: block;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--accent-dark);
+}

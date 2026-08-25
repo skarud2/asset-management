@@ -1,0 +1,416 @@
+.surplus-calc {
+    margin-bottom: 32px;
+}
+
+.surplus-calc * {
+    box-sizing: border-box;
+}
+
+.calc-head {
+    margin-bottom: 30px;
+}
+
+.calc-step {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.calc-head h2 {
+    margin: 0;
+    font-size: 26px;
+}
+
+.calc-head > div > p:last-child {
+    margin: 8px 0 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.calc-section {
+    padding: 28px 0;
+    border-top: 1px solid #ddd;
+}
+
+.calc-title {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.calc-title > span {
+    flex: 0 0 auto;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.calc-title h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.calc-title p {
+    margin: 4px 0 0;
+    color: #777;
+    font-size: 13px;
+}
+
+.sync-wrap {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.sync-wrap form {
+    margin: 0;
+}
+
+.sync-btn {
+    height: 42px;
+    padding: 0 16px;
+    border: 1px solid #111;
+    border-radius: 6px;
+    color: #fff;
+    background: #111;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.sync-btn:hover {
+    color: #111;
+    background: #fff;
+}
+
+.sync-date {
+    color: #777;
+    font-size: 12px;
+}
+
+.sync-date b {
+    margin-left: 4px;
+    color: #333;
+    font-weight: 600;
+}
+
+.cash-summary {
+    margin-bottom: 18px;
+    padding: 24px 26px;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+
+    border: 1px solid #111;
+    background: #fff;
+}
+
+.cash-summary > div {
+    min-width: 0;
+}
+
+.cash-summary > div + div {
+    padding-left: 28px;
+    border-left: 1px solid #ddd;
+}
+
+.cash-summary > div > span {
+    display: block;
+    margin-bottom: 7px;
+
+    color: #666;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.cash-summary > div > strong {
+    display: block;
+
+    color: #111;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+}
+
+.account-list {
+    display: grid;
+    gap: 10px;
+}
+
+.account-row {
+    min-height: 76px;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 10px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+}
+
+.account-row:hover {
+    border-color: #999;
+}
+
+.account-row:has(.account-check:checked) {
+    border-color: #111;
+    background: #fafafa;
+}
+
+.account-check {
+    width: 16px;
+    height: 16px;
+
+    margin: 0;
+    padding: 0;
+
+    justify-self: start;
+
+    accent-color: #111;
+    cursor: pointer;
+}
+
+.account-info {
+    min-width: 0;
+
+    margin: 0;
+
+    justify-self: start;
+
+    color: #333;
+
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+
+    text-align: left;
+}
+
+.account-balance {
+    margin: 0;
+
+    justify-self: end;
+
+    color: #333;
+
+    font-size: 18px;
+    font-weight: 800;
+
+    text-align: right;
+    white-space: nowrap;
+}
+
+.need-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.need-card {
+    padding: 22px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.need-head {
+    min-height: 48px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.need-head h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.need-head > span {
+    height: fit-content;
+    padding: 4px 7px;
+
+    flex: 0 0 auto;
+
+    border: 1px solid #bbb;
+
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.estimate {
+    display: block;
+    margin-top: 18px;
+
+    color: #111;
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.need-card > p {
+    min-height: 42px;
+
+    margin: 7px 0 20px;
+
+    color: #777;
+
+    font-size: 12px;
+}
+
+.calc-detail {
+    margin-bottom: 18px;
+    padding: 11px 0;
+
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+
+    font-size: 12px;
+}
+
+.calc-field {
+    display: block;
+    margin-top: 12px;
+}
+
+.calc-field > span {
+    display: block;
+    margin-bottom: 6px;
+
+    color: #555;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.calc-field > div {
+    display: flex;
+    align-items: center;
+
+    border: 1px solid #bbb;
+
+    background: #fff;
+}
+
+.calc-field input {
+    min-width: 0;
+    width: 100%;
+    height: 42px;
+
+    padding: 0 10px;
+
+    border: 0;
+    outline: 0;
+
+    color: #222;
+
+    background: #fff;
+}
+
+.calc-field input:focus {
+    outline: none;
+}
+
+.calc-field > div:focus-within {
+    border-color: #111;
+}
+
+.calc-field input[type="date"] {
+    border: 1px solid #bbb;
+}
+
+.calc-field b {
+    padding-right: 10px;
+
+    color: #555;
+
+    font-size: 12px;
+}
+
+.calc-result {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+
+    padding: 30px;
+
+    border: 2px solid #111;
+
+    background: #fff;
+}
+
+.result-main > span {
+    display: block;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.result-main > strong {
+    display: block;
+
+    margin-top: 8px;
+
+    color: #111;
+
+    font-size: 34px;
+    font-weight: 800;
+
+    letter-spacing: -0.03em;
+}
+
+.result-main > p {
+    margin: 8px 0 0;
+
+    color: #666;
+
+    font-size: 13px;
+}
+
+.breakdown h4 {
+    margin: 0 0 14px;
+
+    font-size: 16px;
+}
+
+.breakdown > div {
+    padding: 8px 0;
+
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+
+    font-size: 13px;
+}
+
+.breakdown > div > span {
+    color: #555;
+}
+
+.breakdown > div > b {
+    color: #222;
+}
+
+.break-total {
+    margin-top: 7px;
+
+    padding-top: 14px !important;
+
+    border-top: 1px solid #111;
+
+    font-weight: 800;
+}
+
+.break-total > span,
+.break-total > b {
+    color: #111 !important;
+}

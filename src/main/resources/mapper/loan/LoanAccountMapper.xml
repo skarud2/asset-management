@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.loan.account.mapper.LoanAccountMapper">
+
+    <!--
+        동일 MyData connection에서
+        동일 외부 대출계좌가 이미 저장되어 있는지 확인
+    -->
+    <select id="findByExternalLoanKey"
+            resultType="com.via.shinvia.loan.account.entity.LoanAccount">
+
+        SELECT
+        loan_account_id,
+        connection_id,
+        external_loan_key,
+        loan_type,
+        principal_amount,
+        current_balance,
+        interest_rate,
+        rate_type,
+        repayment_type,
+        disbursed_at,
+        maturity_at,
+        loan_status,
+        data_as_of_at,
+        updated_at,
+        prepayment_fee_rate,
+        prepayment_fee_end_date
+
+        FROM loan_account
+
+        WHERE connection_id = #{connectionId}
+        AND external_loan_key = #{externalLoanKey}
+
+        LIMIT 1
+
+    </select>
+
+
+    <select id="findAllByConnectionId"
+            resultType="com.via.shinvia.loan.account.entity.LoanAccount">
+
+        SELECT
+        loan_account_id,
+        connection_id,
+        external_loan_key,
+        loan_type,
+        principal_amount,
+        current_balance,
+        interest_rate,
+        rate_type,
+        repayment_type,
+        disbursed_at,
+        maturity_at,
+        loan_status,
+        data_as_of_at,
+        updated_at,
+        prepayment_fee_rate,
+        prepayment_fee_end_date
+
+        FROM loan_account
+
+        WHERE connection_id = #{connectionId}
+
+        ORDER BY loan_account_id
+
+    </select>
+
+
+    <insert id="insertLoanAccount"
+            useGeneratedKeys="true"
+            keyProperty="loanAccountId"
+            keyColumn="loan_account_id">
+
+        INSERT INTO loan_account (
+        connection_id,
+        external_loan_key,
+        loan_type,
+        principal_amount,
+        current_balance,
+        interest_rate,
+        rate_type,
+        repayment_type,
+        disbursed_at,
+        maturity_at,
+        loan_status,
+        data_as_of_at,
+        updated_at,
+        prepayment_fee_rate,
+        prepayment_fee_end_date
+        )
+        VALUES (
+        #{connectionId},
+        #{externalLoanKey},
+        #{loanType},
+        #{principalAmount},
+        #{currentBalance},
+        #{interestRate},
+        #{rateType},
+        #{repaymentType},
+        #{disbursedAt},
+        #{maturityAt},
+        #{loanStatus},
+        #{dataAsOfAt},
+        #{updatedAt},
+        #{prepaymentFeeRate},
+        #{prepaymentFeeEndDate}
+        )
+
+    </insert>
+
+
+    <update id="updateLoanAccount">
+
+        UPDATE loan_account
+
+        SET
+        loan_type = #{loanType},
+        principal_amount = #{principalAmount},
+        current_balance = #{currentBalance},
+        interest_rate = #{interestRate},
+        rate_type = #{rateType},
+        repayment_type = #{repaymentType},
+        disbursed_at = #{disbursedAt},
+        maturity_at = #{maturityAt},
+        loan_status = #{loanStatus},
+        data_as_of_at = #{dataAsOfAt},
+        updated_at = #{updatedAt},
+        prepayment_fee_rate = #{prepaymentFeeRate},
+        prepayment_fee_end_date = #{prepaymentFeeEndDate}
+
+        WHERE loan_account_id = #{loanAccountId}
+
+    </update>
+
+</mapper>

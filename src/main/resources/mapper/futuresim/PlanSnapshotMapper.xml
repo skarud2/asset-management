@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.futuresim.mapper.PlanSnapshotMapper">
+
+    <insert id="upsert">
+        INSERT INTO futuresim_plan_snapshot (
+            user_id, plan_name, goal_amount, goal_preset_key, benchmark_type, benchmark_label, benchmark_median_net_worth,
+            assumed_return_rate, selected_levers_json, baseline_months_to_goal, projected_months_to_goal,
+            diff_months, loan_impact_json, final_net_worth
+        ) VALUES (
+            #{userId}, #{planName}, #{goalAmount}, #{goalPresetKey}, #{benchmarkType}, #{benchmarkLabel}, #{benchmarkMedianNetWorth},
+            #{assumedReturnRate}, #{selectedLeversJson}, #{baselineMonthsToGoal}, #{projectedMonthsToGoal},
+            #{diffMonths}, #{loanImpactJson}, #{finalNetWorth}
+        )
+        ON DUPLICATE KEY UPDATE
+            goal_amount = VALUES(goal_amount),
+            goal_preset_key = VALUES(goal_preset_key),
+            benchmark_type = VALUES(benchmark_type),
+            benchmark_label = VALUES(benchmark_label),
+            benchmark_median_net_worth = VALUES(benchmark_median_net_worth),
+            assumed_return_rate = VALUES(assumed_return_rate),
+            selected_levers_json = VALUES(selected_levers_json),
+            baseline_months_to_goal = VALUES(baseline_months_to_goal),
+            projected_months_to_goal = VALUES(projected_months_to_goal),
+            diff_months = VALUES(diff_months),
+            loan_impact_json = VALUES(loan_impact_json),
+            final_net_worth = VALUES(final_net_worth)
+    </insert>
+
+    <select id="findAllByUserId" resultType="com.via.shinvia.futuresim.entity.FuturesimPlanSnapshot">
+        SELECT * FROM futuresim_plan_snapshot
+        WHERE user_id = #{userId}
+        ORDER BY updated_at DESC
+    </select>
+
+    <select id="findByIdAndUserId" resultType="com.via.shinvia.futuresim.entity.FuturesimPlanSnapshot">
+        SELECT * FROM futuresim_plan_snapshot
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+</mapper>

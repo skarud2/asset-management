@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head><title>자산형성상품 | SHINVIA</title></head>
+<body>
+<main class="policy-container bank-policy-page">
+    <section class="page-header">
+        <p class="page-label">ASSET PRODUCT</p>
+        <h1>자산형성상품</h1>
+        <p class="page-description">목돈 마련과 자산 형성을 지원하는 상품을 확인할 수 있습니다.</p>
+    </section>
+    <section class="policy-notice"><p>서민금융진흥원 제공 정보를 기반으로 조회됩니다. 신청 전 취급기관의 공식 안내를 확인해 주세요.</p></section>
+
+    <section class="policy-search-area">
+        <form method="get" th:action="@{/asset-products}" id="financialProductSearchForm">
+            <input type="hidden" name="page" value="0">
+            <div class="policy-filter-form">
+                <div class="search-input-group"><label for="keyword" class="sr-only">상품 검색</label>
+                    <input id="keyword" class="policy-search-input" type="search" name="keyword"
+                           th:value="${search.keyword}" placeholder="상품명, 지원대상, 기관을 검색하세요"></div>
+                <div class="page-size-group"><label for="size" class="sr-only">페이지당 표시 개수</label>
+                    <select id="size" class="page-size-select" name="size" onchange="this.form.submit()">
+                        <option th:each="option : ${ {10,20,30,40,50} }" th:value="${option}"
+                                th:selected="${search.size == option}" th:text="${option + '개씩 보기'}">20개씩 보기
+                        </option>
+                    </select></div>
+                <button class="search-button" type="submit">검색</button>
+            </div>
+            <div class="detail-filter-header"><h2>상세검색 필터</h2>
+                <button type="button" id="detailFilterToggle" class="detail-filter-toggle collapsed"
+                        aria-expanded="false" aria-controls="detailFilterPanel">
+                    <span id="filterToggleText">펼치기</span><span class="filter-toggle-icon">▲</span></button>
+            </div>
+            <div id="detailFilterPanel" class="detail-filter-panel hidden">
+                <div class="detail-filter-row">
+                    <div class="detail-filter-label">지원대상</div>
+                    <div class="detail-filter-options">
+                        <label class="filter-chip"
+                               th:each="option : ${ {'근로자','사업자','소상공인','대학생·청년','채무조정자','금융취약계층','사회적경제기업','농림어업인','기타'} }">
+                            <input type="checkbox" name="targets" th:value="${option}"
+                                   th:checked="${#lists.contains(search.targets, option)}"><span
+                                th:text="${option}">대상</span></label>
+                    </div>
+                </div>
+                <div class="detail-filter-row">
+                    <div class="detail-filter-label">상품유형</div>
+                    <div class="detail-filter-options">
+                        <label class="filter-chip" th:each="option : ${ {'적금','예금','매립적립통장'} }">
+                            <input type="checkbox" name="products" th:value="${option}"
+                                   th:checked="${#lists.contains(search.products, option)}"><span
+                                th:text="${option}">유형</span></label>
+                    </div>
+                </div>
+                <div class="detail-filter-row">
+                    <div class="detail-filter-label">가입기간</div>
+                    <div class="detail-filter-options">
+                        <label class="filter-chip" th:each="option : ${ {'1년 이하','3년 이하','5년 이하'} }">
+                            <input type="checkbox" name="terms" th:value="${option}"
+                                   th:checked="${#lists.contains(search.terms, option)}"><span
+                                th:text="${option}">기간</span></label>
+                    </div>
+                </div>
+                <div class="detail-filter-row">
+                    <div class="detail-filter-label">연령대</div>
+                    <div class="detail-filter-options">
+                        <label class="filter-chip" th:each="option : ${ageOptions}"><input type="checkbox" name="ages"
+                                                                                           th:value="${option}"
+                                                                                           th:checked="${#lists.contains(search.ages, option)}"><span
+                                th:text="${option}">연령</span></label>
+                    </div>
+                </div>
+                <div class="detail-filter-row">
+                    <div class="detail-filter-label">소득기준</div>
+                    <div class="detail-filter-options">
+                        <label class="filter-chip" th:each="option : ${incomeOptions}"><input type="checkbox"
+                                                                                              name="incomes"
+                                                                                              th:value="${option}"
+                                                                                              th:checked="${#lists.contains(search.incomes, option)}"><span
+                                th:text="${option}">소득</span></label>
+                    </div>
+                </div>
+                <div class="detail-filter-row">
+                    <div class="detail-filter-label">서비스 지역</div>
+                    <div class="detail-filter-options">
+                        <label class="filter-chip"
+                               th:each="option : ${ {'전국','서울','경기','인천','부산','광주','대구','대전','울산','세종','강원','전남','전북','충남','충북','경남','경북','제주'} }">
+                            <input type="checkbox" name="regions" th:value="${option}"
+                                   th:checked="${#lists.contains(search.regions, option)}"><span
+                                th:text="${option}">지역</span></label>
+                    </div>
+                </div>
+                <div class="detail-filter-actions"><a class="filter-reset-button" th:href="@{/asset-products}">초기화</a>
+                    <button class="filter-submit-button" type="submit">조건 검색</button>
+                </div>
+            </div>
+        </form>
+    </section>
+    <th:block th:replace="~{policy/product-fragments :: results}"></th:block>
+    <th:block th:replace="~{policy/product-fragments :: modal}"></th:block>
+</main>
+</body>
+</html>

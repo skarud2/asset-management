@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<section th:fragment="calculator"
+         id="surplusCalculator"
+         class="surplus-calc"
+         th:attr="data-has-saved=${hasSavedCalculation}">
+
+    <div class="calc-head">
+        <div>
+            <p class="calc-step">STEP 1</p>
+            <h2>가용 여유자금을 계산해볼게요</h2>
+            <p>
+                최근 금융데이터를 기반으로 필요한 자금을 추정합니다.
+                추정된 금액은 직접 수정할 수 있습니다.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- 현재 자금 -->
+    <section class="calc-section">
+
+        <div class="calc-title">
+            <span>1-1</span>
+
+            <div>
+                <h3>현재 자금 현황</h3>
+                <p>
+                    여유자금 계산에 사용할 계좌를 선택해주세요.
+                    예·적금은 기본적으로 제외됩니다.
+                </p>
+            </div>
+        </div>
+
+
+        <div class="cash-summary">
+
+            <div>
+                <span>전체 계좌 잔액</span>
+
+                <strong th:text="${#numbers.formatInteger(
+                    totalCurrentBalance, 0, 'COMMA') + '원'}">
+                    0원
+                </strong>
+            </div>
+
+            <div>
+                <span>여유자금 계산 대상</span>
+
+                <strong id="selectedAccountBalance"
+                        th:text="${#numbers.formatInteger(
+                    defaultAvailableBalance, 0, 'COMMA') + '원'}">
+                    0원
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="account-list">
+
+            <label class="account-row"
+                   th:each="account : ${accountList}">
+
+                <input type="checkbox"
+                       class="account-check"
+                       th:value="${account.accountId}"
+                       th:attr="data-balance=${account.currentBalance}"
+                       th:checked="${selectedAccountIds.contains(account.accountId)}">
+
+                    <strong  class="account-info" th:text="${account.accountName}">
+                        계좌명
+                    </strong>
+
+                <strong class="account-balance"
+                        th:text="${#numbers.formatInteger(
+                    account.currentBalance, 0, 'COMMA') + '원'}">
+                    0원
+                </strong>
+
+            </label>
+
+        </div>
+
+
+        <input type="hidden"
+               id="withdrawableAmount"
+               th:value="${defaultAvailableBalance}">
+
+    </section>
+
+
+    <!-- 필요자금 -->
+    <section class="calc-section">
+        <div class="calc-title">
+            <span>1-2</span>
+            <div>
+                <h3>향후 필요자금</h3>
+                <p>자동 추정값을 확인하고 실제 상황에 맞게 수정해주세요.</p>
+            </div>
+        </div>
+
+        <div class="need-grid">
+
+            <!-- 생활비 -->
+            <article class="need-card">
+                <div class="need-head">
+                    <h4>다음 수입일까지 예상 생활비</h4>
+                    <span>자동 추정</span>
+                </div>
+
+                <strong class="estimate"
+                        th:text="${#numbers.formatInteger(estimatedLivingExpense, 0, 'COMMA') + '원'}">
+                    0원
+                </strong>
+
+                <p>
+                    최근 3개월 카드·계좌 소비내역으로 추정했습니다.
+                </p>
+
+                <label class="calc-field">
+                    <span>다음 예상 수입일</span>
+
+                    <input type="date"
+                           id="nextIncomeDate"
+                           name="nextIncomeDate"
+                           th:value="${nextIncomeDate}">
+                </label>
+
+                <label class="calc-field">
+                    <span>적용 생활비</span>
+
+                    <div>
+                        <input type="number"
+                               id="livingExpense"
+                               name="livingExpense"
+                               min="0"
+                               step="1000"
+                               th:value="${livingExpense}">
+                        <b>원</b>
+                    </div>
+                </label>
+            </article>
+
+
+            <!-- 예정지출 -->
+            <article class="need-card">
+                <div class="need-head">
+                    <h4>다음 수입 전 예정지출</h4>
+                    <span>자동 추정</span>
+                </div>
+
+                <strong class="estimate"
+                        th:text="${#numbers.formatInteger(estimatedScheduledExpense, 0, 'COMMA') + '원'}">
+                    0원
+                </strong>
+
+                <p>
+                    현재 예정된 카드 청구금액을 기준으로 계산합니다.
+                </p>
+
+                <div class="calc-detail">
+                    <span>카드 결제 예정금</span>
+
+                    <b th:text="${#numbers.formatInteger(estimatedScheduledExpense, 0, 'COMMA') + '원'}">
+                        0원
+                    </b>
+                </div>
+
+                <label class="calc-field">
+                    <span>적용 예정지출</span>
+
+                    <div>
+                        <input type="number"
+                               id="scheduledExpense"
+                               name="scheduledExpense"
+                               min="0"
+                               step="1000"
+                               th:value="${scheduledExpense}">
+                        <b>원</b>
+                    </div>
+                </label>
+            </article>
+
+
+            <!-- 비상자금 -->
+            <article class="need-card">
+                <div class="need-head">
+                    <h4>보호할 비상자금</h4>
+                    <span>추천</span>
+                </div>
+
+                <strong class="estimate"
+                        th:text="${#numbers.formatInteger(recommendedEmergencyFund, 0, 'COMMA') + '원'}">
+                    0원
+                </strong>
+
+                <p>
+                    예상하지 못한 지출에 대비해 운용하지 않고 남겨둘 금액입니다.
+                </p>
+
+                <label class="calc-field">
+                    <span>적용 비상자금</span>
+
+                    <div>
+                        <input type="number"
+                               id="emergencyFund"
+                               name="emergencyFund"
+                               min="0"
+                               step="10000"
+                               th:value="${emergencyFund}">
+                        <b>원</b>
+                    </div>
+                </label>
+            </article>
+
+        </div>
+    </section>
+
+
+    <!-- 최종 계산 -->
+    <section class="calc-result">
+        <div class="result-main">
+            <span>현재 가용 여유자금</span>
+
+            <strong id="calculatedSurplusAmount"
+                    th:text="${#numbers.formatInteger(availableSurplusAmount, 0, 'COMMA') + '원'}">
+                0원
+            </strong>
+
+            <p>
+                필요 생활비, 예정지출, 비상자금을 제외한 금액입니다.
+            </p>
+        </div>
+
+        <div class="breakdown">
+            <h4>계산 내역</h4>
+
+            <div>
+                <span>실제 출금 가능 현금</span>
+                <b id="breakWithdrawable">0원</b>
+            </div>
+
+            <div>
+                <span>예상 생활비</span>
+                <b id="breakLiving">0원</b>
+            </div>
+
+            <div>
+                <span>예정지출</span>
+                <b id="breakScheduled">0원</b>
+            </div>
+
+            <div>
+                <span>보호 비상자금</span>
+                <b id="breakEmergency">0원</b>
+            </div>
+
+            <div class="break-total">
+                <span>가용 여유자금</span>
+                <b id="breakTotal">0원</b>
+            </div>
+        </div>
+
+        <input type="hidden"
+               id="finalCalculatedSurplus">
+    </section>
+
+</section>
+
+</body>
+</html>

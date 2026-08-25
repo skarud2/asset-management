@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.surplusfund.guideversion.mapper.SurplusFundGuideVersionMapper">
+
+    <resultMap id="guideVersionRecordMap"
+               type="com.via.shinvia.surplusfund.guideversion.model.GuideVersionRecord">
+        <id property="surplusFundGuideVersionId" column="surplus_fund_guide_version_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="guideVersionNo" column="guide_version_no"/>
+        <result property="guideName" column="guide_name"/>
+        <result property="surplusFundCalculationId" column="surplus_fund_calculation_id"/>
+        <result property="surplusFundPlanId" column="surplus_fund_plan_id"/>
+        <result property="selectedEtfCount" column="selected_etf_count"/>
+        <result property="snapshotSchemaVersion" column="snapshot_schema_version"/>
+        <result property="idempotencyKey" column="idempotency_key"/>
+        <result property="completedAt" column="completed_at"/>
+        <result property="nameUpdatedAt" column="name_updated_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="operationAmount" column="operation_amount"/>
+        <result property="investmentStyle" column="investment_style"/>
+    </resultMap>
+
+    <resultMap id="calculationSnapshotMap"
+               type="com.via.shinvia.surplusfund.guideversion.model.GuideCalculationSnapshot">
+        <id property="surplusFundCalculationId" column="surplus_fund_calculation_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="totalCurrentBalance" column="total_current_balance"/>
+        <result property="selectedAccountBalance" column="selected_account_balance"/>
+        <result property="estimatedNextIncomeDate" column="estimated_next_income_date"/>
+        <result property="adjustedNextIncomeDate" column="adjusted_next_income_date"/>
+        <result property="estimatedLivingExpense" column="estimated_living_expense"/>
+        <result property="adjustedLivingExpense" column="adjusted_living_expense"/>
+        <result property="estimatedScheduledExpense" column="estimated_scheduled_expense"/>
+        <result property="adjustedScheduledExpense" column="adjusted_scheduled_expense"/>
+        <result property="recommendedEmergencyFund" column="recommended_emergency_fund"/>
+        <result property="adjustedEmergencyFund" column="adjusted_emergency_fund"/>
+        <result property="calculatedSurplusAmount" column="calculated_surplus_amount"/>
+        <result property="finalSurplusAmount" column="final_surplus_amount"/>
+    </resultMap>
+
+    <resultMap id="planSnapshotMap"
+               type="com.via.shinvia.surplusfund.guideversion.model.GuidePlanSnapshot">
+        <id property="surplusFundPlanId" column="surplus_fund_plan_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="operationAmount" column="operation_amount"/>
+        <result property="investmentStyle" column="investment_style"/>
+        <result property="ruleVersion" column="rule_version"/>
+        <result property="confirmedAt" column="confirmed_at"/>
+    </resultMap>
+
+    <resultMap id="allocationMap"
+               type="com.via.shinvia.surplusfund.guideversion.model.GuideVersionAllocation">
+        <result property="assetType" column="asset_type"/>
+        <result property="allocationRatio" column="allocation_ratio"/>
+        <result property="allocationAmount" column="allocation_amount"/>
+    </resultMap>
+
+    <resultMap id="reasonMap"
+               type="com.via.shinvia.surplusfund.guideversion.model.GuideVersionReason">
+        <result property="reasonOrder" column="reason_order"/>
+        <result property="reasonText" column="reason_text"/>
+    </resultMap>
+
+    <resultMap id="etfSnapshotMap"
+               type="com.via.shinvia.surplusfund.guideversion.model.GuideVersionEtfSnapshot">
+        <id property="surplusFundGuideEtfSnapshotId" column="surplus_fund_guide_etf_snapshot_id"/>
+        <result property="surplusFundGuideVersionId" column="surplus_fund_guide_version_id"/>
+        <result property="sourceInvestmentProductId" column="source_investment_product_id"/>
+        <result property="selectionOrder" column="selection_order"/>
+        <result property="productCode" column="product_code"/>
+        <result property="isinCode" column="isin_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="providerName" column="provider_name"/>
+        <result property="category" column="category"/>
+        <result property="sourceType" column="source_type"/>
+        <result property="priceBaseDate" column="price_base_date"/>
+        <result property="closingPrice" column="closing_price"/>
+        <result property="previousDayChange" column="previous_day_change"/>
+        <result property="fluctuationRate" column="fluctuation_rate"/>
+        <result property="nav" column="nav"/>
+        <result property="openingPrice" column="opening_price"/>
+        <result property="highPrice" column="high_price"/>
+        <result property="lowPrice" column="low_price"/>
+        <result property="tradingVolume" column="trading_volume"/>
+        <result property="tradingValue" column="trading_value"/>
+        <result property="listedShareCount" column="listed_share_count"/>
+        <result property="marketCap" column="market_cap"/>
+        <result property="netAssetTotalAmount" column="net_asset_total_amount"/>
+        <result property="baseIndexName" column="base_index_name"/>
+        <result property="baseIndexClose" column="base_index_close"/>
+        <result property="productLastSyncedAt" column="product_last_synced_at"/>
+        <result property="capturedAt" column="captured_at"/>
+    </resultMap>
+
+    <sql id="guideVersionColumns">
+        v.surplus_fund_guide_version_id,
+        v.user_id,
+        v.guide_version_no,
+        v.guide_name,
+        v.surplus_fund_calculation_id,
+        v.surplus_fund_plan_id,
+        v.selected_etf_count,
+        v.snapshot_schema_version,
+        v.idempotency_key,
+        v.completed_at,
+        v.name_updated_at,
+        v.created_at
+    </sql>
+
+    <select id="lockUserById" resultType="java.lang.Long">
+        SELECT user_id
+        FROM app_user
+        WHERE user_id = #{userId}
+        FOR UPDATE
+    </select>
+
+    <select id="findByIdempotencyKey" resultMap="guideVersionRecordMap">
+        SELECT <include refid="guideVersionColumns"/>
+        FROM surplus_fund_guide_version v
+        WHERE v.user_id = #{userId}
+          AND v.idempotency_key = #{idempotencyKey}
+    </select>
+
+    <select id="findByPlanIdAndUserId" resultMap="guideVersionRecordMap">
+        SELECT <include refid="guideVersionColumns"/>
+        FROM surplus_fund_guide_version v
+        WHERE v.user_id = #{userId}
+          AND v.surplus_fund_plan_id = #{planId}
+    </select>
+
+    <select id="findCalculationByIdAndUserId" resultMap="calculationSnapshotMap">
+        SELECT
+            surplus_fund_calculation_id,
+            user_id,
+            total_current_balance,
+            selected_account_balance,
+            estimated_next_income_date,
+            adjusted_next_income_date,
+            estimated_living_expense,
+            adjusted_living_expense,
+            estimated_scheduled_expense,
+            adjusted_scheduled_expense,
+            recommended_emergency_fund,
+            adjusted_emergency_fund,
+            calculated_surplus_amount,
+            final_surplus_amount
+        FROM surplus_fund_calculation
+        WHERE surplus_fund_calculation_id = #{calculationId}
+          AND user_id = #{userId}
+    </select>
+
+    <select id="findPlanByIdAndUserId" resultMap="planSnapshotMap">
+        SELECT
+            surplus_fund_plan_id,
+            user_id,
+            operation_amount,
+            investment_style,
+            rule_version,
+            confirmed_at
+        FROM surplus_fund_plan
+        WHERE surplus_fund_plan_id = #{planId}
+          AND user_id = #{userId}
+    </select>
+
+    <select id="findAllocationsByPlanId" resultMap="allocationMap">
+        SELECT
+            asset_type,
+            allocation_ratio,
+            allocation_amount
+        FROM surplus_fund_plan_allocation
+        WHERE surplus_fund_plan_id = #{planId}
+        ORDER BY FIELD(asset_type, 'CASH', 'ETF', 'FUND')
+    </select>
+
+    <select id="findReasonsByPlanId" resultMap="reasonMap">
+        SELECT reason_order, reason_text
+        FROM surplus_fund_plan_reason
+        WHERE surplus_fund_plan_id = #{planId}
+        ORDER BY reason_order
+    </select>
+
+    <select id="findEtfSourcesByIds" resultMap="etfSnapshotMap">
+        SELECT
+            NULL AS surplus_fund_guide_etf_snapshot_id,
+            NULL AS surplus_fund_guide_version_id,
+            c.investment_product_id AS source_investment_product_id,
+            0 AS selection_order,
+            c.product_code,
+            c.isin_code,
+            c.product_name,
+            c.provider_name,
+            c.category,
+            c.source_type,
+            d.price_base_date,
+            d.closing_price,
+            d.previous_day_change,
+            d.fluctuation_rate,
+            d.nav,
+            d.opening_price,
+            d.high_price,
+            d.low_price,
+            d.trading_volume,
+            d.trading_value,
+            d.listed_share_count,
+            d.market_cap,
+            d.net_asset_total_amount,
+            d.base_index_name,
+            d.base_index_close,
+            c.last_synced_at AS product_last_synced_at,
+            NULL AS captured_at
+        FROM investment_product_catalog c
+        INNER JOIN etf_product_detail d
+            ON d.investment_product_id = c.investment_product_id
+        WHERE c.product_type = 'ETF'
+          AND c.active = 1
+          AND c.investment_product_id IN
+          <foreach collection="productIds" item="productId" open="(" separator="," close=")">
+              #{productId}
+          </foreach>
+    </select>
+
+    <select id="findNextVersionNo" resultType="int">
+        SELECT COALESCE(MAX(guide_version_no), 0) + 1
+        FROM surplus_fund_guide_version
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertGuideVersion"
+            parameterType="com.via.shinvia.surplusfund.guideversion.model.GuideVersionRecord"
+            useGeneratedKeys="true"
+            keyProperty="surplusFundGuideVersionId"
+            keyColumn="surplus_fund_guide_version_id">
+        INSERT INTO surplus_fund_guide_version (
+            user_id,
+            guide_version_no,
+            guide_name,
+            surplus_fund_calculation_id,
+            surplus_fund_plan_id,
+            selected_etf_count,
+            snapshot_schema_version,
+            idempotency_key,
+            completed_at
+        ) VALUES (
+            #{userId},
+            #{guideVersionNo},
+            #{guideName},
+            #{surplusFundCalculationId},
+            #{surplusFundPlanId},
+            #{selectedEtfCount},
+            #{snapshotSchemaVersion},
+            #{idempotencyKey},
+            #{completedAt}
+        )
+    </insert>
+
+    <insert id="insertEtfSnapshots">
+        INSERT INTO surplus_fund_guide_etf_snapshot (
+            surplus_fund_guide_version_id,
+            source_investment_product_id,
+            selection_order,
+            product_code,
+            isin_code,
+            product_name,
+            provider_name,
+            category,
+            source_type,
+            price_base_date,
+            closing_price,
+            previous_day_change,
+            fluctuation_rate,
+            nav,
+            opening_price,
+            high_price,
+            low_price,
+            trading_volume,
+            trading_value,
+            listed_share_count,
+            market_cap,
+            net_asset_total_amount,
+            base_index_name,
+            base_index_close,
+            product_last_synced_at,
+            captured_at
+        ) VALUES
+        <foreach collection="snapshots" item="snapshot" separator=",">
+            (
+                #{guideVersionId},
+                #{snapshot.sourceInvestmentProductId},
+                #{snapshot.selectionOrder},
+                #{snapshot.productCode},
+                #{snapshot.isinCode},
+                #{snapshot.productName},
+                #{snapshot.providerName},
+                #{snapshot.category},
+                #{snapshot.sourceType},
+                #{snapshot.priceBaseDate},
+                #{snapshot.closingPrice},
+                #{snapshot.previousDayChange},
+                #{snapshot.fluctuationRate},
+                #{snapshot.nav},
+                #{snapshot.openingPrice},
+                #{snapshot.highPrice},
+                #{snapshot.lowPrice},
+                #{snapshot.tradingVolume},
+                #{snapshot.tradingValue},
+                #{snapshot.listedShareCount},
+                #{snapshot.marketCap},
+                #{snapshot.netAssetTotalAmount},
+                #{snapshot.baseIndexName},
+                #{snapshot.baseIndexClose},
+                #{snapshot.productLastSyncedAt},
+                CURRENT_TIMESTAMP
+            )
+        </foreach>
+    </insert>
+
+    <select id="findSummariesByUserId" resultMap="guideVersionRecordMap">
+        SELECT
+            <include refid="guideVersionColumns"/>,
+            p.operation_amount,
+            p.investment_style
+        FROM surplus_fund_guide_version v
+        INNER JOIN surplus_fund_plan p
+            ON p.surplus_fund_plan_id = v.surplus_fund_plan_id
+        WHERE v.user_id = #{userId}
+        ORDER BY v.guide_version_no DESC
+    </select>
+
+    <select id="findByIdAndUserId" resultMap="guideVersionRecordMap">
+        SELECT <include refid="guideVersionColumns"/>
+        FROM surplus_fund_guide_version v
+        WHERE v.surplus_fund_guide_version_id = #{guideVersionId}
+          AND v.user_id = #{userId}
+    </select>
+
+    <select id="findEtfSnapshotsByGuideVersionId" resultMap="etfSnapshotMap">
+        SELECT
+            surplus_fund_guide_etf_snapshot_id,
+            surplus_fund_guide_version_id,
+            source_investment_product_id,
+            selection_order,
+            product_code,
+            isin_code,
+            product_name,
+            provider_name,
+            category,
+            source_type,
+            price_base_date,
+            closing_price,
+            previous_day_change,
+            fluctuation_rate,
+            nav,
+            opening_price,
+            high_price,
+            low_price,
+            trading_volume,
+            trading_value,
+            listed_share_count,
+            market_cap,
+            net_asset_total_amount,
+            base_index_name,
+            base_index_close,
+            product_last_synced_at,
+            captured_at
+        FROM surplus_fund_guide_etf_snapshot
+        WHERE surplus_fund_guide_version_id = #{guideVersionId}
+        ORDER BY selection_order
+    </select>
+
+    <update id="updateGuideName">
+        UPDATE surplus_fund_guide_version
+        SET guide_name = #{guideName},
+            name_updated_at = CURRENT_TIMESTAMP
+        WHERE surplus_fund_guide_version_id = #{guideVersionId}
+          AND user_id = #{userId}
+    </update>
+
+</mapper>

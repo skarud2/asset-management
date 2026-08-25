@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.marketdata.mapper.BondYieldCurveMapper">
+
+    <!-- asOfDate 정확히 일치하는 날짜가 아니라, 그 이하 날짜 중 가장 최근 곡선을 조회한다.
+         주말/공휴일 등으로 매일 갱신되지 않는 실제 채권시장 데이터 특성을 반영. -->
+    <select id="findByAsOfDate"
+            resultType="com.via.shinvia.marketdata.entity.BondYieldCurveRow">
+
+        SELECT
+        tenor_months,
+        yield_rate
+        FROM bond_yield_curve
+        WHERE as_of_date = (
+        SELECT MAX(as_of_date)
+        FROM bond_yield_curve
+        WHERE as_of_date &lt;= #{asOfDate}
+        )
+        ORDER BY tenor_months ASC
+
+    </select>
+
+</mapper>

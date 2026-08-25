@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.policy.recommendation.common.mapper.RecommendationUserMapper">
+
+    <!-- 회원 + 최신 금융프로필 + 정책추천 설문 통합 조회 -->
+    <select id="findByUserId"
+            resultType="com.via.shinvia.policy.recommendation.common.dto.RecommendationUserDTO">
+        SELECT
+        u.user_id,
+        TIMESTAMPDIFF(YEAR, u.birth_date, CURDATE()) AS age,
+
+        fp.annual_income,
+        CAST(fp.income_type AS CHAR) AS income_type,
+        CAST(fp.employment_status AS CHAR) AS employment_status,
+        fp.credit_score,
+        fp.liquid_asset_amount,
+
+        rp.residence_sido,
+        rp.residence_sigungu,
+        rp.residence_months,
+        rp.employment_months,
+        rp.has_income,
+        rp.income_verifiable,
+        rp.household_size,
+        rp.marital_status,
+        rp.has_children,
+        rp.children_count,
+        rp.basic_livelihood_recipient,
+        rp.near_poverty,
+        rp.single_parent_household,
+        rp.disabled,
+        rp.self_reliance_youth,
+        rp.multicultural_household,
+        rp.north_korean_defector,
+        rp.child_headed_household,
+        rp.earned_income_tax_credit_recipient,
+        rp.basic_pension_recipient,
+        rp.disability_benefit_recipient,
+        rp.jeonse_fraud_victim,
+        rp.household_annual_income,
+        rp.household_net_asset_amount,
+        rp.homeless_household,
+        rp.household_head,
+        rp.prospective_household_head,
+        rp.first_time_home_buyer,
+        rp.debt_default_status,
+        rp.overdue_status,
+        rp.policy_finance_usage,
+        rp.financial_education_status,
+        rp.desired_support_purpose,
+        rp.desired_amount,
+        rp.monthly_saving_capacity,
+        rp.priority_preference
+
+        FROM app_user u
+
+        LEFT JOIN user_financial_profile fp
+        ON fp.user_financial_profile_id = (
+        SELECT MAX(fp2.user_financial_profile_id)
+        FROM user_financial_profile fp2
+        WHERE fp2.user_id = u.user_id
+        )
+
+        LEFT JOIN policy_recommendation_profile rp
+        ON rp.user_id = u.user_id
+
+        WHERE u.user_id = #{userId}
+        LIMIT 1
+    </select>
+
+</mapper>

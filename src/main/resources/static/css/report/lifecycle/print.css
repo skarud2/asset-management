@@ -1,0 +1,653 @@
+/* =========================================================
+ * 금융 라이프 플랜 PDF 전용 디자인
+ * ========================================================= */
+.report-lifecycle-document {
+    color: #1e293b;
+    font-family: inherit;
+}
+
+.report-lifecycle-hero {
+    padding: 24px 28px;
+    background: #f8fafc;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-lifecycle-hero span {
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #2563eb;
+    text-transform: uppercase;
+}
+
+.report-lifecycle-hero h1 {
+    margin: 6px 0 4px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.report-lifecycle-hero p {
+    margin: 0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.report-lifecycle-section {
+    margin-bottom: 24px;
+}
+
+.report-lifecycle-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.report-lifecycle-section-title span {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.report-lifecycle-section-title h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.report-lifecycle-section-title p {
+    margin: 0 0 0 8px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* 바 차트 */
+.report-lifecycle-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    padding: 16px 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    min-height: 120px;
+    margin-bottom: 14px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-lifecycle-chart-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+
+.report-lifecycle-chart-value {
+    font-size: 11px;
+    font-weight: 700;
+    color: #334155;
+}
+
+.report-lifecycle-chart-track {
+    width: 100%;
+    max-width: 44px;
+    height: 60px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    border-bottom: 2px solid #cbd5e1;
+}
+
+.report-lifecycle-chart-track span {
+    width: 100%;
+    background: #3b82f6;
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-lifecycle-chart-item:nth-child(2n) .report-lifecycle-chart-track span {
+    background: #10b981;
+}
+
+.report-lifecycle-chart-item:nth-child(3n) .report-lifecycle-chart-track span {
+    background: #f59e0b;
+}
+
+.report-lifecycle-chart-item b {
+    font-size: 11px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.report-lifecycle-chart-item small {
+    font-size: 10px;
+    color: #64748b;
+}
+
+/* 브레이크다운 표 */
+.report-lifecycle-breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.report-lifecycle-breakdown-table th,
+.report-lifecycle-breakdown-table td {
+    padding: 8px 14px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.report-lifecycle-breakdown-table thead th {
+    background: #f8fafc;
+    font-weight: 700;
+    color: #475569;
+    text-align: left;
+    border-bottom: 1.5px solid #e2e8f0;
+}
+
+.report-lifecycle-breakdown-table tbody tr.is-total th {
+    background: #f8fafc;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.report-lifecycle-breakdown-table tbody tr.is-total td {
+    background: #f8fafc;
+    font-weight: 800;
+    color: #2563eb;
+    text-align: right;
+}
+
+.report-lifecycle-breakdown-table tbody tr:not(.is-total) td:last-child {
+    text-align: right;
+    color: #475569;
+}
+
+/* =========================================================
+ * STEP별 모달 뷰 스타일 (생애주기 결과 모달과 100% 동일)
+ * ========================================================= */
+.report-lifecycle-modal-page {
+    page-break-before: always;
+    break-before: page;
+    page-break-inside: auto;
+    break-inside: auto;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.report-lifecycle-modal-page .report-lifecycle-detail-page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+    border-bottom: 1.5px solid #e2e8f0;
+}
+
+.report-lifecycle-modal-page .report-lifecycle-detail-page-heading span {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #2563eb;
+}
+
+.report-lifecycle-modal-page .report-lifecycle-detail-page-heading b {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.report-modal-result-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.report-modal-result-wrapper .modal-event-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    background: #f8fafc;
+    border-radius: 14px;
+    border: 1.5px solid #e2e8f0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-modal-result-wrapper .modal-event-icon {
+    font-size: 24px;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: #eff6ff;
+    color: #2563eb;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.report-modal-result-wrapper .modal-event-hero-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.report-modal-result-wrapper .modal-event-hero-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.report-modal-result-wrapper .snapshot-step-badge {
+    font-size: 11px;
+    font-weight: 800;
+    color: #2563eb;
+    background: #eff6ff;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.report-modal-result-wrapper .modal-date-badge {
+    font-size: 11.5px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.report-modal-result-wrapper .modal-event-hero-info h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #0f172a;
+    font-weight: 800;
+}
+
+.report-modal-result-wrapper .modal-hero-cost {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    background: #fff7ed;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid #ffedd5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-modal-result-wrapper .modal-hero-cost span {
+    font-size: 11px;
+    color: #9a3412;
+    font-weight: 700;
+}
+
+.report-modal-result-wrapper .modal-hero-cost strong {
+    font-size: 18px;
+    color: #c2410c;
+    font-weight: 850;
+}
+
+.report-modal-result-wrapper .lifecycle-modal-block h4 {
+    margin: 0 0 12px;
+    color: #1e293b;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.report-modal-result-wrapper .lifecycle-modal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.report-modal-result-wrapper .lifecycle-modal-grid article {
+    min-width: 0;
+    padding: 12px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-modal-result-wrapper .lifecycle-modal-grid span {
+    display: block;
+    margin-bottom: 5px;
+    color: #64748b;
+    font-size: 11.5px;
+    font-weight: 600;
+}
+
+.report-modal-result-wrapper .lifecycle-modal-grid strong {
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 800;
+    word-break: keep-all;
+}
+
+.report-modal-result-wrapper .lifecycle-feasibility {
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 1.5px solid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-modal-result-wrapper .lifecycle-feasibility.success {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+.report-modal-result-wrapper .lifecycle-feasibility.danger {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+.report-modal-result-wrapper .lifecycle-feasibility span {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.06);
+    margin-bottom: 6px;
+}
+
+.report-modal-result-wrapper .lifecycle-feasibility h4 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.report-modal-result-wrapper .lifecycle-feasibility p {
+    margin: 0 0 8px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.report-modal-result-wrapper .lifecycle-feasibility strong {
+    display: inline-block;
+    margin-right: 12px;
+    font-size: 12.5px;
+}
+
+.report-modal-result-wrapper .result-calc-breakdown {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-modal-result-wrapper .result-calc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.report-modal-result-wrapper .calc-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #334155;
+}
+
+.report-modal-result-wrapper .calc-item-row.is-total-row {
+    font-weight: 800;
+    color: #0f172a;
+    padding-top: 6px;
+}
+
+.report-modal-result-wrapper .calc-divider-line {
+    height: 1px;
+    background: #cbd5e1;
+    margin: 4px 0;
+}
+
+.report-modal-result-wrapper .result-funding-summary {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed #cbd5e1;
+}
+
+.report-modal-result-wrapper .funding-pill {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.report-modal-result-wrapper .funding-pill.is-final-target {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.report-modal-result-wrapper .funding-pill.is-final-target b {
+    color: #1d4ed8;
+}
+
+.report-modal-result-wrapper .funding-pill b.is-minus {
+    color: #dc2626;
+}
+
+.report-modal-result-wrapper .lifecycle-recommendation-list {
+    display: grid;
+    gap: 10px;
+}
+
+.report-modal-result-wrapper .lifecycle-recommendation-item {
+    padding: 14px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-modal-result-wrapper .lifecycle-recommendation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.report-modal-result-wrapper .lifecycle-recommendation-header strong {
+    font-size: 14.5px;
+    color: #0f172a;
+    font-weight: 800;
+}
+
+.report-modal-result-wrapper .lifecycle-status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.report-modal-result-wrapper .lifecycle-status-badge.eligible {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.report-modal-result-wrapper .lifecycle-status-badge.needs-confirmation {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.report-modal-result-wrapper .lifecycle-status-badge.not-eligible {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.report-modal-result-wrapper .lifecycle-source-meta {
+    margin: 0 0 6px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.report-modal-result-wrapper .lifecycle-eligibility-reason {
+    margin: 6px 0;
+    padding: 8px 10px;
+    background: #f8fafc;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #475569;
+    border-left: 3px solid #3b82f6;
+}
+
+.report-modal-result-wrapper .lifecycle-benefit-tag {
+    display: inline-block;
+    margin-top: 4px;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.report-modal-result-wrapper .lifecycle-product-terms {
+    display: flex;
+    gap: 14px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #334155;
+}
+
+.report-modal-result-wrapper .lifecycle-product-terms strong {
+    color: #0f172a;
+}
+
+/* =========================================================
+ * 원금균등상환 납입액 변화 차트 및 자동 페이지 분할 규칙
+ * ========================================================= */
+.report-modal-result-wrapper .lifecycle-modal-block,
+.report-modal-result-wrapper .lifecycle-feasibility,
+.report-modal-result-wrapper .report-amortization,
+.report-modal-result-wrapper .modal-event-hero {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.report-modal-result-wrapper .report-amortization {
+    margin-top: 16px;
+    padding: 18px 20px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    background: #f8fafc;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-modal-result-wrapper .report-amortization-title {
+    margin-bottom: 14px;
+}
+
+.report-modal-result-wrapper .report-amortization-title b {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.report-modal-result-wrapper .report-amortization-title span {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.report-modal-result-wrapper .report-amortization-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    height: 120px;
+    padding: 10px 14px 4px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.report-modal-result-wrapper .report-amortization-bar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.report-modal-result-wrapper .report-amortization-bar span {
+    font-size: 10px;
+    font-weight: 700;
+    color: #2563eb;
+    white-space: nowrap;
+}
+
+.report-modal-result-wrapper .report-amortization-bar div {
+    width: 100%;
+    max-width: 32px;
+    height: 65px;
+    display: flex;
+    align-items: flex-end;
+    background: #f1f5f9;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.report-modal-result-wrapper .report-amortization-bar div i {
+    width: 100%;
+    background: #2563eb;
+    border-radius: 4px;
+    display: block;
+    min-height: 4px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.report-modal-result-wrapper .report-amortization-bar b {
+    font-size: 10px;
+    font-weight: 800;
+    color: #475569;
+    white-space: nowrap;
+}

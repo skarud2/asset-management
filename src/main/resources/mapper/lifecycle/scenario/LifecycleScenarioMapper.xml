@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.via.shinvia.lifecycle.scenario.mapper.LifecycleScenarioMapper">
+    <select id="findActiveScenarioIdByUserId" resultType="java.lang.Long">
+        SELECT lifecycle_scenario_id
+        FROM lifecycle_scenario
+        WHERE user_id = #{userId}
+          AND status = 'ACTIVE'
+        ORDER BY updated_at DESC, lifecycle_scenario_id DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insertScenario"
+            useGeneratedKeys="true"
+            keyProperty="scenario.lifecycleScenarioId"
+            keyColumn="lifecycle_scenario_id">
+        INSERT INTO lifecycle_scenario (
+            user_id, scenario_name, description, base_date, status
+        ) VALUES (
+            #{scenario.userId}, #{scenario.scenarioName},
+            #{scenario.description}, #{scenario.baseDate}, #{scenario.status}
+        )
+    </insert>
+
+    <select id="findScenariosByUserId"
+            resultType="com.via.shinvia.lifecycle.scenario.dto.LifecycleScenarioResponse">
+        SELECT
+            scenario.lifecycle_scenario_id AS scenario_id,
+            scenario.scenario_name,
+            scenario.description,
+            scenario.base_date,
+            scenario.status,
+            COUNT(event.lifecycle_event_id) AS event_count
+        FROM lifecycle_scenario scenario
+        LEFT JOIN lifecycle_event event
+          ON event.lifecycle_scenario_id = scenario.lifecycle_scenario_id
+        WHERE scenario.user_id = #{userId}
+          AND scenario.status != 'ARCHIVED'
+        GROUP BY
+            scenario.lifecycle_scenario_id,
+            scenario.scenario_name,
+            scenario.description,
+            scenario.base_date,
+            scenario.status
+        ORDER BY scenario.updated_at DESC, scenario.lifecycle_scenario_id DESC
+    </select>
+
+    <select id="findScenarioByIdAndUserId"
+            resultType="com.via.shinvia.lifecycle.scenario.dto.LifecycleScenarioResponse">
+        SELECT
+            scenario.lifecycle_scenario_id AS scenario_id,
+            scenario.scenario_name,
+            scenario.description,
+            scenario.base_date,
+            scenario.status,
+            COUNT(event.lifecycle_event_id) AS event_count
+        FROM lifecycle_scenario scenario
+        LEFT JOIN lifecycle_event event
+          ON event.lifecycle_scenario_id = scenario.lifecycle_scenario_id
+        WHERE scenario.lifecycle_scenario_id = #{scenarioId}
+          AND scenario.user_id = #{userId}
+          AND scenario.status != 'ARCHIVED'
+        GROUP BY
+            scenario.lifecycle_scenario_id,
+            scenario.scenario_name,
+            scenario.description,
+            scenario.base_date,
+            scenario.status
+    </select>
+
+    <update id="updateScenario">
+        UPDATE lifecycle_scenario
+        SET
+            scenario_name = #{scenarioName},
+            description = #{description},
+            status = #{status}
+        WHERE lifecycle_scenario_id = #{scenarioId}
+          AND user_id = #{userId}
+          AND status != 'ARCHIVED'
+    </update>
+
+    <update id="archiveScenario">
+        UPDATE lifecycle_scenario
+        SET status = 'ARCHIVED',
+            result_data = NULL
+        WHERE lifecycle_scenario_id = #{scenarioId}
+          AND user_id = #{userId}
+          AND status != 'ARCHIVED'
+    </update>
+
+    <delete id="deleteSimulationResultByScenarioIdAndUserId">
+        DELETE FROM lifecycle_scenario_result
+        WHERE lifecycle_scenario_id = #{scenarioId}
+          AND user_id = #{userId}
+    </delete>
+
+    <update id="clearSimulationResult">
+        UPDATE lifecycle_scenario
+        SET result_data = NULL
+        WHERE lifecycle_scenario_id = #{scenarioId}
+          AND user_id = #{userId}
+    </update>
+
+    <update id="updateSimulationResult">
+        UPDATE lifecycle_scenario
+        SET result_data = CAST(#{resultJson} AS JSON),
+            status = 'COMPLETED'
+        WHERE lifecycle_scenario_id = #{scenarioId}
+          AND user_id = #{userId}
+    </update>
+
+    <select id="findSimulationResult" resultType="java.lang.String">
+        SELECT result_data
+        FROM lifecycle_scenario
+        WHERE lifecycle_scenario_id = #{scenarioId}
+          AND user_id = #{userId}
+    </select>
+
+    <update id="ensureSimulationResultTable">
+        CREATE TABLE IF NOT EXISTS lifecycle_scenario_result (
+            lifecycle_scenario_result_id BIGINT NOT NULL AUTO_INCREMENT,
+            lifecycle_scenario_id BIGINT NOT NULL,
+            user_id BIGINT NOT NULL,
+            scenario_name VARCHAR(100) NOT NULL,
+            result_version INT NOT NULL DEFAULT 1,
+            simulated_at DATETIME(6) NOT NULL,
+            event_count INT NOT NULL DEFAULT 0,
+            total_event_cost DECIMAL(19,2) NOT NULL DEFAULT 0,
+            total_funding_shortage DECIMAL(19,2) NOT NULL DEFAULT 0,
+            initial_net_asset DECIMAL(19,2) NOT NULL DEFAULT 0,
+            final_net_asset DECIMAL(19,2) NOT NULL DEFAULT 0,
+            net_asset_change DECIMAL(19,2) NOT NULL DEFAULT 0,
+            final_monthly_saving_capacity DECIMAL(19,2) NOT NULL DEFAULT 0,
+            final_dsr DECIMAL(9,4) NOT NULL DEFAULT 0,
+            ordered_expense_amounts_json LONGTEXT NULL,
+            ordered_event_costs_json LONGTEXT NULL,
+            one_time_cost_breakdown_json LONGTEXT NULL,
+            monthly_expense_breakdown_json LONGTEXT NULL,
+            detailed_analysis_json LONGTEXT NULL,
+            created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+            PRIMARY KEY (lifecycle_scenario_result_id),
+            UNIQUE KEY uk_lifecycle_result_scenario (lifecycle_scenario_id),
+            KEY idx_lifecycle_result_user (user_id, simulated_at)
+        )
+    </update>
+
+    <select id="countSimulationResultColumn" resultType="int">
+        SELECT COUNT(*)
+        FROM information_schema.columns
+        WHERE table_schema = DATABASE()
+          AND table_name = 'lifecycle_scenario_result'
+          AND column_name = #{columnName}
+    </select>
+
+    <update id="addOrderedExpenseAmountsColumn">
+        ALTER TABLE lifecycle_scenario_result ADD COLUMN ordered_expense_amounts_json LONGTEXT NULL
+    </update>
+
+    <update id="addOrderedEventCostsColumn">
+        ALTER TABLE lifecycle_scenario_result ADD COLUMN ordered_event_costs_json LONGTEXT NULL
+    </update>
+
+    <update id="addDetailedAnalysisColumn">
+        ALTER TABLE lifecycle_scenario_result ADD COLUMN detailed_analysis_json LONGTEXT NULL
+    </update>
+
+    <update id="addOneTimeCostBreakdownColumn">
+        ALTER TABLE lifecycle_scenario_result ADD COLUMN one_time_cost_breakdown_json LONGTEXT NULL
+    </update>
+
+    <update id="addMonthlyExpenseBreakdownColumn">
+        ALTER TABLE lifecycle_scenario_result ADD COLUMN monthly_expense_breakdown_json LONGTEXT NULL
+    </update>
+
+    <insert id="insertSimulationResultHistory">
+        INSERT INTO lifecycle_scenario_result (
+            lifecycle_scenario_id, user_id, scenario_name, result_version,
+            simulated_at, event_count, total_event_cost, total_funding_shortage,
+            initial_net_asset, final_net_asset, net_asset_change,
+            final_monthly_saving_capacity, final_dsr,
+            ordered_expense_amounts_json, ordered_event_costs_json,
+            one_time_cost_breakdown_json, monthly_expense_breakdown_json,
+            detailed_analysis_json
+        )
+        SELECT
+            scenario.lifecycle_scenario_id, scenario.user_id, scenario.scenario_name, 1,
+            #{result.simulatedAt}, #{result.eventCount}, #{result.totalEventCost},
+            #{result.totalFundingShortage}, #{result.initialNetAsset}, #{result.finalNetAsset},
+            #{result.netAssetChange}, #{result.finalMonthlySavingCapacity}, #{result.finalDsr},
+            #{orderedExpenseAmountsJson}, #{orderedEventCostsJson},
+            #{oneTimeCostBreakdownJson}, #{monthlyExpenseBreakdownJson},
+            #{detailedAnalysisJson}
+        FROM lifecycle_scenario scenario
+        WHERE scenario.lifecycle_scenario_id = #{scenarioId}
+          AND scenario.user_id = #{userId}
+        ON DUPLICATE KEY UPDATE
+            scenario_name = VALUES(scenario_name),
+            result_version = result_version + 1,
+            simulated_at = VALUES(simulated_at),
+            event_count = VALUES(event_count),
+            total_event_cost = VALUES(total_event_cost),
+            total_funding_shortage = VALUES(total_funding_shortage),
+            initial_net_asset = VALUES(initial_net_asset),
+            final_net_asset = VALUES(final_net_asset),
+            net_asset_change = VALUES(net_asset_change),
+            final_monthly_saving_capacity = VALUES(final_monthly_saving_capacity),
+            final_dsr = VALUES(final_dsr),
+            ordered_expense_amounts_json = VALUES(ordered_expense_amounts_json),
+            ordered_event_costs_json = VALUES(ordered_event_costs_json),
+            one_time_cost_breakdown_json = VALUES(one_time_cost_breakdown_json),
+            monthly_expense_breakdown_json = VALUES(monthly_expense_breakdown_json),
+            detailed_analysis_json = VALUES(detailed_analysis_json)
+    </insert>
+
+    <!-- 신규 결과 이력 테이블 도입 전에 lifecycle_scenario.result_data에 저장된 결과를 복원한다. -->
+    <insert id="backfillSimulationResults">
+        INSERT IGNORE INTO lifecycle_scenario_result (
+            lifecycle_scenario_id, user_id, scenario_name, result_version,
+            simulated_at, event_count, total_event_cost, total_funding_shortage,
+            initial_net_asset, final_net_asset, net_asset_change,
+            final_monthly_saving_capacity, final_dsr
+        )
+        SELECT
+            scenario.lifecycle_scenario_id,
+            scenario.user_id,
+            scenario.scenario_name,
+            1,
+            COALESCE(
+                STR_TO_DATE(
+                    JSON_UNQUOTE(JSON_EXTRACT(scenario.result_data, '$.simulatedAt')),
+                    '%Y-%m-%dT%H:%i:%s.%f'
+                ),
+                STR_TO_DATE(
+                    JSON_UNQUOTE(JSON_EXTRACT(scenario.result_data, '$.simulatedAt')),
+                    '%Y-%m-%dT%H:%i:%s'
+                ),
+                scenario.updated_at,
+                CURRENT_TIMESTAMP(6)
+            ),
+            COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(scenario.result_data, '$.eventCount')) AS SIGNED), 0),
+            COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(scenario.result_data, '$.totalEventCost')) AS DECIMAL(19,2)), 0),
+            COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(scenario.result_data, '$.totalFundingShortage')) AS DECIMAL(19,2)), 0),
+            COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(scenario.result_data, '$.initialNetAsset')) AS DECIMAL(19,2)), 0),
+            COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(scenario.result_data, '$.finalNetAsset')) AS DECIMAL(19,2)), 0),
+            COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(scenario.result_data, '$.netAssetChange')) AS DECIMAL(19,2)), 0),
+            COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(scenario.result_data, '$.finalMonthlySavingCapacity')) AS DECIMAL(19,2)), 0),
+            COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(scenario.result_data, '$.finalDsr')) AS DECIMAL(9,4)), 0)
+        FROM lifecycle_scenario scenario
+        WHERE scenario.user_id = #{userId}
+          AND scenario.result_data IS NOT NULL
+          AND JSON_VALID(scenario.result_data)
+    </insert>
+
+    <select id="findLatestSimulationResultRecord"
+            resultType="com.via.shinvia.lifecycle.scenario.model.LifecycleScenarioResultRecord">
+        SELECT lifecycle_scenario_result_id, lifecycle_scenario_id,
+               scenario_name, simulated_at, event_count, total_event_cost,
+               total_funding_shortage, initial_net_asset, final_net_asset,
+               net_asset_change, final_monthly_saving_capacity, final_dsr,
+               ordered_expense_amounts_json, ordered_event_costs_json,
+               one_time_cost_breakdown_json, monthly_expense_breakdown_json, detailed_analysis_json
+        FROM lifecycle_scenario_result
+        WHERE user_id = #{userId}
+        ORDER BY simulated_at DESC, lifecycle_scenario_result_id DESC
+        LIMIT 1
+    </select>
+
+    <select id="findSimulationResultRecordByScenarioId"
+            resultType="com.via.shinvia.lifecycle.scenario.model.LifecycleScenarioResultRecord">
+        SELECT lifecycle_scenario_result_id, lifecycle_scenario_id,
+               scenario_name, simulated_at, event_count, total_event_cost,
+               total_funding_shortage, initial_net_asset, final_net_asset,
+               net_asset_change, final_monthly_saving_capacity, final_dsr,
+               ordered_expense_amounts_json, ordered_event_costs_json,
+               one_time_cost_breakdown_json, monthly_expense_breakdown_json, detailed_analysis_json
+        FROM lifecycle_scenario_result
+        WHERE lifecycle_scenario_id = #{scenarioId}
+          AND user_id = #{userId}
+        ORDER BY simulated_at DESC, lifecycle_scenario_result_id DESC
+        LIMIT 1
+    </select>
+
+    <select id="findSimulationResultRecordById"
+            resultType="com.via.shinvia.lifecycle.scenario.model.LifecycleScenarioResultRecord">
+        SELECT lifecycle_scenario_result_id, lifecycle_scenario_id,
+               scenario_name, simulated_at, event_count, total_event_cost,
+               total_funding_shortage, initial_net_asset, final_net_asset,
+               net_asset_change, final_monthly_saving_capacity, final_dsr,
+               ordered_expense_amounts_json, ordered_event_costs_json,
+               one_time_cost_breakdown_json, monthly_expense_breakdown_json, detailed_analysis_json
+        FROM lifecycle_scenario_result
+        WHERE lifecycle_scenario_result_id = #{resultId}
+          AND user_id = #{userId}
+    </select>
+
+    <select id="findSimulationResultRecordsByUserId"
+            resultType="com.via.shinvia.lifecycle.scenario.model.LifecycleScenarioResultRecord">
+        SELECT lifecycle_scenario_result_id, lifecycle_scenario_id,
+               scenario_name, simulated_at, event_count, total_event_cost,
+               total_funding_shortage, initial_net_asset, final_net_asset,
+               net_asset_change, final_monthly_saving_capacity, final_dsr,
+               ordered_expense_amounts_json, ordered_event_costs_json,
+               one_time_cost_breakdown_json, monthly_expense_breakdown_json, detailed_analysis_json
+        FROM lifecycle_scenario_result
+        WHERE user_id = #{userId}
+        ORDER BY simulated_at DESC, lifecycle_scenario_result_id DESC
+    </select>
+
+    <update id="markScenarioCompleted">
+        UPDATE lifecycle_scenario
+        SET status = 'COMPLETED'
+        WHERE lifecycle_scenario_id = #{scenarioId}
+          AND user_id = #{userId}
+    </update>
+</mapper>

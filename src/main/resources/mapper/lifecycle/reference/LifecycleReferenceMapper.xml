@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.lifecycle.reference.mapper.LifecycleReferenceMapper">
+
+    <!--
+        조건에 맞는 활성 기준값 중
+        기준연도·기준월이 가장 최신인 1건 조회
+    -->
+    <select id="findLatestReference"
+        resultType="com.via.shinvia.lifecycle.reference.dto.LifecycleReferenceDto">
+
+        SELECT
+        lifecycle_reference_id,
+        event_type,
+        reference_type,
+        region_sido,
+        region_sigungu,
+        lifestyle_level,
+        amount_value,
+        rate_value,
+        numeric_value,
+        reference_year,
+        reference_month,
+        source_name,
+        source_title,
+        source_url,
+        source_type,
+        note,
+        active,
+        created_at,
+        updated_at
+        FROM lifecycle_reference
+        WHERE event_type = #{eventType}
+        AND reference_type = #{referenceType}
+        AND active = TRUE
+
+        <!-- 생활 수준 조건 -->
+        <choose>
+            <when test="lifestyleLevel != null">
+                AND lifestyle_level = #{lifestyleLevel}
+            </when>
+
+            <otherwise>
+                AND lifestyle_level IS NULL
+            </otherwise>
+        </choose>
+
+        <!-- 시도 조건 -->
+        <choose>
+            <when test="regionSido != null and regionSido != ''">
+                AND region_sido = #{regionSido}
+            </when>
+
+            <otherwise>
+                AND region_sido IS NULL
+            </otherwise>
+        </choose>
+
+        <!-- 시군구 조건 -->
+        <choose>
+            <when test="regionSigungu != null and regionSigungu != ''">
+                AND region_sigungu = #{regionSigungu}
+            </when>
+
+            <otherwise>
+                AND region_sigungu IS NULL
+            </otherwise>
+        </choose>
+
+        ORDER BY
+        reference_year DESC,
+        COALESCE(reference_month, 0) DESC,
+        lifecycle_reference_id DESC
+
+        LIMIT 1
+
+    </select>
+
+    <select id="findLatestVehicleReference"
+            resultType="com.via.shinvia.lifecycle.reference.dto.LifecycleReferenceDto">
+        SELECT
+        lifecycle_reference_id,
+        event_type,
+        reference_type,
+        vehicle_class,
+        vehicle_condition,
+        amount_value,
+        rate_value,
+        numeric_value,
+        reference_year,
+        reference_month,
+        source_name,
+        source_title,
+        source_url,
+        source_type,
+        note,
+        active,
+        created_at,
+        updated_at
+        FROM lifecycle_reference
+        WHERE event_type = #{eventType}
+        AND reference_type = #{referenceType}
+        AND vehicle_class = #{vehicleClass}
+        AND active = TRUE
+        <choose>
+            <when test="vehicleCondition != null">
+                AND vehicle_condition = #{vehicleCondition}
+            </when>
+            <otherwise>
+                AND vehicle_condition IS NULL
+            </otherwise>
+        </choose>
+        ORDER BY reference_year DESC,
+                 COALESCE(reference_month, 0) DESC,
+                 lifecycle_reference_id DESC
+        LIMIT 1
+    </select>
+
+</mapper>

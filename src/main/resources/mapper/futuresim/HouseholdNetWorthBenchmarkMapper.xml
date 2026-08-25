@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.futuresim.mapper.HouseholdNetWorthBenchmarkMapper">
+
+    <!--
+        household_size_label(전체/1인/2인/3인/4인/5인이상)로 최신 조사년도 1건 조회.
+        같은 라벨로 여러 조사년도가 쌓여도 항상 가장 최근 값을 쓴다.
+    -->
+    <select id="findLatestByLabel"
+            resultType="com.via.shinvia.futuresim.entity.KosisHouseholdNetWorth">
+
+        SELECT
+        id,
+        household_size_code,
+        household_size_label,
+        survey_year,
+        avg_income,
+        median_income,
+        avg_asset,
+        median_asset,
+        avg_debt,
+        median_debt,
+        avg_net_worth,
+        median_net_worth,
+        avg_debt_repayment,
+        median_debt_repayment,
+        avg_household_head_age,
+        household_distribution_pct
+
+        FROM kosis_household_net_worth
+
+        WHERE household_size_label = #{householdSizeLabel}
+
+        ORDER BY survey_year DESC
+
+        LIMIT 1
+
+    </select>
+
+    <!--
+        가구원수 구성비 막대(1인~5인이상) 5개 구간을 household_size_code 순으로 한 번에 조회.
+        "전체" 행(B0600)은 구성 요소가 아니라서 제외하고, 라벨별로 최신 조사년도 1건만 남긴다.
+    -->
+    <select id="findAllLatest"
+            resultType="com.via.shinvia.futuresim.entity.KosisHouseholdNetWorth">
+
+        SELECT
+        k.id,
+        k.household_size_code,
+        k.household_size_label,
+        k.survey_year,
+        k.avg_income,
+        k.median_income,
+        k.avg_asset,
+        k.median_asset,
+        k.avg_debt,
+        k.median_debt,
+        k.avg_net_worth,
+        k.median_net_worth,
+        k.avg_debt_repayment,
+        k.median_debt_repayment,
+        k.avg_household_head_age,
+        k.household_distribution_pct
+
+        FROM kosis_household_net_worth k
+        INNER JOIN (
+            SELECT household_size_label, MAX(survey_year) AS max_year
+            FROM kosis_household_net_worth
+            WHERE household_size_label != '전체'
+            GROUP BY household_size_label
+        ) latest
+        ON k.household_size_label = latest.household_size_label
+        AND k.survey_year = latest.max_year
+
+        ORDER BY k.household_size_code ASC
+
+    </select>
+
+</mapper>

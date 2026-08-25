@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.via.shinvia.policy.asset.repository.AssetFormationProductRepository">
+    <sql id="conditions">
+        WHERE p.active = TRUE
+        <if test="search.keyword != null and search.keyword != ''">
+            AND CONCAT_WS(' ', p.product_name, p.institution_name, p.subscription_target,
+                p.subscription_period, p.income_condition, p.age_condition, p.support_region,
+                p.saving_method, p.government_support, p.maturity_benefit, p.application_method)
+                LIKE CONCAT('%',
+                    REPLACE(REPLACE(REPLACE(#{search.keyword}, '=', '=='), '%', '=%'), '_', '=_'),
+                    '%') ESCAPE '='
+        </if>
+        <if test="search.targets != null and !search.targets.isEmpty()">
+            AND (<foreach collection="search.targets" item="value" separator=" OR ">
+                p.subscription_target LIKE CONCAT('%', #{value}, '%')
+            </foreach>)
+        </if>
+        <if test="search.products != null and !search.products.isEmpty()">
+            AND (<foreach collection="search.products" item="value" separator=" OR ">
+                CONCAT_WS(' ', p.product_name, p.saving_method, p.maturity_benefit)
+                LIKE CONCAT('%', #{value}, '%')
+            </foreach>)
+        </if>
+        <if test="search.terms != null and !search.terms.isEmpty()">
+            AND (<foreach collection="search.terms" item="value" separator=" OR ">
+                p.subscription_period LIKE CONCAT('%', #{value}, '%')
+            </foreach>)
+        </if>
+        <if test="search.ages != null and !search.ages.isEmpty()">
+            AND (<foreach collection="search.ages" item="value" separator=" OR ">
+                p.age_condition LIKE CONCAT('%', #{value}, '%')
+            </foreach>)
+        </if>
+        <if test="search.incomes != null and !search.incomes.isEmpty()">
+            AND (<foreach collection="search.incomes" item="value" separator=" OR ">
+                p.income_condition LIKE CONCAT('%', #{value}, '%')
+            </foreach>)
+        </if>
+        <if test="search.regions != null and !search.regions.isEmpty()">
+            AND (<foreach collection="search.regions" item="value" separator=" OR ">
+                p.support_region LIKE CONCAT('%', #{value}, '%')
+            </foreach>)
+        </if>
+    </sql>
+
+    <select id="search" resultType="com.via.shinvia.policy.asset.entity.AssetFormationProduct">
+        SELECT p.* FROM asset_formation_product p
+        <include refid="conditions"/>
+        ORDER BY p.asset_formation_product_id
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM asset_formation_product p
+        <include refid="conditions"/>
+    </select>
+
+    <select id="findByExternalId" resultType="com.via.shinvia.policy.asset.entity.AssetFormationProduct">
+        SELECT * FROM asset_formation_product WHERE external_id = #{externalId} AND active = TRUE
+    </select>
+
+    <insert id="upsert">
+        INSERT INTO asset_formation_product (
+            external_id, product_name, institution_name, subscription_target,
+            subscription_period, income_condition, age_condition, support_region,
+            saving_method, government_support, maturity_benefit, application_method,
+            related_url, active, source_updated_at, synced_at
+        ) VALUES (
+            #{externalId}, #{productName}, #{institutionName}, #{subscriptionTarget},
+            #{subscriptionPeriod}, #{incomeCondition}, #{ageCondition}, #{supportRegion},
+            #{savingMethod}, #{governmentSupport}, #{maturityBenefit}, #{applicationMethod},
+            #{relatedUrl}, #{active}, #{sourceUpdatedAt}, #{syncedAt}
+        )
+        ON DUPLICATE KEY UPDATE
+            product_name = VALUES(product_name), institution_name = VALUES(institution_name),
+            subscription_target = VALUES(subscription_target), subscription_period = VALUES(subscription_period),
+            income_condition = VALUES(income_condition), age_condition = VALUES(age_condition),
+            support_region = VALUES(support_region), saving_method = VALUES(saving_method),
+            government_support = VALUES(government_support), maturity_benefit = VALUES(maturity_benefit),
+            application_method = VALUES(application_method), related_url = VALUES(related_url),
+            active = VALUES(active), source_updated_at = VALUES(source_updated_at), synced_at = VALUES(synced_at)
+    </insert>
+
+    <update id="deactivateAll">
+        UPDATE asset_formation_product SET active = FALSE WHERE active = TRUE
+    </update>
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.futuresim.mapper.AgeGroupNetWorthBenchmarkMapper">
+
+    <!--
+        age_group_label(29세 이하/30~39세/40~49세/50~59세/60세 이상)로 최신 조사년도 1건 조회.
+        같은 라벨로 여러 조사년도가 쌓여도 항상 가장 최근 값을 쓴다.
+    -->
+    <select id="findLatestByLabel"
+            resultType="com.via.shinvia.futuresim.entity.KosisAgeGroupNetWorth">
+
+        SELECT
+        id,
+        age_group_code,
+        age_group_label,
+        survey_year,
+        avg_household_head_age,
+        household_distribution_pct,
+        avg_income,
+        median_income,
+        avg_asset,
+        median_asset,
+        avg_debt,
+        median_debt,
+        avg_net_worth,
+        median_net_worth,
+        avg_debt_repayment,
+        median_debt_repayment
+
+        FROM kosis_age_group_net_worth
+
+        WHERE age_group_label = #{ageGroupLabel}
+
+        ORDER BY survey_year DESC
+
+        LIMIT 1
+
+    </select>
+
+    <!--
+        연령대 스펙트럼(29세 이하~60세 이상) 5개 구간을 age_group_code 순으로 한 번에 조회.
+        "전체" 행(B1600)은 스펙트럼 대상이 아니라서 제외하고, 라벨별로 최신 조사년도 1건만 남긴다.
+    -->
+    <select id="findAllLatest"
+            resultType="com.via.shinvia.futuresim.entity.KosisAgeGroupNetWorth">
+
+        SELECT
+        k.id,
+        k.age_group_code,
+        k.age_group_label,
+        k.survey_year,
+        k.avg_household_head_age,
+        k.household_distribution_pct,
+        k.avg_income,
+        k.median_income,
+        k.avg_asset,
+        k.median_asset,
+        k.avg_debt,
+        k.median_debt,
+        k.avg_net_worth,
+        k.median_net_worth,
+        k.avg_debt_repayment,
+        k.median_debt_repayment
+
+        FROM kosis_age_group_net_worth k
+        INNER JOIN (
+            SELECT age_group_label, MAX(survey_year) AS max_year
+            FROM kosis_age_group_net_worth
+            WHERE age_group_label != '전체'
+            GROUP BY age_group_label
+        ) latest
+        ON k.age_group_label = latest.age_group_label
+        AND k.survey_year = latest.max_year
+
+        ORDER BY k.age_group_code ASC
+
+    </select>
+
+</mapper>

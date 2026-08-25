@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="homePurchaseForm">
+
+    <section class="lifecycle-event-detail">
+
+        <div class="lifecycle-event-detail-header">
+
+            <div>
+                <span>주택 구매</span>
+                <h3>주택 구매 계획을 알려주세요.</h3>
+            </div>
+
+            <p>
+                희망 주택가격과 자기자금, 대출기간을 기준으로
+                주택구매 이후 자산과 부채 변화를 분석합니다.
+            </p>
+
+        </div>
+
+
+        <form id="homePurchaseSurveyForm"
+              class="lifecycle-form">
+
+            <div class="lifecycle-form-group">
+
+                <label for="homePurchaseTargetDate">
+                    주택 구매 목표 시기
+                </label>
+
+                <input type="month"
+                       id="homePurchaseTargetDate"
+                       name="targetDate"
+                       required>
+
+            </div>
+
+
+            <div class="lifecycle-form-group">
+
+                <label for="homePurchaseRegionSido">
+                    희망 지역 시·도
+                </label>
+
+                <select id="homePurchaseRegionSido"
+                        name="regionSido"
+                        data-region-sido
+                        data-region-target="homePurchaseRegionSigungu"
+                        required>
+                    <option value="">시·도를 선택해주세요</option>
+                </select>
+
+            </div>
+
+
+            <div class="lifecycle-form-group">
+
+                <label for="homePurchaseRegionSigungu">
+                    희망 지역 시·군·구
+                </label>
+
+                <select id="homePurchaseRegionSigungu"
+                        name="regionSigungu"
+                        data-region-sigungu
+                        required
+                        disabled>
+                    <option value="">먼저 시·도를 선택해주세요</option>
+                </select>
+
+            </div>
+
+
+            <div class="lifecycle-form-group">
+
+                <label for="homePurchaseHousingType">
+                    희망 주택 유형
+                </label>
+
+                <select id="homePurchaseHousingType"
+                        name="housingType"
+                        required>
+
+                    <option value="">선택해주세요</option>
+                    <option th:each="type : ${housingTypes}"
+                            th:value="${type.name()}"
+                            th:text="${type.label}"></option>
+
+                </select>
+
+            </div>
+
+
+            <div class="lifecycle-form-group">
+
+                <label for="homePurchaseDesiredArea">
+                    희망 전용면적
+                </label>
+
+                <div class="lifecycle-input-unit">
+
+                    <input type="number"
+                           id="homePurchaseDesiredArea"
+                           name="desiredArea"
+                           min="0"
+                           step="0.1">
+
+                    <span>㎡</span>
+
+                </div>
+
+            </div>
+
+
+            <div class="lifecycle-form-group">
+
+                <span class="lifecycle-form-label">
+                    주택 가격 수준
+                </span>
+
+                <div class="lifecycle-radio-group">
+                    <th:block th:replace="~{lifecycle/fragments/lifestyle-options :: options('homePurchaseLifestyleLevel', false)}"></th:block>
+                </div>
+
+            </div>
+
+
+            <div class="lifecycle-form-group">
+                <span class="lifecycle-form-label">주택가격 산정 방식</span>
+                <div class="lifecycle-radio-group">
+                    <label>
+                        <input type="radio" name="homePriceMode" value="REFERENCE" data-ui-only="true" checked>
+                        평균 기준값 사용
+                    </label>
+                    <label>
+                        <input type="radio" name="homePriceMode" value="CUSTOM" data-ui-only="true">
+                        직접 입력
+                    </label>
+                </div>
+                <small>평균 기준값은 선택한 주택 유형·면적·가격 수준에 따라 레퍼런스 테이블에서 자동 계산됩니다.</small>
+            </div>
+
+            <div class="lifecycle-form-group" id="homePurchaseCustomPriceArea" hidden>
+                <label for="homePurchaseDesiredPrice">희망 주택가격</label>
+                <div class="lifecycle-input-unit">
+                    <input type="number"
+                           id="homePurchaseDesiredPrice"
+                           name="desiredPurchasePrice"
+                           min="0"
+                           disabled>
+                    <span>원</span>
+                </div>
+            </div>
+
+
+            <div class="lifecycle-form-group">
+
+                <label for="homePurchaseOwnFundAmount">
+                    사용할 자기자금
+                </label>
+
+                <div class="lifecycle-input-unit">
+
+                    <input type="number"
+                           id="homePurchaseOwnFundAmount"
+                           name="ownFundAmount"
+                           min="0">
+
+                    <span>원</span>
+
+                </div>
+
+            </div>
+
+
+            <div class="lifecycle-form-group">
+
+                <label for="homePurchaseLoanPeriod">
+                    주택담보대출 기간
+                </label>
+
+                <select id="homePurchaseLoanPeriod"
+                        name="loanPeriodMonths">
+
+                    <option value="">선택해주세요</option>
+                    <option value="120">10년</option>
+                    <option value="180">15년</option>
+                    <option value="240">20년</option>
+                    <option value="360">30년</option>
+                    <option value="480">40년</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="lifecycle-form-group">
+
+                <label for="homePurchaseRepaymentType">
+                    희망 상환방식
+                </label>
+
+                <select id="homePurchaseRepaymentType"
+                        name="repaymentType">
+
+                    <option value="">선택해주세요</option>
+
+                    <option th:each="type : ${repaymentTypes}"
+                            th:value="${type.name()}"
+                            th:text="${type.label}"></option>
+
+                </select>
+
+            </div>
+
+
+            <div class="lifecycle-form-actions">
+
+                <button type="button"
+                        id="saveHomePurchaseSurveyBtn"
+                        class="lifecycle-primary-button">
+
+                    주택 구매 계획 저장
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</th:block>
+
+</html>

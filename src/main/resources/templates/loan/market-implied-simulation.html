@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>시장 내재 금리 시나리오 테스트 | Via</title>
+</head>
+<body>
+<main class="page-shell">
+    <link rel="stylesheet" th:href="@{/css/loan-ratesimulation-common.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <header class="page-header">
+        <h1>시장 내재 금리 시나리오 테스트</h1>
+        <p class="hint">
+            채권 수익률곡선에서 뽑아낸 내재 선도금리를 이 대출에 적용했을 때 월상환액이 어떻게 변할지 보여줍니다. (로컬 테스트 전용 페이지)
+        </p>
+        <p class="hint">
+            수익률곡선은 KOFIA 채권정보센터 승인 전이라 수동 입력값(bond_yield_curve 테이블) 기반입니다
+        </p>
+    </header>
+
+    <section class="card my-loans-card" id="myLoansSection"
+              data-target-input="loanId"
+              th:attr="data-active-loan-id=${loanId}">
+        <h2 class="card-title">내 보유 대출</h2>
+        <div id="myLoansList" class="my-loans-list">
+            <p class="my-loans-empty">불러오는 중...</p>
+        </div>
+    </section>
+
+    <section class="scenario-section" aria-labelledby="marketImpliedFormTitle">
+        <div class="scenario-section-heading">
+            <div>
+                <h2 id="marketImpliedFormTitle">시나리오 조건 입력</h2>
+                <p>내 보유 대출에서 대상 대출을 선택한 후 실행하기 버튼을 눌러 주세요.</p>
+            </div>
+            <span><b>*</b> 필수 입력</span>
+        </div>
+
+        <form id="marketImpliedForm" class="scenario-form">
+            <input type="hidden" id="loanId" name="loanId" th:value="${loanId}" required min="1">
+
+            <div class="scenario-actions">
+                <button type="button" id="resetButton" class="scenario-button secondary">초기화</button>
+                <button type="submit" id="submitButton" class="scenario-button primary">실행하기</button>
+            </div>
+        </form>
+
+        <p id="errorMessage" class="banner banner-error hidden"></p>
+    </section>
+
+    <section id="resultArea" class="card hidden">
+        <h2 class="card-title">결과</h2>
+
+        <div class="result-heading">
+            <div class="loan-label">
+                <span id="resultLoanType"></span>
+                <span class="rate-type">· <span id="resultRateType"></span></span>
+            </div>
+            <span id="resultStatusBadge" class="badge"></span>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-tile">
+                <span class="stat-label">기준일</span>
+                <span class="stat-value"><span id="resultAsOfDate">-</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">현재 금리</span>
+                <span class="stat-value"><span id="resultInitialRate">-</span><span class="unit">%</span></span>
+            </div>
+        </div>
+
+        <p id="resultMessage" class="banner banner-neutral hidden"></p>
+
+        <div id="chartSection">
+            <h3 class="section-title">선도금리 적용 시 월상환액 변화</h3>
+            <div class="chart-card">
+                <canvas id="monthlyPaymentChart"></canvas>
+            </div>
+
+            <h3 class="section-title">상세 내역</h3>
+            <div class="table-wrap">
+                <table id="resultTable">
+                    <thead>
+                    <tr>
+                        <th>경과개월</th>
+                        <th>내재금리</th>
+                        <th>월상환액</th>
+                    </tr>
+                    </thead>
+                    <tbody id="resultTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <p id="resultDataSource" class="banner banner-neutral"></p>
+    </section>
+
+    <script th:src="@{/js/my-loans-widget.js}"></script>
+    <script th:src="@{/js/market-implied-simulation.js}"></script>
+</main>
+</body>
+</html>

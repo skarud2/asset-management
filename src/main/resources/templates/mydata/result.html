@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <meta charset="UTF-8">
+    <title>마이데이터 조회</title>
+    <link rel="stylesheet" th:href="@{/css/mydata-result.css}">
+</head>
+
+<body>
+<main class="result-container">
+
+    <div class="result-head">
+        <h1>마이데이터 조회</h1>
+
+        <form th:action="@{/mydata/sync}"
+              method="post"
+              class="sync-form">
+            <button type="submit"
+                    class="sync-button">
+                최신 마이데이터 불러오기
+            </button>
+        </form>
+    </div>
+
+    <!-- 카드 -->
+    <section class="result-section">
+        <div class="section-head">
+            <h2 class="section-title">연동된 카드</h2>
+            <span class="section-count" th:text="${cardCnt + '개'}">
+                0개
+            </span>
+        </div>
+
+        <p class="empty-message"
+           th:if="${cards == null or #lists.isEmpty(cards)}">
+            조회된 카드가 없습니다.
+        </p>
+
+        <div class="asset-list"
+             th:if="${cards != null and !#lists.isEmpty(cards)}">
+
+            <div class="asset-item"
+                 th:each="card : ${cards}">
+
+                <h3 class="asset-name"
+                    th:text="${card.cardName}">
+                    카드 이름
+                </h3>
+
+                <p class="asset-info"
+                   th:text="${card.cardNumberMasked}">
+                    카드 번호
+                </p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- 계좌 -->
+    <section class="result-section">
+        <div class="section-head">
+            <h2 class="section-title">연동된 계좌</h2>
+
+            <span class="section-count"
+                  th:text="${accountCnt + '개'}">
+                0개
+            </span>
+        </div>
+
+        <p class="empty-message"
+           th:if="${accountList == null or #lists.isEmpty(accountList)}">
+            조회된 계좌가 없습니다.
+        </p>
+
+        <div class="asset-list"
+             th:if="${accountList != null and !#lists.isEmpty(accountList)}">
+
+            <div class="asset-item"
+                 th:each="account : ${accountList}">
+
+                <h3 class="asset-name"
+                    th:text="${account.accountName}">
+                    계좌명
+                </h3>
+
+                <p class="asset-info">
+                    <strong th:text="${#numbers.formatDecimal(
+                            account.currentBalance,
+                            0,
+                            'COMMA',
+                            0,
+                            'POINT'
+                    )}">
+                        0
+                    </strong>
+                    원
+                </p>
+
+            </div>
+        </div>
+    </section>
+    <!--대출 계좌-->
+    <section class="result-section">
+        <div class="section-head">
+            <h2 class="section-title">연동된 대출</h2>
+
+            <span class="section-count"
+                  th:text="${loanCnt + '개'}">
+            0개
+        </span>
+        </div>
+
+        <p class="empty-message"
+           th:if="${loanList == null or #lists.isEmpty(loanList)}">
+            조회된 대출이 없습니다.
+        </p>
+
+        <div class="asset-list"
+             th:if="${loanList != null and !#lists.isEmpty(loanList)}">
+
+            <div class="asset-item"
+                 th:each="loan : ${loanList}">
+
+                <h3 class="asset-name"
+                    th:text="${loan.loanType}">
+                    대출 유형
+                </h3>
+
+                <p class="asset-info">
+                    대출잔액
+                    <strong th:text="${#numbers.formatDecimal(
+                        loan.currentBalance,
+                        0,
+                        'COMMA',
+                        0,
+                        'POINT'
+                )}">
+                        0
+                    </strong>
+                    원
+                </p>
+
+                <p class="asset-info">
+                    금리
+                    <strong th:text="${loan.interestRate}">
+                        0
+                    </strong>
+                    %
+                </p>
+
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

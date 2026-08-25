@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.stresstest.mapper.StressTestLoanMapper">
+
+    <!-- loan_account에는 user_id 컬럼이 없어 mydata_connection을 거쳐 2단 조인한다
+         (card_account는 user_id를 직접 갖고 있어 1단으로 조회 가능 - 두 테이블 설계가 다름) -->
+    <select id="findNormalLoansByUserId"
+            resultType="com.via.shinvia.stresstest.entity.StressTestLoanRow">
+
+        SELECT
+        la.loan_account_id,
+        la.loan_type,
+        la.current_balance,
+        la.interest_rate,
+        la.rate_type,
+        la.repayment_type,
+        la.maturity_at,
+        la.loan_status,
+        la.prepayment_fee_rate,
+        la.prepayment_fee_end_date
+        FROM loan_account la
+        JOIN mydata_connection mc ON mc.connection_id = la.connection_id
+        WHERE mc.user_id = #{userId}
+        AND la.loan_status = '정상'
+
+    </select>
+
+</mapper>

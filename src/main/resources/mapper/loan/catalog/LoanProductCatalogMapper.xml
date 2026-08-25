@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.loan.catalog.mapper.LoanProductCatalogMapper">
+
+    <!-- 중요: 이 Mapper는 서비스의 사용자 추천 테이블 loan_product를 건드리지 않는다. -->
+
+    <update id="deactivateByLoanType">
+        UPDATE loan_product_catalog
+        SET active = FALSE,
+            updated_at = NOW()
+        WHERE loan_type = #{loanType}
+          AND active = TRUE
+    </update>
+
+    <insert id="upsertCatalog">
+        INSERT INTO loan_product_catalog (
+            source_type,
+            source_product_key,
+            source_finance_code,
+            source_product_code,
+            source_product_subtype,
+            disclosure_month,
+            product_name,
+            loan_type,
+            min_rate,
+            max_rate,
+            max_limit_amount,
+            max_period_months,
+            target_description,
+            active,
+            institution_name,
+            institution_id,
+            join_way,
+            disclosure_start_date,
+            disclosure_end_date,
+            source_submitted_at,
+            source_url,
+            collected_at
+        ) VALUES (
+            #{sourceType},
+            #{sourceProductKey},
+            #{sourceFinanceCode},
+            #{sourceProductCode},
+            COALESCE(#{sourceProductSubtype}, ''),
+            #{disclosureMonth},
+            #{productName},
+            #{loanType},
+            #{minRate},
+            #{maxRate},
+            #{maxLimitAmount},
+            #{maxPeriodMonths},
+            #{targetDescription},
+            COALESCE(#{active}, TRUE),
+            #{institutionName},
+            #{institutionId},
+            #{joinWay},
+            #{disclosureStartDate},
+            #{disclosureEndDate},
+            #{sourceSubmittedAt},
+            #{sourceUrl},
+            COALESCE(#{collectedAt}, NOW())
+        )
+        ON DUPLICATE KEY UPDATE
+            source_finance_code = VALUES(source_finance_code),
+            source_product_code = VALUES(source_product_code),
+            disclosure_month = VALUES(disclosure_month),
+            product_name = VALUES(product_name),
+            loan_type = VALUES(loan_type),
+            min_rate = VALUES(min_rate),
+            max_rate = VALUES(max_rate),
+            max_limit_amount = VALUES(max_limit_amount),
+            max_period_months = VALUES(max_period_months),
+            target_description = VALUES(target_description),
+            active = VALUES(active),
+            institution_name = VALUES(institution_name),
+            institution_id = VALUES(institution_id),
+            join_way = VALUES(join_way),
+            disclosure_start_date = VALUES(disclosure_start_date),
+            disclosure_end_date = VALUES(disclosure_end_date),
+            source_submitted_at = VALUES(source_submitted_at),
+            source_url = VALUES(source_url),
+            collected_at = VALUES(collected_at),
+            updated_at = NOW()
+    </insert>
+
+    <select id="findCatalogProductId" resultType="java.lang.Long">
+        SELECT catalog_product_id
+        FROM loan_product_catalog
+        WHERE source_type = #{sourceType}
+          AND source_product_key = #{sourceProductKey}
+          AND source_product_subtype = COALESCE(#{sourceProductSubtype}, '')
+        LIMIT 1
+    </select>
+
+    <insert id="upsertHousingDetail">
+        INSERT INTO housing_loan_product_detail (
+            catalog_product_id,
+            loan_incidental_expense,
+            early_repayment_fee_text,
+            delinquency_rate_text,
+            loan_limit_text
+        ) VALUES (
+            #{catalogProductId},
+            #{detail.incidentalExpense},
+            #{detail.earlyRepaymentFee},
+            #{detail.delinquencyRate},
+            #{detail.loanLimit}
+        )
+        ON DUPLICATE KEY UPDATE
+            loan_incidental_expense = VALUES(loan_incidental_expense),
+            early_repayment_fee_text = VALUES(early_repayment_fee_text),
+            delinquency_rate_text = VALUES(delinquency_rate_text),
+            loan_limit_text = VALUES(loan_limit_text),
+            updated_at = NOW()
+    </insert>
+
+    <delete id="deleteHousingOptions">
+        DELETE FROM housing_loan_product_option
+        WHERE catalog_product_id = #{catalogProductId}
+    </delete>
+
+    <insert id="insertHousingOption">
+        INSERT INTO housing_loan_product_option (
+            catalog_product_id,
+            collateral_type_code,
+            collateral_type_name,
+            repayment_type_code,
+            repayment_type_name,
+            rate_type_code,
+            rate_type_name,
+            min_rate,
+            max_rate,
+            average_rate
+        ) VALUES (
+            #{catalogProductId},
+            COALESCE(#{option.collateralTypeCode}, ''),
+            #{option.collateralTypeName},
+            #{option.repaymentTypeCode},
+            #{option.repaymentTypeName},
+            #{option.rateTypeCode},
+            #{option.rateTypeName},
+            #{option.minRate},
+            #{option.maxRate},
+            #{option.averageRate}
+        )
+    </insert>
+
+    <insert id="upsertCreditDetail">
+        INSERT INTO credit_loan_product_detail (
+            catalog_product_id,
+            credit_bureau_name,
+            credit_product_type_code,
+            credit_product_type_name
+        ) VALUES (
+            #{catalogProductId},
+            #{detail.creditBureauName},
+            #{detail.productTypeCode},
+            #{detail.productTypeName}
+        )
+        ON DUPLICATE KEY UPDATE
+            credit_bureau_name = VALUES(credit_bureau_name),
+            credit_product_type_code = VALUES(credit_product_type_code),
+            credit_product_type_name = VALUES(credit_product_type_name),
+            updated_at = NOW()
+    </insert>
+
+    <delete id="deleteCreditOptions">
+        DELETE FROM credit_loan_rate_option
+        WHERE catalog_product_id = #{catalogProductId}
+    </delete>
+
+    <insert id="insertCreditOption">
+        INSERT INTO credit_loan_rate_option (
+            catalog_product_id,
+            rate_category_code,
+            rate_category_name,
+            rate_over_900,
+            rate_801_900,
+            rate_701_800,
+            rate_601_700,
+            rate_501_600,
+            rate_401_500,
+            rate_301_400,
+            rate_300_or_below,
+            average_rate
+        ) VALUES (
+            #{catalogProductId},
+            #{option.categoryCode},
+            #{option.categoryName},
+            #{option.over900},
+            #{option.from801To900},
+            #{option.from701To800},
+            #{option.from601To700},
+            #{option.from501To600},
+            #{option.from401To500},
+            #{option.from301To400},
+            #{option.belowOrEqual300},
+            #{option.averageRate}
+        )
+    </insert>
+
+    <select id="findCatalogSummaries" resultType="map">
+        SELECT
+            catalog_product_id AS catalogProductId,
+            source_product_key AS sourceProductKey,
+            product_name AS productName,
+            loan_type AS loanType,
+            min_rate AS minRate,
+            max_rate AS maxRate,
+            max_limit_amount AS maxLimitAmount,
+            max_period_months AS maxPeriodMonths,
+            target_description AS targetDescription,
+            active,
+            institution_name AS institutionName,
+            join_way AS joinWay,
+            disclosure_start_date AS disclosureStartDate,
+            disclosure_end_date AS disclosureEndDate,
+            collected_at AS collectedAt,
+            updated_at AS updatedAt
+        FROM loan_product_catalog
+        <where>
+            <if test="loanType != null and loanType != ''">
+                loan_type = #{loanType}
+            </if>
+            <if test="active != null">
+                AND active = #{active}
+            </if>
+        </where>
+        ORDER BY loan_type, institution_name, product_name, catalog_product_id
+    </select>
+
+    <select id="findCatalogSummaryById" resultType="map">
+        SELECT
+            catalog_product_id AS catalogProductId,
+            source_type AS sourceType,
+            source_product_key AS sourceProductKey,
+            source_finance_code AS sourceFinanceCode,
+            source_product_code AS sourceProductCode,
+            source_product_subtype AS sourceProductSubtype,
+            disclosure_month AS disclosureMonth,
+            product_name AS productName,
+            loan_type AS loanType,
+            min_rate AS minRate,
+            max_rate AS maxRate,
+            max_limit_amount AS maxLimitAmount,
+            max_period_months AS maxPeriodMonths,
+            target_description AS targetDescription,
+            active,
+            institution_name AS institutionName,
+            institution_id AS institutionId,
+            join_way AS joinWay,
+            disclosure_start_date AS disclosureStartDate,
+            disclosure_end_date AS disclosureEndDate,
+            source_submitted_at AS sourceSubmittedAt,
+            source_url AS sourceUrl,
+            collected_at AS collectedAt,
+            updated_at AS updatedAt
+        FROM loan_product_catalog
+        WHERE catalog_product_id = #{catalogProductId}
+    </select>
+
+    <select id="findHousingDetail" resultType="map">
+        SELECT
+            catalog_product_id AS catalogProductId,
+            loan_incidental_expense AS loanIncidentalExpense,
+            early_repayment_fee_text AS earlyRepaymentFeeText,
+            delinquency_rate_text AS delinquencyRateText,
+            loan_limit_text AS loanLimitText,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM housing_loan_product_detail
+        WHERE catalog_product_id = #{catalogProductId}
+    </select>
+
+    <select id="findHousingOptions" resultType="map">
+        SELECT
+            housing_loan_product_option_id AS housingLoanProductOptionId,
+            catalog_product_id AS catalogProductId,
+            collateral_type_code AS collateralTypeCode,
+            collateral_type_name AS collateralTypeName,
+            repayment_type_code AS repaymentTypeCode,
+            repayment_type_name AS repaymentTypeName,
+            rate_type_code AS rateTypeCode,
+            rate_type_name AS rateTypeName,
+            min_rate AS minRate,
+            max_rate AS maxRate,
+            average_rate AS averageRate,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM housing_loan_product_option
+        WHERE catalog_product_id = #{catalogProductId}
+        ORDER BY collateral_type_code, repayment_type_code, rate_type_code,
+                 housing_loan_product_option_id
+    </select>
+
+    <select id="findCreditDetail" resultType="map">
+        SELECT
+            catalog_product_id AS catalogProductId,
+            credit_bureau_name AS creditBureauName,
+            credit_product_type_code AS creditProductTypeCode,
+            credit_product_type_name AS creditProductTypeName,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM credit_loan_product_detail
+        WHERE catalog_product_id = #{catalogProductId}
+    </select>
+
+    <select id="findCreditOptions" resultType="map">
+        SELECT
+            credit_loan_rate_option_id AS creditLoanRateOptionId,
+            catalog_product_id AS catalogProductId,
+            rate_category_code AS rateCategoryCode,
+            rate_category_name AS rateCategoryName,
+            rate_over_900 AS rateOver900,
+            rate_801_900 AS rate801To900,
+            rate_701_800 AS rate701To800,
+            rate_601_700 AS rate601To700,
+            rate_501_600 AS rate501To600,
+            rate_401_500 AS rate401To500,
+            rate_301_400 AS rate301To400,
+            rate_300_or_below AS rate300OrBelow,
+            average_rate AS averageRate,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM credit_loan_rate_option
+        WHERE catalog_product_id = #{catalogProductId}
+        ORDER BY rate_category_code, credit_loan_rate_option_id
+    </select>
+
+</mapper>

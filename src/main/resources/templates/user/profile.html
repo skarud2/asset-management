@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic2 :: layout(
+          ~{::title},
+          ~{::main},
+          ~{::script},
+          ${serviceName}
+      )}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>내 프로필 관리</title>
+</head>
+
+<body>
+
+<main class="profile-page">
+
+    <section class="profile-wrap">
+
+        <div class="profile-head">
+            <h1>내 프로필 관리</h1>
+            <p>회원 정보를 확인하고 수정할 수 있습니다.</p>
+        </div>
+
+        <!-- 회원 정보 -->
+        <div class="profile-card">
+
+            <div class="card-head">
+                <h2>회원 정보</h2>
+                <p>가입 시 등록한 정보를 확인할 수 있습니다.</p>
+            </div>
+
+            <form th:action="@{/profile}"
+                  th:object="${profile}"
+                  method="post">
+
+                <div class="field">
+                    <label for="loginEmail">이메일</label>
+                    <input type="email"
+                           id="loginEmail"
+                           th:field="*{loginEmail}"
+                           readonly>
+                </div>
+
+                <div class="field">
+                    <label for="userName">이름</label>
+                    <input type="text"
+                           id="userName"
+                           th:field="*{userName}"
+                           readonly>
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('userName')}"
+                       th:errors="*{userName}"></p>
+                </div>
+
+                <div class="field">
+                    <label for="phoneNumber">휴대전화 번호</label>
+                    <input type="tel"
+                           id="phoneNumber"
+                           th:field="*{phoneNumber}"
+                           maxlength="11"
+                           inputmode="numeric"
+                           readonly>
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('phoneNumber')}"
+                       th:errors="*{phoneNumber}"></p>
+                </div>
+
+                <div class="field">
+                    <label for="birthDate">생년월일</label>
+
+                    <input type="text"
+                           id="birthDate"
+                           th:field="*{birthDate}"
+                           readonly>
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('birthDate')}"
+                       th:errors="*{birthDate}"></p>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button"
+                            id="profileEditBtn"
+                            class="white-btn">
+                        수정하기
+                    </button>
+
+                    <button type="submit"
+                            id="profileSaveBtn"
+                            class="black-btn"
+                            hidden>
+                        저장하기
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+
+        <!-- 비밀번호 -->
+        <div class="profile-card">
+
+            <div class="card-head">
+                <h2>비밀번호</h2>
+                <p>로그인 비밀번호를 변경할 수 있습니다.</p>
+            </div>
+
+            <form th:action="@{/profile/password}"
+                  th:object="${passwordForm}"
+                  method="post">
+
+                <div id="passwordView"
+                     class="field">
+
+                    <label>비밀번호</label>
+
+                    <input type="password"
+                           value="********"
+                           readonly>
+                </div>
+
+                <div id="passwordEditArea"
+                     hidden>
+
+                    <div class="field">
+                        <label for="newPassword">
+                            새 비밀번호
+                        </label>
+
+                        <input type="password"
+                               id="newPassword"
+                               th:field="*{password}"
+                               autocomplete="new-password"
+                               disabled>
+
+                        <p class="error"
+                           th:if="${#fields.hasErrors('password')}"
+                           th:errors="*{password}"></p>
+                    </div>
+
+                    <div class="field">
+                        <label for="passwordConfirm">
+                            새 비밀번호 확인
+                        </label>
+
+                        <input type="password"
+                               id="passwordConfirm"
+                               th:field="*{passwordConfirm}"
+                               autocomplete="new-password"
+                               disabled>
+
+                        <p class="error"
+                           th:if="${#fields.hasErrors('passwordConfirm')}"
+                           th:errors="*{passwordConfirm}"></p>
+
+                        <p id="passwordMessage"
+                           class="password-message"></p>
+                    </div>
+
+                </div>
+
+                <div class="btn-row">
+                    <button type="button"
+                            id="passwordEditBtn"
+                            class="white-btn">
+                        수정하기
+                    </button>
+
+                    <button type="submit"
+                            id="passwordSaveBtn"
+                            class="black-btn"
+                            hidden>
+                        저장하기
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </section>
+
+</main>
+
+<script defer th:src="@{/js/profile.js}"></script>
+
+</body>
+</html>

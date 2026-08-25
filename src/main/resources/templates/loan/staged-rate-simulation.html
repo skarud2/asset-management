@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>계단식 금리 시나리오 테스트 | Via</title>
+</head>
+<body>
+<main class="page-shell">
+    <link rel="stylesheet" th:href="@{/css/loan-ratesimulation-common.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <header class="page-header">
+        <h1>계단식 금리 시나리오 테스트</h1>
+        <p class="hint">
+            재산정 주기마다 금리가 단계적으로 오르내린다고 가정했을 때, 시점별 월상환액 변화를 보여줍니다. (로컬 테스트 전용 페이지)
+        </p>
+    </header>
+
+    <section class="card my-loans-card" id="myLoansSection"
+              data-target-input="loanId"
+              th:attr="data-active-loan-id=${loanId}">
+        <h2 class="card-title">내 보유 대출</h2>
+        <div id="myLoansList" class="my-loans-list">
+            <p class="my-loans-empty">불러오는 중...</p>
+        </div>
+    </section>
+
+    <section class="scenario-section" aria-labelledby="stagedFormTitle">
+        <div class="scenario-section-heading">
+            <div>
+                <h2 id="stagedFormTitle">시나리오 조건 입력</h2>
+                <p>재산정 조건을 입력한 후 실행하기 버튼을 눌러 주세요.</p>
+            </div>
+            <span><b>*</b> 필수 입력</span>
+        </div>
+
+        <form id="stagedForm" class="scenario-form">
+            <input type="hidden" id="loanId" name="loanId" th:value="${loanId}" required min="1">
+
+            <div class="scenario-form-row">
+                <label for="repricingCycleMonths">재산정 주기 <b>*</b></label>
+                <div class="scenario-field field-with-unit">
+                    <input type="number" id="repricingCycleMonths" name="repricingCycleMonths" value="6" required min="1">
+                    <span>개월</span>
+                </div>
+
+                <label for="stepDeltaPercent">재산정 변동폭 <b>*</b></label>
+                <div class="scenario-field field-with-unit">
+                    <input type="number" id="stepDeltaPercent" name="stepDeltaPercent" value="0.25" required step="any">
+                    <span>%p</span>
+                </div>
+            </div>
+
+            <div class="scenario-form-row single-row">
+                <label for="stepCount">재산정 반복 횟수 <b>*</b></label>
+                <div class="scenario-field">
+                    <input type="number" id="stepCount" name="stepCount" value="5" required min="1">
+                </div>
+            </div>
+
+            <div class="scenario-actions">
+                <button type="button" id="resetButton" class="scenario-button secondary">초기화</button>
+                <button type="submit" id="submitButton" class="scenario-button primary">실행하기</button>
+            </div>
+        </form>
+
+        <p id="errorMessage" class="banner banner-error hidden"></p>
+    </section>
+
+    <section id="resultArea" class="card hidden">
+        <h2 class="card-title">결과</h2>
+
+        <div class="result-heading">
+            <div class="loan-label">
+                <span id="resultLoanType"></span>
+                <span class="rate-type">· <span id="resultRateType"></span></span>
+            </div>
+            <span id="resultStatusBadge" class="badge"></span>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-tile">
+                <span class="stat-label">초기 금리</span>
+                <span class="stat-value"><span id="resultInitialRate">-</span><span class="unit">%</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">초기 월상환액</span>
+                <span class="stat-value"><span id="resultInitialMonthlyPayment">-</span><span class="unit">원</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">구간이자 합계</span>
+                <span class="stat-value"><span id="resultTotalSegmentInterest">-</span><span class="unit">원</span></span>
+            </div>
+        </div>
+
+        <p id="resultMessage" class="banner banner-neutral hidden"></p>
+        <p id="resultTruncated" class="banner banner-warning hidden">
+            대출 만기가 이 시점 이전에 도래해서 계산을 중단했어요.
+        </p>
+
+        <div id="chartSection">
+            <h3 class="section-title">월상환액 변화</h3>
+            <div class="chart-card">
+                <canvas id="monthlyPaymentChart"></canvas>
+            </div>
+
+            <h3 class="section-title">상세 내역</h3>
+            <div class="table-wrap">
+                <table id="resultTable">
+                    <thead>
+                    <tr>
+                        <th>경과개월</th>
+                        <th>적용금리</th>
+                        <th>잔액</th>
+                        <th>월상환액</th>
+                        <th>구간이자</th>
+                    </tr>
+                    </thead>
+                    <tbody id="resultTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <script th:src="@{/js/my-loans-widget.js}"></script>
+    <script th:src="@{/js/staged-rate-simulation.js}"></script>
+</main>
+</body>
+</html>

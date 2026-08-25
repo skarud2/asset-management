@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic2 :: layout(~{::title}, ~{::main}, ~{::script}, ${serviceName})}">
+<head>
+    <meta charset="UTF-8">
+    <title>소셜 계정 연결</title>
+    <link rel="stylesheet" th:href="@{/css/signup.css}">
+</head>
+<body>
+
+<main class="page">
+    <section class="wrap">
+
+        <h1 class="title">기존 계정 연결</h1>
+        <div class="line"></div>
+
+        <p class="desc">
+            이미 가입된 이메일입니다.<br>
+            기존 계정을 확인한 후 카카오 로그인을 연결해주세요.
+        </p>
+
+        <div class="box">
+
+            <form class="form"
+                  th:action="@{/social/link}"
+                  th:object="${socialLinkRequest}"
+                  method="post">
+
+                <div class="field">
+                    <label>이메일</label>
+
+                    <input type="email"
+                           th:value="${providerEmail}"
+                           readonly>
+                </div>
+
+                <div class="field">
+                    <label for="password">기존 계정 비밀번호</label>
+
+                    <input type="password"
+                           id="password"
+                           th:field="*{password}"
+                           placeholder="비밀번호를 입력해주세요"
+                           autocomplete="current-password">
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('password')}"
+                       th:errors="*{password}">
+                    </p>
+                </div>
+
+                <p class="error all"
+                   th:if="${linkError}"
+                   th:text="${linkError}">
+                </p>
+
+                <button type="submit"
+                        class="btn">
+                    카카오 계정 연결
+                </button>
+
+                <a th:href="@{/login}"
+                   class="cancel">
+                    취소
+                </a>
+
+            </form>
+
+        </div>
+
+    </section>
+</main>
+
+</body>
+
+</main>
+
+<script>
+</script>
+
+</body>
+</html>

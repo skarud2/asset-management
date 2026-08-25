@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.via.shinvia.policy.social.repository.SocialFinanceProductRepository">
+    <sql id="conditions">
+        WHERE p.active = TRUE
+        <if test="search.keyword != null and search.keyword != ''">
+            AND CONCAT_WS(' ', p.product_name, p.institution_name, p.product_category,
+                p.support_target, p.business_type, p.support_method, p.support_amount,
+                p.handling_institution, p.application_method)
+                LIKE CONCAT('%',
+                    REPLACE(REPLACE(REPLACE(#{search.keyword}, '=', '=='), '%', '=%'), '_', '=_'),
+                    '%') ESCAPE '='
+        </if>
+        <if test="search.categories != null and !search.categories.isEmpty()">
+            AND (<foreach collection="search.categories" item="value" separator=" OR ">
+                p.product_category LIKE CONCAT('%', #{value}, '%')
+            </foreach>)
+        </if>
+        <if test="search.targets != null and !search.targets.isEmpty()">
+            AND (<foreach collection="search.targets" item="value" separator=" OR ">
+                p.support_target LIKE CONCAT('%', #{value}, '%')
+            </foreach>)
+        </if>
+    </sql>
+
+    <select id="search" resultType="com.via.shinvia.policy.social.entity.SocialFinanceProduct">
+        SELECT p.* FROM social_finance_product p
+        <include refid="conditions"/>
+        ORDER BY p.social_finance_product_id
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM social_finance_product p
+        <include refid="conditions"/>
+    </select>
+
+    <select id="findByExternalId" resultType="com.via.shinvia.policy.social.entity.SocialFinanceProduct">
+        SELECT * FROM social_finance_product WHERE external_id = #{externalId} AND active = TRUE
+    </select>
+
+    <insert id="upsert">
+        INSERT INTO social_finance_product (
+            external_id, product_name, institution_name, product_category, support_target,
+            business_type, support_method, support_amount, handling_institution,
+            application_method, related_url, active, source_updated_at, synced_at
+        ) VALUES (
+            #{externalId}, #{productName}, #{institutionName}, #{productCategory}, #{supportTarget},
+            #{businessType}, #{supportMethod}, #{supportAmount}, #{handlingInstitution},
+            #{applicationMethod}, #{relatedUrl}, #{active}, #{sourceUpdatedAt}, #{syncedAt}
+        )
+        ON DUPLICATE KEY UPDATE
+            product_name = VALUES(product_name), institution_name = VALUES(institution_name),
+            product_category = VALUES(product_category), support_target = VALUES(support_target),
+            business_type = VALUES(business_type), support_method = VALUES(support_method),
+            support_amount = VALUES(support_amount), handling_institution = VALUES(handling_institution),
+            application_method = VALUES(application_method), related_url = VALUES(related_url),
+            active = VALUES(active), source_updated_at = VALUES(source_updated_at), synced_at = VALUES(synced_at)
+    </insert>
+
+    <update id="deactivateAll">
+        UPDATE social_finance_product SET active = FALSE WHERE active = TRUE
+    </update>
+</mapper>

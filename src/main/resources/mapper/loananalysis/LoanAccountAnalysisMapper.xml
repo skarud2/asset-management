@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 대출계좌 분석 Mapper -->
+<mapper namespace="com.via.shinvia.loananalysis.mapper.LoanAccountAnalysisMapper">
+
+
+    <!-- 사용자 보유 대출 전체 조회 -->
+    <select id="findActiveLoansByUserId"
+            resultType="com.via.shinvia.loananalysis.dto.LoanAccountAnalysisDTO">
+
+        SELECT
+        la.loan_account_id,
+        la.loan_type,
+        la.principal_amount,
+        la.current_balance,
+        la.interest_rate,
+        la.rate_type,
+        la.repayment_type,
+        la.disbursed_at,
+        la.maturity_at,
+        la.loan_status,
+        la.prepayment_fee_rate,
+        la.prepayment_fee_end_date
+
+        FROM loan_account la
+
+        <!-- 회원의 마이데이터 연결 조회 -->
+        INNER JOIN mydata_connection mc
+        ON mc.connection_id = la.connection_id
+
+        <!-- 사용자 기준 조회 -->
+        WHERE mc.user_id = #{userId}
+
+        <!-- 상환 대상 대출 조회 -->
+        AND la.loan_status IN ('정상', '연체')
+
+        <!-- 금리와 잔액 기준 기본 정렬 -->
+        ORDER BY
+        la.interest_rate DESC,
+        la.current_balance ASC
+
+    </select>
+
+
+    <!-- 사용자 대출 1건 조회 -->
+    <select id="findLoanById"
+            resultType="com.via.shinvia.loananalysis.dto.LoanAccountAnalysisDTO">
+
+        SELECT
+        la.loan_account_id,
+        la.loan_type,
+        la.principal_amount,
+        la.current_balance,
+        la.interest_rate,
+        la.rate_type,
+        la.repayment_type,
+        la.disbursed_at,
+        la.maturity_at,
+        la.loan_status,
+        la.prepayment_fee_rate,
+        la.prepayment_fee_end_date
+
+        FROM loan_account la
+
+        <!-- 회원의 마이데이터 연결 조회 -->
+        INNER JOIN mydata_connection mc
+        ON mc.connection_id = la.connection_id
+
+        <!-- 사용자와 대출번호 확인 -->
+        WHERE mc.user_id = #{userId}
+        AND la.loan_account_id = #{loanAccountId}
+
+        <!-- 정상·연체 대출만 조회 -->
+        AND la.loan_status IN ('정상', '연체')
+
+        LIMIT 1
+
+    </select>
+
+
+</mapper>

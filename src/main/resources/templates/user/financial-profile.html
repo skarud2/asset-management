@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic2 :: layout(~{::title}, ~{::main}, ~{::script}, ${serviceName})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>금융 프로필</title>
+    <link rel="stylesheet" th:href="@{/css/financial-profile.css}">
+</head>
+
+<body>
+<main class="profile-page">
+    <section class="profile-container">
+        <header class="profile-heading">
+            <h1>금융 프로필</h1>
+        </header>
+
+        <div class="profile-divider"></div>
+        <p class="description" th:if="${isNew}">금융 정보를 등록해주세요.</p>
+
+        <div class="profile-box">
+            <form id="financialProfileForm"
+                  class="profile-form"
+                  th:action="(${isNew}
+          ? @{/financial-profile/new}
+          : @{/financial-profile/edit})"
+                  th:object="${financialProfile}"
+                  method="post">
+
+                <div class="form-field">
+                    <label for="annualIncome">연소득</label>
+
+                    <div class="input-area">
+                        <input type="number"
+                               id="annualIncome"
+                               required
+                               th:field="*{annualIncome}"
+                               data-editable
+                               th:disabled="${!isNew}"
+                               placeholder="연소득을 입력해주세요">
+
+                        <p class="field-error"
+                           th:if="${#fields.hasErrors('annualIncome')}"
+                           th:errors="*{annualIncome}">
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="incomeType">소득 유형</label>
+
+                    <div class="input-area">
+                        <select id="incomeType"
+                                required
+                                th:field="*{incomeType}"
+                                data-editable
+                                th:disabled="${!isNew}">
+                            <option value="">선택해주세요</option>
+                            <option value="EMPLOYMENT">근로소득</option>
+                            <option value="BUSINESS">사업소득</option>
+                            <option value="FINANCIAL">금융소득</option>
+                            <option value="OTHER">기타</option>
+                        </select>
+
+                        <p class="field-error"
+                           th:if="${#fields.hasErrors('incomeType')}"
+                           th:errors="*{incomeType}">
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="employmentStatus">고용 상태</label>
+
+                    <div class="input-area">
+                        <select id="employmentStatus"
+                                required
+                                th:field="*{employmentStatus}"
+                                data-editable
+                                th:disabled="${!isNew}">
+                            <option value="">선택해주세요</option>
+
+                            <option value="REGULAR">정규직</option>
+                            <option value="CONTRACT">계약직</option>
+                            <option value="TEMPORARY">일용직/프리랜서</option>
+                            <option value="OTHER">기타</option>
+                        </select>
+
+                        <p class="field-error"
+                           th:if="${#fields.hasErrors('employmentStatus')}"
+                           th:errors="*{employmentStatus}">
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="liquidAssetAmount">현금성 자산</label>
+
+                    <div class="input-area">
+                        <input type="number"
+                               id="liquidAssetAmount"
+                               required
+                               th:field="*{liquidAssetAmount}"
+                               data-editable
+                               th:disabled="${!isNew}"
+                               placeholder="현금성 자산을 입력해주세요">
+
+                        <p class="field-error"
+                           th:if="${#fields.hasErrors('liquidAssetAmount')}"
+                           th:errors="*{liquidAssetAmount}">
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="creditScore">신용점수</label>
+
+                    <div class="input-area">
+                        <input type="number"
+                               id="creditScore"
+                               th:field="*{creditScore}"
+                               min="1"
+                               max="1000"
+                               data-editable
+                               th:disabled="${!isNew}"
+                               placeholder="신용점수를 입력해주세요">
+
+                        <p class="field-error"
+                           th:if="${#fields.hasErrors('creditScore')}"
+                           th:errors="*{creditScore}">
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 신규 등록 -->
+                <button type="submit"
+                        class="primary-button"
+                        th:if="${isNew}">
+                    등록하기
+                </button>
+
+                <!-- 기존 정보 조회 -->
+                <div class="button-group"
+                     th:unless="${isNew}">
+
+                    <button type="button"
+                            id="editButton"
+                            class="primary-button">
+                        수정하기
+                    </button>
+
+                    <button type="submit"
+                            id="saveButton"
+                            class="primary-button"
+                            hidden>
+                        저장하기
+                    </button>
+
+                    <button type="button"
+                            id="cancelButton"
+                            class="secondary-button"
+                            hidden>
+                        취소
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </section>
+</main>
+
+<script th:src="@{/js/financial-profile.js}"></script>
+</body>
+</html>

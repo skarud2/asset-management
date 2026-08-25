@@ -1,0 +1,144 @@
+<header th:fragment="mainHeader"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        class="header">
+    <div class="main-header">
+        <div class="brand-section">
+            <a class="logo" th:href="@{/}">Via</a>
+            <nav class="nav-links">
+                <div class="nav-item mega-menu-container">
+                    <a th:href="@{/loans/recommendations}" class="nav-link">대출</a>
+                    <div class="mega-menu">
+                        <div class="mega-menu-inner mega-menu-categories">
+                            <section class="mega-menu-category" th:each="category : ${loanServiceMenus}">
+                                <div class="mega-menu-category-heading">
+                                    <span class="material-symbols-outlined" th:text="${category.icon}">payments</span>
+                                    <h4 th:text="${category.name}">서비스</h4>
+                                </div>
+                                <ul class="mega-menu-list">
+                                    <li th:each="item : ${category.items}">
+                                        <a th:if="${item.enabled}" th:href="@{${item.path}}" th:text="${item.name}">서비스</a>
+                                        <span th:unless="${item.enabled}" class="mega-menu-disabled">
+                                            <span th:text="${item.name}">서비스</span> <small>준비중</small>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-item mega-menu-container">
+                    <span class="nav-link">자산관리</span>
+
+                    <div class="mega-menu">
+                        <div class="mega-menu-inner mega-menu-categories">
+                            <section class="mega-menu-category" th:each="category : ${assetServiceMenus}">
+                                <div class="mega-menu-category-heading">
+                                    <span class="material-symbols-outlined" th:text="${category.icon}">timeline</span>
+                                    <h4 th:text="${category.name}">서비스</h4>
+                                </div>
+                                <ul class="mega-menu-list">
+                                    <li th:each="item : ${category.items}">
+                                        <a th:if="${item.enabled}" th:href="@{${item.path}}" th:text="${item.name}">서비스</a>
+                                        <span th:unless="${item.enabled}" class="mega-menu-disabled">
+                                            <span th:text="${item.name}">서비스</span> <small>준비중</small>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <div class="action-buttons">
+            <div class="header-session-timer" sec:authorize="isAuthenticated()" aria-label="접속시간">
+                <span id="headerSessionRemainingTime" aria-live="off">00분 00초</span>
+                <button id="headerTokenRefreshBtn" class="btn-refresh" type="button" title="접속시간 1시간 연장">연장</button>
+            </div>
+            <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn-signin">로그인</a>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn-signin">로그아웃</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="utility-nav">
+        <a th:href="@{/dsr}" class="utility-link">DSR 계산기</a>
+
+        <div class="user-avatar-container"
+             sec:authorize="isAuthenticated()">
+
+            <div class="user-avatar"
+                 id="userAvatarBtn"
+                 role="button"
+                 aria-expanded="false"
+                 aria-label="User Profile Menu">
+
+        <span class="material-symbols-outlined"
+              data-icon="account_circle">
+            account_circle
+        </span>
+            </div>
+
+            <div class="profile-popover"
+                 id="profilePopover">
+
+                <div class="popover-header">
+                    <div class="popover-user-info">
+                        <div class="popover-avatar-large">
+                    <span class="material-symbols-outlined">
+                        account_circle
+                    </span>
+                        </div>
+
+                        <div>
+                            <div class="user-name"
+                                 th:text="${loginUserName} + ' 님'">
+                                사용자 님
+                            </div>
+
+                            <div class="user-email"
+                                 th:text="${loginUserEmail}">
+                                로그인 사용자
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="popover-body">
+                    <a th:href="@{/profile}" class="popover-item">
+                        <span class="material-symbols-outlined">person</span>
+                        <span>내 프로필 관리</span>
+                    </a>
+
+                    <a th:href="@{/mydata/connection}" class="popover-item">
+                        <span class="material-symbols-outlined">receipt_long</span>
+                        <span>마이데이터 조회</span>
+                    </a>
+
+                    <a th:href="@{/financial-profile}" class="popover-item">
+                        <span class="material-symbols-outlined">manage_accounts</span>
+                        <span>금융 프로필</span>
+                    </a>
+
+                    <a href="#" class="popover-item">
+                        <span class="material-symbols-outlined">help</span>
+                        <span>고객센터 문의</span>
+                    </a>
+                </div>
+
+                <div class="popover-footer">
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit"
+                                class="popover-btn-logout">
+                            로그아웃
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

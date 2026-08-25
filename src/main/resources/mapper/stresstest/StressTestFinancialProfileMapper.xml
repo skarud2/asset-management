@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.stresstest.mapper.StressTestFinancialProfileMapper">
+
+    <!-- loananalysis.FinancialCapacityMapper와 달리 transaction_analysis/loan_analysis(아직 없는 테이블)를
+         LEFT JOIN하지 않고 user_financial_profile만 직접 조회한다. 프로필이 없는 사용자는 null 반환. -->
+    <select id="findAnnualIncomeByUserId"
+            resultType="java.math.BigDecimal">
+
+        SELECT annual_income
+        FROM user_financial_profile
+        WHERE user_id = #{userId}
+
+    </select>
+
+    <select id="findLiquidAssetAmountByUserId"
+            resultType="java.math.BigDecimal">
+
+        SELECT liquid_asset_amount
+        FROM user_financial_profile
+        WHERE user_id = #{userId}
+
+    </select>
+
+</mapper>

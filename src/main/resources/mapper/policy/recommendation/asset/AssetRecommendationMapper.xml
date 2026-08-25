@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.policy.recommendation.asset.mapper.AssetRecommendationMapper">
+
+    <select id="findActiveProducts"
+            resultType="com.via.shinvia.policy.recommendation.asset.dto.AssetFormationProductDTO">
+        SELECT
+        asset_formation_product_id AS product_id,
+        external_id,
+        product_name,
+        institution_name,
+        subscription_target,
+        subscription_period,
+        income_condition,
+        age_condition,
+        support_region,
+        saving_method,
+        government_support,
+        maturity_benefit,
+        application_method,
+        related_url
+        FROM asset_formation_product
+        WHERE active = TRUE
+        ORDER BY asset_formation_product_id
+    </select>
+
+</mapper>

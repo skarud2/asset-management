@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="monthlyRentForm">
+    <section class="lifecycle-event-detail">
+        <div class="lifecycle-event-detail-header">
+            <div><span>월세</span><h3>월세 입주 계획을 알려주세요.</h3></div>
+            <p>희망 지역과 보증금, 월세 및 관리비를 기준으로 주거비 변화를 분석합니다.</p>
+        </div>
+
+        <form id="monthlyRentSurveyForm" class="lifecycle-form">
+            <div class="lifecycle-form-group">
+                <label for="monthlyRentTargetDate">월세 입주 희망 시기</label>
+                <input type="month" id="monthlyRentTargetDate" name="targetDate" required>
+            </div>
+            <div class="lifecycle-form-group">
+                <label for="monthlyRentRegionSido">희망 지역 시·도</label>
+                <select id="monthlyRentRegionSido" name="regionSido"
+                        data-region-sido data-region-target="monthlyRentRegionSigungu" required>
+                    <option value="">시·도를 선택해주세요</option>
+                </select>
+            </div>
+            <div class="lifecycle-form-group">
+                <label for="monthlyRentRegionSigungu">희망 지역 시·군·구</label>
+                <select id="monthlyRentRegionSigungu" name="regionSigungu"
+                        data-region-sigungu required disabled>
+                    <option value="">먼저 시·도를 선택해주세요</option>
+                </select>
+            </div>
+            <div class="lifecycle-form-group">
+                <label for="monthlyRentHousingType">희망 주택 유형</label>
+                <select id="monthlyRentHousingType" name="housingType" required>
+                    <option value="">선택해주세요</option>
+                    <option th:each="type : ${housingTypes}"
+                            th:value="${type.name()}"
+                            th:text="${type.label}"></option>
+                </select>
+            </div>
+            <div class="lifecycle-form-group">
+                <label for="monthlyRentDesiredArea">희망 전용면적</label>
+                <div class="lifecycle-input-unit">
+                    <input type="number" id="monthlyRentDesiredArea" name="desiredArea" min="0" step="0.1" required>
+                    <span>㎡</span>
+                </div>
+            </div>
+            <div class="lifecycle-form-group">
+                <span class="lifecycle-form-label">주거 수준</span>
+                <div class="lifecycle-radio-group">
+                    <th:block th:replace="~{lifecycle/fragments/lifestyle-options :: options('monthlyRentLifestyleLevel', false)}"></th:block>
+                </div>
+            </div>
+            <div class="lifecycle-form-group">
+                <label for="monthlyRentDesiredDeposit">희망 보증금</label>
+                <div class="lifecycle-input-unit">
+                    <input type="number" id="monthlyRentDesiredDeposit" name="desiredDeposit" min="0" required>
+                    <span>원</span>
+                </div>
+            </div>
+            <div class="lifecycle-form-group">
+                <label for="monthlyRentDesiredMonthlyRent">희망 월세</label>
+                <div class="lifecycle-input-unit">
+                    <input type="number" id="monthlyRentDesiredMonthlyRent" name="desiredMonthlyRent" min="0" required>
+                    <span>원</span>
+                </div>
+            </div>
+            <div class="lifecycle-form-group">
+                <label for="monthlyRentManagementFee">예상 월 관리비</label>
+                <div class="lifecycle-input-unit">
+                    <input type="number" id="monthlyRentManagementFee" name="monthlyManagementFee" min="0" required>
+                    <span>원</span>
+                </div>
+            </div>
+            <div class="lifecycle-form-actions">
+                <button type="button" id="saveMonthlyRentSurveyBtn" class="lifecycle-primary-button">월세 계획 저장</button>
+            </div>
+        </form>
+    </section>
+</th:block>
+</html>

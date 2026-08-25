@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head><title>사회연대금융 | SHINVIA</title></head>
+<body>
+<main class="policy-container bank-policy-page">
+    <section class="page-header"><p class="page-label">SOCIAL FINANCE</p>
+        <h1>사회연대금융</h1>
+        <p class="page-description">사회적경제기업과 금융취약계층을 위한 금융상품을 확인할 수 있습니다.</p></section>
+    <section class="policy-notice"><p>서민금융진흥원 제공 정보를 기반으로 조회됩니다. 신청 전 운영기관의 공식 안내를 확인해 주세요.</p></section>
+    <section class="policy-search-area">
+        <form method="get" th:action="@{/social-finance}" id="financialProductSearchForm">
+            <input type="hidden" name="page" value="0">
+            <div class="policy-filter-form">
+                <div class="search-input-group"><label for="keyword" class="sr-only">상품 검색</label><input id="keyword"
+                                                                                                         class="policy-search-input"
+                                                                                                         type="search"
+                                                                                                         name="keyword"
+                                                                                                         th:value="${search.keyword}"
+                                                                                                         placeholder="상품명, 지원대상, 기관을 검색하세요">
+                </div>
+                <div class="page-size-group"><label for="size" class="sr-only">페이지당 표시 개수</label><select id="size"
+                                                                                                         class="page-size-select"
+                                                                                                         name="size"
+                                                                                                         onchange="this.form.submit()">
+                    <option th:each="option : ${ {10,20,30,40,50} }" th:value="${option}"
+                            th:selected="${search.size == option}" th:text="${option + '개씩 보기'}">20개씩 보기
+                    </option>
+                </select></div>
+                <button class="search-button" type="submit">검색</button>
+            </div>
+            <div class="detail-filter-header"><h2>상세검색 필터</h2>
+                <button type="button" id="detailFilterToggle" class="detail-filter-toggle collapsed"
+                        aria-expanded="false" aria-controls="detailFilterPanel"><span
+                        id="filterToggleText">펼치기</span><span class="filter-toggle-icon">▲</span></button>
+            </div>
+            <div id="detailFilterPanel" class="detail-filter-panel hidden">
+                <div class="detail-filter-row">
+                    <div class="detail-filter-label">지원분류</div>
+                    <div class="detail-filter-options">
+                        <label class="filter-chip" th:each="option : ${ {'대출(보증)','투자','지원제도','교육/컨설팅','기타'} }"><input
+                                type="checkbox" name="categories" th:value="${option}"
+                                th:checked="${#lists.contains(search.categories, option)}"><span
+                                th:text="${option}">분류</span></label>
+                    </div>
+                </div>
+                <div class="detail-filter-row">
+                    <div class="detail-filter-label">지원대상</div>
+                    <div class="detail-filter-options">
+                        <label class="filter-chip"
+                               th:each="option : ${ {'사회적기업','사회적협동조합','마을기업','자활기업','소셜벤처','기타'} }"><input
+                                type="checkbox" name="targets" th:value="${option}"
+                                th:checked="${#lists.contains(search.targets, option)}"><span
+                                th:text="${option}">대상</span></label>
+                    </div>
+                </div>
+                <div class="detail-filter-actions"><a class="filter-reset-button" th:href="@{/social-finance}">초기화</a>
+                    <button class="filter-submit-button" type="submit">조건 검색</button>
+                </div>
+            </div>
+        </form>
+    </section>
+    <th:block th:replace="~{policy/product-fragments :: results}"></th:block>
+    <th:block th:replace="~{policy/product-fragments :: modal}"></th:block>
+</main>
+</body>
+</html>

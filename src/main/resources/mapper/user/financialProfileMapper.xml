@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.finprofile.FinancialProfileMapper">
+    <select id="findFinancialProfileByUserId">
+        SELECT
+            user_financial_profile_id,
+            user_id,
+            annual_income,
+            income_type,
+            employment_status,
+            credit_score,
+            liquid_asset_amount,
+            created_at,
+            updated_at
+        FROM user_financial_profile
+        WHERE user_id=#{userId}
+    </select>
+
+    <insert id="insertFinancialProfile"
+            parameterType="FinancialProfile"
+            useGeneratedKeys="true"
+            keyProperty="userFinancialProfileId"
+            keyColumn="user_financial_profile_id">
+        INSERT INTO user_financial_profile(
+            user_id,
+            annual_income,
+            income_type,
+            employment_status,
+            credit_score,
+            liquid_asset_amount
+        )
+        VALUES(
+            #{userId},
+            #{annualIncome},
+            #{incomeType},
+            #{employmentStatus},
+            #{creditScore},
+            #{liquidAssetAmount}
+        )
+    </insert>
+
+
+    <update id="updateFinancialProfile">
+        UPDATE user_financial_profile
+
+        <set>
+            <if test="annualIncome != null">
+                annual_income = #{annualIncome},
+            </if>
+
+            <if test="incomeType != null">
+                income_type = #{incomeType},
+            </if>
+
+            <if test="employmentStatus != null">
+                employment_status = #{employmentStatus},
+            </if>
+
+            <if test="creditScore != null">
+                credit_score = #{creditScore},
+            </if>
+
+            <if test="liquidAssetAmount != null">
+                liquid_asset_amount = #{liquidAssetAmount},
+            </if>
+        </set>
+
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

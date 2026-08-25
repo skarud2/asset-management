@@ -1,0 +1,94 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.via'
+version = '4.0.0'
+description = 'Shinvia'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+dependencies {
+    // Spring Web
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-restclient'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+    // Thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // MyBatis
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.0'
+
+    // MySQL 실행용 드라이버
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // Spring Data 공통 기능
+    implementation 'org.springframework.data:spring-data-commons'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // 이메일
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // DTO 변환
+    implementation 'org.modelmapper:modelmapper:3.2.0'
+
+    implementation 'org.apache.commons:commons-csv:1.11.0'
+
+    implementation 'com.microsoft.playwright:playwright:1.61.0'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // 개발 도구
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // 테스트
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-thymeleaf-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+
+    // MyBatis 테스트
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:4.0.0'
+
+    // 테스트 Lombok
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    //스웨거
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+
+    //프론트 작업용..DevTools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.register('playwrightInstall', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.microsoft.playwright.CLI'
+    args 'install', 'chromium'
+}
+
+tasks.register('installPlaywrightChromium') {
+    dependsOn 'playwrightInstall'
+}

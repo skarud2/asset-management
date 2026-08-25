@@ -1,0 +1,849 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.lifecycle.survey.mapper.LifecycleSurveyMapper">
+
+
+    <!-- ===================================================== -->
+    <!-- 1. 기본 생활정보                                      -->
+    <!-- ===================================================== -->
+
+    <!-- 회원의 기본 생활정보 조회 -->
+    <select id="findBaseSurveyByUserId"
+            resultType="com.via.shinvia.lifecycle.survey.dto.LifecycleBaseSurveyResponse">
+
+        SELECT
+        lifecycle_base_profile_id,
+        user_id,
+        monthly_living_expense,
+        current_housing_type,
+        current_monthly_housing_expense AS monthly_housing_expense,
+        industry_code,
+        salary_growth_scenario,
+        custom_salary_growth_rate,
+        created_at,
+        updated_at
+        FROM lifecycle_base_profile
+        WHERE user_id = #{userId}
+
+    </select>
+
+
+    <!-- 기본 생활정보 최초 저장 -->
+    <insert id="insertBaseSurvey">
+
+        INSERT INTO lifecycle_base_profile (
+        user_id,
+        monthly_living_expense,
+        current_housing_type,
+        current_monthly_housing_expense,
+        industry_code,
+        salary_growth_scenario,
+        custom_salary_growth_rate
+        )
+        VALUES (
+        #{userId},
+        #{request.monthlyLivingExpense},
+        #{request.currentHousingType},
+        #{request.monthlyHousingExpense},
+        #{request.industryCode},
+        #{request.salaryGrowthScenario},
+        #{request.customSalaryGrowthRate}
+        )
+
+    </insert>
+
+
+    <!-- 기본 생활정보 수정 -->
+    <update id="updateBaseSurvey">
+
+        UPDATE lifecycle_base_profile
+        SET
+        monthly_living_expense = #{request.monthlyLivingExpense},
+        current_housing_type = #{request.currentHousingType},
+        current_monthly_housing_expense = #{request.monthlyHousingExpense},
+        industry_code = #{request.industryCode},
+        salary_growth_scenario = #{request.salaryGrowthScenario},
+        custom_salary_growth_rate = #{request.customSalaryGrowthRate}
+        WHERE user_id = #{userId}
+
+    </update>
+
+
+
+    <!-- ===================================================== -->
+    <!-- 2. 결혼                                               -->
+    <!-- ===================================================== -->
+
+    <insert id="insertMarriageEvent">
+
+        INSERT INTO lifecycle_event (
+        lifecycle_scenario_id,
+        event_type,
+        event_order,
+        target_date,
+        lifestyle_level,
+        survey_data
+        )
+        VALUES (
+        #{scenarioId},
+        'MARRIAGE',
+        #{eventOrder},
+        #{request.targetDate},
+        #{request.lifestyleLevel},
+        CAST(#{surveyData} AS JSON)
+        )
+
+    </insert>
+
+
+    <select id="findMarriageEventById"
+            resultType="com.via.shinvia.lifecycle.survey.dto.MarriageSurveyResponse">
+
+        SELECT
+        lifecycle_event_id,
+        lifecycle_scenario_id,
+        event_order,
+        target_date,
+        lifestyle_level,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.regionSido')
+        ) AS region_sido,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.regionSigungu')
+        ) AS region_sigungu,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.guestCount')
+        ) AS UNSIGNED
+        ) AS guest_count,
+
+        CASE
+        WHEN JSON_EXTRACT(survey_data, '$.furnitureIncluded') = TRUE
+        THEN TRUE
+        ELSE FALSE
+        END AS furniture_included,
+
+        CASE
+        WHEN JSON_EXTRACT(survey_data, '$.honeymoonIncluded') = TRUE
+        THEN TRUE
+        ELSE FALSE
+        END AS honeymoon_included,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.userContributionRate')
+        ) AS DECIMAL(9,6)
+        ) AS user_contribution_rate,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.familySupportAmount')
+        ) AS DECIMAL(19,2)
+        ) AS family_support_amount,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.customEstimatedCost')
+        ) AS DECIMAL(19,2)
+        ) AS custom_estimated_cost,
+
+        created_at,
+        updated_at
+
+        FROM lifecycle_event
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'MARRIAGE'
+
+    </select>
+
+
+    <update id="updateMarriageEvent">
+
+        UPDATE lifecycle_event
+
+        SET
+        target_date = #{request.targetDate},
+        lifestyle_level = #{request.lifestyleLevel},
+        survey_data = CAST(#{surveyData} AS JSON)
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'MARRIAGE'
+
+    </update>
+
+
+
+    <!-- ===================================================== -->
+    <!-- 3. 출산                                               -->
+    <!-- ===================================================== -->
+
+    <insert id="insertChildbirthEvent"
+            useGeneratedKeys="true"
+            keyColumn="lifecycle_event_id"
+            keyProperty="request.lifecycleEventId">
+
+        INSERT INTO lifecycle_event (
+        lifecycle_scenario_id,
+        event_type,
+        event_order,
+        target_date,
+        lifestyle_level,
+        survey_data
+        )
+        VALUES (
+        #{scenarioId},
+        'CHILDBIRTH',
+        #{eventOrder},
+        #{request.targetDate},
+        #{request.lifestyleLevel},
+        CAST(#{surveyData} AS JSON)
+        )
+
+    </insert>
+
+
+    <select id="findChildbirthEventById"
+            resultType="com.via.shinvia.lifecycle.survey.dto.ChildbirthSurveyResponse">
+
+        SELECT
+        lifecycle_event_id,
+        lifecycle_scenario_id,
+        event_order,
+        target_date,
+        lifestyle_level,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.childOrder')
+        ) AS UNSIGNED
+        ) AS child_order,
+
+        CASE WHEN JSON_EXTRACT(survey_data, '$.repurchaseCarSeat') = TRUE
+        THEN TRUE ELSE FALSE END AS repurchase_car_seat,
+
+        CASE WHEN JSON_EXTRACT(survey_data, '$.repurchaseStroller') = TRUE
+        THEN TRUE ELSE FALSE END AS repurchase_stroller,
+
+        CASE WHEN JSON_EXTRACT(survey_data, '$.repurchaseCrib') = TRUE
+        THEN TRUE ELSE FALSE END AS repurchase_crib,
+
+        CASE WHEN JSON_EXTRACT(survey_data, '$.repurchaseOtherSetup') = TRUE
+        THEN TRUE ELSE FALSE END AS repurchase_other_setup,
+
+        CASE
+        WHEN JSON_EXTRACT(survey_data, '$.postpartumCare') = TRUE
+        THEN TRUE
+        ELSE FALSE
+        END AS postpartum_care,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.regionSido')
+        ) AS region_sido,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.regionSigungu')
+        ) AS region_sigungu,
+
+        created_at,
+        updated_at
+
+        FROM lifecycle_event
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'CHILDBIRTH'
+
+    </select>
+
+
+    <update id="updateChildbirthEvent">
+
+        UPDATE lifecycle_event
+
+        SET
+        target_date = #{request.targetDate},
+        lifestyle_level = #{request.lifestyleLevel},
+        survey_data = CAST(#{surveyData} AS JSON)
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'CHILDBIRTH'
+
+    </update>
+
+
+
+    <!-- ===================================================== -->
+    <!-- 4. 차량 구매                                          -->
+    <!-- ===================================================== -->
+
+    <insert id="insertVehicleEvent"
+            useGeneratedKeys="true"
+            keyColumn="lifecycle_event_id"
+            keyProperty="request.lifecycleEventId">
+
+        INSERT INTO lifecycle_event (
+        lifecycle_scenario_id,
+        event_type,
+        event_order,
+        target_date,
+        survey_data
+        )
+        VALUES (
+        #{scenarioId},
+        'VEHICLE_PURCHASE',
+        #{eventOrder},
+        #{request.targetDate},
+        CAST(#{surveyData} AS JSON)
+        )
+
+    </insert>
+
+
+    <select id="findVehicleEventById"
+            resultType="com.via.shinvia.lifecycle.survey.dto.VehicleSurveyResponse">
+
+        SELECT
+        lifecycle_event_id,
+        lifecycle_scenario_id,
+        event_order,
+        target_date,
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.vehicleName')
+        ) AS vehicle_name,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.vehicleModel')
+        ) AS vehicle_model,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.vehicleCondition')
+        ) AS vehicle_condition,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.annualMileageKm')
+        ) AS UNSIGNED
+        ) AS annual_mileage_km,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.vehiclePrice')
+        ) AS DECIMAL(19,2)
+        ) AS vehicle_price,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.cashPaymentAmount')
+        ) AS DECIMAL(19,2)
+        ) AS cash_payment_amount,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.loanAmount')
+        ) AS DECIMAL(19,2)
+        ) AS loan_amount,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.loanPeriodMonths')
+        ) AS UNSIGNED
+        ) AS loan_period_months,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.monthlyMaintenanceCost')
+        ) AS DECIMAL(19,2)
+        ) AS monthly_maintenance_cost,
+
+        created_at,
+        updated_at
+
+        FROM lifecycle_event
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'VEHICLE_PURCHASE'
+
+    </select>
+
+
+    <update id="updateVehicleEvent">
+
+        UPDATE lifecycle_event
+
+        SET
+        target_date = #{request.targetDate},
+        survey_data = CAST(#{surveyData} AS JSON)
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'VEHICLE_PURCHASE'
+
+    </update>
+
+
+
+    <!-- ===================================================== -->
+    <!-- 5. 월세                                               -->
+    <!-- ===================================================== -->
+
+    <insert id="insertMonthlyRentEvent">
+
+        INSERT INTO lifecycle_event (
+        lifecycle_scenario_id,
+        event_type,
+        event_order,
+        target_date,
+        lifestyle_level,
+        survey_data
+        )
+        VALUES (
+        #{scenarioId},
+        'MONTHLY_RENT',
+        #{eventOrder},
+        #{request.targetDate},
+        #{request.lifestyleLevel},
+        CAST(#{surveyData} AS JSON)
+        )
+
+    </insert>
+
+
+    <select id="findMonthlyRentEventById"
+            resultType="com.via.shinvia.lifecycle.survey.dto.MonthlyRentSurveyResponse">
+
+        SELECT
+        lifecycle_event_id,
+        lifecycle_scenario_id,
+        event_order,
+        target_date,
+        lifestyle_level,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.regionSido')
+        ) AS region_sido,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.regionSigungu')
+        ) AS region_sigungu,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.housingType')
+        ) AS housing_type,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.desiredArea')
+        ) AS DECIMAL(10,2)
+        ) AS desired_area,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.desiredDeposit')
+        ) AS DECIMAL(19,2)
+        ) AS desired_deposit,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.desiredMonthlyRent')
+        ) AS DECIMAL(19,2)
+        ) AS desired_monthly_rent,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.monthlyManagementFee')
+        ) AS DECIMAL(19,2)
+        ) AS monthly_management_fee,
+
+        CASE
+        WHEN JSON_EXTRACT(survey_data, '$.keepExistingHome') = FALSE
+        THEN FALSE
+        ELSE TRUE
+        END AS keep_existing_home,
+
+        created_at,
+        updated_at
+
+        FROM lifecycle_event
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'MONTHLY_RENT'
+
+    </select>
+
+
+    <update id="updateMonthlyRentEvent">
+
+        UPDATE lifecycle_event
+
+        SET
+        target_date = #{request.targetDate},
+        lifestyle_level = #{request.lifestyleLevel},
+        survey_data = CAST(#{surveyData} AS JSON)
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'MONTHLY_RENT'
+
+    </update>
+
+
+
+    <!-- ===================================================== -->
+    <!-- 6. 전세                                               -->
+    <!-- ===================================================== -->
+
+    <insert id="insertJeonseEvent">
+
+        INSERT INTO lifecycle_event (
+        lifecycle_scenario_id,
+        event_type,
+        event_order,
+        target_date,
+        lifestyle_level,
+        survey_data
+        )
+        VALUES (
+        #{scenarioId},
+        'JEONSE',
+        #{eventOrder},
+        #{request.targetDate},
+        #{request.lifestyleLevel},
+        CAST(#{surveyData} AS JSON)
+        )
+
+    </insert>
+
+
+    <select id="findJeonseEventById"
+            resultType="com.via.shinvia.lifecycle.survey.dto.JeonseSurveyResponse">
+
+        SELECT
+        lifecycle_event_id,
+        lifecycle_scenario_id,
+        event_order,
+        target_date,
+        lifestyle_level,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.regionSido')
+        ) AS region_sido,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.regionSigungu')
+        ) AS region_sigungu,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.housingType')
+        ) AS housing_type,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.desiredArea')
+        ) AS DECIMAL(10,2)
+        ) AS desired_area,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.desiredJeonseAmount')
+        ) AS DECIMAL(19,2)
+        ) AS desired_jeonse_amount,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.ownFundAmount')
+        ) AS DECIMAL(19,2)
+        ) AS own_fund_amount,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.desiredLoanAmount')
+        ) AS DECIMAL(19,2)
+        ) AS desired_loan_amount,
+
+        CASE
+        WHEN JSON_EXTRACT(survey_data, '$.keepExistingHome') = FALSE
+        THEN FALSE
+        ELSE TRUE
+        END AS keep_existing_home,
+
+        created_at,
+        updated_at
+
+        FROM lifecycle_event
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'JEONSE'
+
+    </select>
+
+
+    <update id="updateJeonseEvent">
+
+        UPDATE lifecycle_event
+
+        SET
+        target_date = #{request.targetDate},
+        lifestyle_level = #{request.lifestyleLevel},
+        survey_data = CAST(#{surveyData} AS JSON)
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'JEONSE'
+
+    </update>
+
+
+
+    <!-- ===================================================== -->
+    <!-- 7. 주택 구매                                          -->
+    <!-- ===================================================== -->
+
+    <insert id="insertHomePurchaseEvent">
+
+        INSERT INTO lifecycle_event (
+        lifecycle_scenario_id,
+        event_type,
+        event_order,
+        target_date,
+        lifestyle_level,
+        survey_data
+        )
+        VALUES (
+        #{scenarioId},
+        'HOME_PURCHASE',
+        #{eventOrder},
+        #{request.targetDate},
+        #{request.lifestyleLevel},
+        CAST(#{surveyData} AS JSON)
+        )
+
+    </insert>
+
+
+    <select id="findHomePurchaseEventById"
+            resultType="com.via.shinvia.lifecycle.survey.dto.HomePurchaseSurveyResponse">
+
+        SELECT
+        lifecycle_event_id,
+        lifecycle_scenario_id,
+        event_order,
+        target_date,
+        lifestyle_level,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.regionSido')
+        ) AS region_sido,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.regionSigungu')
+        ) AS region_sigungu,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.housingType')
+        ) AS housing_type,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.desiredArea')
+        ) AS DECIMAL(10,2)
+        ) AS desired_area,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.desiredPurchasePrice')
+        ) AS DECIMAL(19,2)
+        ) AS desired_purchase_price,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.ownFundAmount')
+        ) AS DECIMAL(19,2)
+        ) AS own_fund_amount,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.loanPeriodMonths')
+        ) AS UNSIGNED
+        ) AS loan_period_months,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.repaymentType')
+        ) AS repayment_type,
+
+        created_at,
+        updated_at
+
+        FROM lifecycle_event
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'HOME_PURCHASE'
+
+    </select>
+
+
+    <update id="updateHomePurchaseEvent">
+
+        UPDATE lifecycle_event
+
+        SET
+        target_date = #{request.targetDate},
+        lifestyle_level = #{request.lifestyleLevel},
+        survey_data = CAST(#{surveyData} AS JSON)
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'HOME_PURCHASE'
+
+    </update>
+
+
+
+    <!-- ===================================================== -->
+    <!-- 8. 대출 상환                                          -->
+    <!-- ===================================================== -->
+
+    <insert id="insertRepaymentEvent">
+
+        INSERT INTO lifecycle_event (
+        lifecycle_scenario_id,
+        event_type,
+        event_order,
+        target_date,
+        lifestyle_level,
+        survey_data
+        )
+        VALUES (
+        #{scenarioId},
+        'REPAYMENT',
+        #{eventOrder},
+        #{request.targetDate},
+        NULL,
+        CAST(#{surveyData} AS JSON)
+        )
+
+    </insert>
+
+
+    <select id="findRepaymentEventById"
+            resultType="com.via.shinvia.lifecycle.survey.dto.RepaymentSurveyResponse">
+
+        SELECT
+        lifecycle_event_id,
+        lifecycle_scenario_id,
+        event_order,
+        target_date,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.loanAccountId')
+        ) AS UNSIGNED
+        ) AS loan_account_id,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.repaymentAmount')
+        ) AS DECIMAL(19,2)
+        ) AS repayment_amount,
+
+        CAST(
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.additionalMonthlyRepayment')
+        ) AS DECIMAL(19,2)
+        ) AS additional_monthly_repayment,
+
+        JSON_UNQUOTE(
+        JSON_EXTRACT(survey_data, '$.repaymentAction')
+        ) AS repayment_action,
+
+        created_at,
+        updated_at
+
+        FROM lifecycle_event
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'REPAYMENT'
+
+    </select>
+
+
+    <update id="updateRepaymentEvent">
+
+        UPDATE lifecycle_event
+
+        SET
+        target_date = #{request.targetDate},
+        survey_data = CAST(#{surveyData} AS JSON)
+
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+        AND event_type = 'REPAYMENT'
+
+    </update>
+
+
+
+    <!-- ===================================================== -->
+    <!-- 9. 이벤트 공통                                        -->
+    <!-- ===================================================== -->
+
+    <!-- 시나리오의 이벤트들을 순서대로 조회 -->
+    <select id="findEventIdsByScenarioId"
+            resultType="java.lang.Long">
+
+        SELECT lifecycle_event_id
+        FROM lifecycle_event
+        WHERE lifecycle_scenario_id = #{scenarioId}
+        ORDER BY event_order
+
+    </select>
+
+    <select id="findTimelineEventsByScenarioId"
+            resultType="com.via.shinvia.lifecycle.survey.dto.LifecycleTimelineEventResponse">
+
+        SELECT
+        lifecycle_event_id AS event_id,
+        event_type,
+        target_date
+        FROM lifecycle_event
+        WHERE lifecycle_scenario_id = #{scenarioId}
+        ORDER BY target_date, event_order
+
+    </select>
+
+
+    <!-- 이벤트 삭제 -->
+    <delete id="deleteEvent">
+
+        DELETE FROM lifecycle_event
+        WHERE lifecycle_event_id = #{lifecycleEventId}
+
+    </delete>
+
+
+    <!--
+        다음 이벤트 순서 계산
+
+        이벤트가 하나도 없으면 1
+        기존 이벤트가 있으면 최대 순서 + 1
+    -->
+    <select id="findNextEventOrder"
+            resultType="java.lang.Integer">
+
+        SELECT COALESCE(MAX(event_order), 0) + 1
+        FROM lifecycle_event
+        WHERE lifecycle_scenario_id = #{scenarioId}
+
+    </select>
+
+    <select id="findLatestEventId" resultType="java.lang.Long">
+        SELECT lifecycle_event_id
+        FROM lifecycle_event
+        WHERE lifecycle_scenario_id = #{scenarioId}
+          AND event_type = #{eventType}
+        ORDER BY lifecycle_event_id DESC
+        LIMIT 1
+    </select>
+
+</mapper>

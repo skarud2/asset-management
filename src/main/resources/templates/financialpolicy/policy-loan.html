@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head><title>정책대출 제도 | SHINVIA</title></head>
+<body>
+<main class="policy-container bank-policy-page financial-policy-page">
+    <link rel="stylesheet" th:href="@{/css/financial-policy.css}">
+    <header class="page-header financial-policy-header"><p class="page-label financial-policy-eyebrow">FINANCIAL POLICY</p><h1>정책대출 제도</h1><p class="page-description financial-policy-lead">주택 구입과 전세자금을 지원하는 대표 정책대출의 목적과 확인사항을 비교합니다.</p></header>
+    <nav class="financial-policy-index" aria-label="페이지 주요 내용"><strong>주요 내용</strong><a href="#policy-overview">한눈에 보기</a><a href="#policy-products">상품 비교</a><a href="#policy-process">신청 전 확인</a><a href="#policy-faq">자주 묻는 질문</a></nav>
+
+    <section class="policy-summary-section"><span id="policy-overview" class="policy-anchor" aria-hidden="true"></span><div class="policy-section-title"><h2>한눈에 보기</h2><p>자금 목적에 맞는 상품부터 구분하세요.</p></div><div class="policy-summary-grid">
+        <article class="policy-summary-card"><span class="policy-summary-number">01</span><h3>보금자리론</h3><p>장기·고정금리·분할상환 방식의 주택 구입용 정책모기지입니다.</p></article>
+        <article class="policy-summary-card"><span class="policy-summary-number">02</span><h3>디딤돌대출</h3><p>소득과 무주택 요건 등을 충족하는 실수요자의 주택 구입을 지원합니다.</p></article>
+        <article class="policy-summary-card"><span class="policy-summary-number">03</span><h3>버팀목 전세자금</h3><p>무주택 세대주의 전세보증금 마련을 지원하는 주택도시기금 상품입니다.</p></article>
+    </div></section>
+
+    <section id="policy-products" class="policy-content-section"><div class="policy-section-title"><h2>대표 상품 비교</h2><p>세부 수치는 신청 시점의 공식 상품 페이지에서 다시 확인하세요.</p></div><div class="policy-table-wrap"><table class="policy-table"><thead><tr><th>상품</th><th>자금 목적</th><th>주요 특징</th><th>우선 확인할 조건</th></tr></thead><tbody>
+        <tr><th>보금자리론</th><td>주택 구입·기존 주담대 상환 등</td><td>실행일부터 만기까지 고정금리, 장기 분할상환</td><td>주택가격, 부부합산 소득, 주택 수, LTV·DTI</td></tr>
+        <tr><th>디딤돌대출</th><td>주택 구입</td><td>무주택 실수요자를 위한 주택도시기금 구입자금</td><td>세대주·무주택, 소득·자산, 주택가격·면적</td></tr>
+        <tr><th>버팀목 전세자금</th><td>임차보증금</td><td>일반·청년·신혼부부 등 유형별 상품 운영</td><td>세대주·무주택, 소득·자산, 보증금·주택면적</td></tr>
+    </tbody></table></div></section>
+
+    <section class="policy-content-section"><div class="policy-section-title"><h2>보금자리론의 특징</h2></div><div class="policy-content-box">
+        <p>보금자리론은 한국주택금융공사가 공급하는 장기 고정금리 주택담보대출입니다. 일반형 외에 생애최초, 전세사기피해자 등 차주 상황에 맞는 유형이 운영됩니다.</p>
+        <div class="policy-example-box"><strong>금리 확인사항</strong><p>u-보금자리론, 아낌e-보금자리론, t-보금자리론은 신청 경로와 전자약정 여부에 따라 적용 금리가 달라질 수 있습니다. 신청자의 조건에 따른 우대금리와 담보주택 소재지에 따른 규제지역 가산금리도 적용될 수 있으므로, 신청일 기준 한국주택금융공사의 공시금리를 확인해야 합니다.</p></div>
+    </div></section>
+
+    <section id="policy-process" class="policy-content-section"><div class="policy-section-title"><h2>신청 전에 네 가지를 확인하세요</h2></div><div class="policy-impact-grid">
+        <article class="policy-impact-card"><h3>자금 목적</h3><p>주택 구입인지 전세보증금인지에 따라 대상 상품이 달라집니다.</p></article>
+        <article class="policy-impact-card"><h3>가구 요건</h3><p>세대주, 무주택 여부, 혼인·자녀 등 우대조건을 확인합니다.</p></article>
+        <article class="policy-impact-card"><h3>소득·자산</h3><p>부부합산 소득과 순자산 기준, 증빙 가능한 소득을 확인합니다.</p></article>
+        <article class="policy-impact-card"><h3>주택 조건</h3><p>가격, 면적, 소재지, 권리관계와 담보평가 기준을 확인합니다.</p></article>
+    </div><div class="policy-warning-box"><strong>중복 이용 확인</strong><p>주택도시기금 대출과 다른 정책모기지는 중복 이용이 제한될 수 있습니다. 기존 대출이 있다면 신청기관에 먼저 알리세요.</p></div></section>
+
+    <section id="policy-faq" class="policy-content-section"><div class="policy-section-title"><h2>자주 묻는 질문</h2></div><div class="policy-faq-list">
+        <details class="policy-faq-item"><summary>정책대출은 일반 은행대출보다 항상 금리가 낮나요?</summary><div class="policy-faq-answer"><p>시장 상황과 우대요건에 따라 달라집니다. 정책대출의 고정금리 여부, 보증료와 중도상환수수료까지 포함해 비교하세요.</p></div></details>
+        <details class="policy-faq-item"><summary>소득 기준만 충족하면 신청할 수 있나요?</summary><div class="policy-faq-answer"><p>아닙니다. 주택 수, 자산, 세대주 여부, 대상 주택과 신용·담보 심사 등 상품별 요건을 모두 확인해야 합니다.</p></div></details>
+        <details class="policy-faq-item"><summary>정확한 금리와 한도는 어디서 확인하나요?</summary><div class="policy-faq-answer"><p>보금자리론은 한국주택금융공사, 디딤돌·버팀목은 주택도시기금 공식 페이지와 수탁은행에서 신청일 기준으로 확인하세요.</p></div></details>
+    </div></section>
+
+    <section class="policy-related-section"><div class="policy-section-title"><h2>함께 확인하면 좋은 내용</h2></div><div class="policy-related-links">
+        <a th:href="@{/policy/recommendation}" class="policy-related-link"><strong>맞춤 금융지원상품 추천</strong><span>개인 조건에 맞는 정책지원상품을 진단합니다.</span></a>
+        <a th:href="@{/policy-support}" class="policy-related-link"><strong>서민금융상품</strong><span>대출 목적의 정책지원상품을 조회합니다.</span></a>
+        <a th:href="@{/asset-products}" class="policy-related-link"><strong>자산형성상품</strong><span>저축과 자산형성을 돕는 지원상품을 함께 살펴봅니다.</span></a>
+    </div></section>
+    <aside class="policy-notice"><h2>확인해 주세요</h2><p>정책대출의 금리·소득·자산·주택가격·한도는 수시로 바뀔 수 있습니다. 이 페이지의 비교는 상품 선택을 돕기 위한 요약이며 신청 가능 여부를 보장하지 않습니다.</p><p>공식 자료: <a href="https://www.hf.go.kr/ko/sub01/sub01_04.do" target="_blank" rel="noopener noreferrer">한국주택금융공사 주택담보대출 찾기</a> · <a href="https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020601.jsp" target="_blank" rel="noopener noreferrer">주택도시기금 개인상품</a></p><p class="policy-updated-date">최종 확인일: 2026년 8월 10일</p></aside>
+</main>
+</body>
+</html>

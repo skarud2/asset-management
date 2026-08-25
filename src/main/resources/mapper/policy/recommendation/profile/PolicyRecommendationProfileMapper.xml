@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.via.shinvia.policy.recommendation.profile.mapper.PolicyRecommendationProfileMapper">
+
+    <!-- 회원 설문 조회 -->
+    <select id="findByUserId"
+            resultType="com.via.shinvia.policy.recommendation.profile.dto.PolicyRecommendationProfileDTO">
+        SELECT policy_recommendation_profile_id,
+               user_id,
+               residence_sido,
+               residence_sigungu,
+               residence_months,
+               employment_months,
+               has_income,
+               income_verifiable,
+               household_size,
+               marital_status,
+               has_children,
+               children_count,
+               basic_livelihood_recipient,
+               near_poverty,
+               single_parent_household,
+               disabled,
+               self_reliance_youth,
+               multicultural_household,
+               north_korean_defector,
+               child_headed_household,
+               earned_income_tax_credit_recipient,
+               basic_pension_recipient,
+               disability_benefit_recipient,
+               jeonse_fraud_victim,
+               household_annual_income,
+               household_net_asset_amount,
+               homeless_household,
+               household_head,
+               prospective_household_head,
+               first_time_home_buyer,
+               debt_default_status,
+               overdue_status,
+               policy_finance_usage,
+               financial_education_status,
+               desired_support_purpose,
+               desired_amount,
+               monthly_saving_capacity,
+               priority_preference
+        FROM policy_recommendation_profile
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 회원 설문 저장·수정 -->
+    <insert id="upsertProfile">
+        INSERT INTO policy_recommendation_profile (
+            user_id, residence_sido, residence_sigungu, residence_months,
+            employment_months, has_income, income_verifiable,
+            household_size, marital_status, has_children, children_count,
+            basic_livelihood_recipient, near_poverty, single_parent_household,
+            disabled, self_reliance_youth, multicultural_household,
+            north_korean_defector, child_headed_household, earned_income_tax_credit_recipient,
+            basic_pension_recipient, disability_benefit_recipient,
+            jeonse_fraud_victim, household_annual_income, homeless_household, household_head,
+            household_net_asset_amount, prospective_household_head,
+            first_time_home_buyer,
+            debt_default_status, overdue_status, policy_finance_usage,
+            financial_education_status, desired_support_purpose, desired_amount,
+            monthly_saving_capacity, priority_preference
+        ) VALUES (
+            #{userId}, #{residenceSido}, #{residenceSigungu}, #{residenceMonths},
+            #{employmentMonths}, #{hasIncome}, #{incomeVerifiable},
+            #{householdSize}, #{maritalStatus}, #{hasChildren}, #{childrenCount},
+            #{basicLivelihoodRecipient}, #{nearPoverty}, #{singleParentHousehold},
+            #{disabled}, #{selfRelianceYouth}, #{multiculturalHousehold},
+            #{northKoreanDefector}, #{childHeadedHousehold}, #{earnedIncomeTaxCreditRecipient},
+            #{basicPensionRecipient}, #{disabilityBenefitRecipient},
+            #{jeonseFraudVictim}, #{householdAnnualIncome}, #{homelessHousehold}, #{householdHead},
+            #{householdNetAssetAmount}, #{prospectiveHouseholdHead},
+            #{firstTimeHomeBuyer},
+            #{debtDefaultStatus}, #{overdueStatus}, #{policyFinanceUsage},
+            #{financialEducationStatus}, #{desiredSupportPurpose}, #{desiredAmount},
+            #{monthlySavingCapacity}, #{priorityPreference}
+        )
+        ON DUPLICATE KEY UPDATE
+            residence_sido = VALUES(residence_sido),
+            residence_sigungu = VALUES(residence_sigungu),
+            residence_months = VALUES(residence_months),
+            employment_months = VALUES(employment_months),
+            has_income = VALUES(has_income),
+            income_verifiable = VALUES(income_verifiable),
+            household_size = VALUES(household_size),
+            marital_status = VALUES(marital_status),
+            has_children = VALUES(has_children),
+            children_count = VALUES(children_count),
+            basic_livelihood_recipient = VALUES(basic_livelihood_recipient),
+            near_poverty = VALUES(near_poverty),
+            single_parent_household = VALUES(single_parent_household),
+            disabled = VALUES(disabled),
+            self_reliance_youth = VALUES(self_reliance_youth),
+            multicultural_household = VALUES(multicultural_household),
+            north_korean_defector = VALUES(north_korean_defector),
+            child_headed_household = VALUES(child_headed_household),
+            earned_income_tax_credit_recipient = VALUES(earned_income_tax_credit_recipient),
+            basic_pension_recipient = VALUES(basic_pension_recipient),
+            disability_benefit_recipient = VALUES(disability_benefit_recipient),
+            jeonse_fraud_victim = VALUES(jeonse_fraud_victim),
+            household_annual_income = VALUES(household_annual_income),
+            household_net_asset_amount = VALUES(household_net_asset_amount),
+            homeless_household = VALUES(homeless_household),
+            household_head = VALUES(household_head),
+            prospective_household_head = VALUES(prospective_household_head),
+            first_time_home_buyer = VALUES(first_time_home_buyer),
+            debt_default_status = VALUES(debt_default_status),
+            overdue_status = VALUES(overdue_status),
+            policy_finance_usage = VALUES(policy_finance_usage),
+            financial_education_status = VALUES(financial_education_status),
+            desired_support_purpose = VALUES(desired_support_purpose),
+            desired_amount = VALUES(desired_amount),
+            monthly_saving_capacity = VALUES(monthly_saving_capacity),
+            priority_preference = VALUES(priority_preference),
+            updated_at = CURRENT_TIMESTAMP
+    </insert>
+</mapper>

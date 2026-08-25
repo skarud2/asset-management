@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <meta charset="UTF-8">
+    <title>금융 라이프 플랜 | SHINVIA</title>
+</head>
+
+<body>
+
+<main class="lifecycle-survey-page">
+
+    <!-- 생애주기 설문 전용 CSS -->
+    <link rel="stylesheet" th:href="@{/css/lifecycle-survey.css}">
+
+
+    <!-- =====================================================
+         상단 제목
+         ===================================================== -->
+    <header class="lifecycle-survey-header">
+
+        <span>나의 미래 금융계획</span>
+
+        <h1>금융 라이프 플랜</h1>
+
+        <p>
+            현재 생활정보와 앞으로 계획하고 있는 주요 생활 이벤트를 입력하고
+            나만의 미래 금융 시나리오를 구성해보세요.
+        </p>
+
+    </header>
+
+
+    <!-- =====================================================
+         설문 진행 단계 (기본정보 제거, 3단계 구성)
+         ===================================================== -->
+    <nav class="lifecycle-step-navigation"
+         aria-label="설문 진행 단계">
+
+        <button type="button"
+                class="lifecycle-step active"
+                data-step="events">
+            1. 생활 이벤트 계획
+        </button>
+
+        <button type="button"
+                class="lifecycle-step"
+                data-step="review">
+            2. 입력 확인
+        </button>
+
+        <button type="button"
+                class="lifecycle-step"
+                data-step="result">
+            3. 결과 보기
+        </button>
+
+    </nav>
+
+
+    <!-- =====================================================
+         STEP 1. 생활 이벤트 계획 (타임라인 + 시나리오 카드 드래그앤드롭)
+         ===================================================== -->
+    <section class="lifecycle-panel"
+             data-step-panel="events">
+
+        <div class="lifecycle-panel-heading">
+            <div>
+                <span>STEP 1</span>
+                <h2>생활 이벤트 타임라인 계획</h2>
+            </div>
+            <p>
+                아래 <strong>시나리오 카드</strong>를 마우스로 끌어서 <strong>타임라인의 원하는 연도/월</strong> 위에 놓으세요.
+                배치된 카드는 타임라인 위에서 드래그하여 시점을 변경하거나, 클릭하여 세부 금액 및 조건을 설정할 수 있습니다.
+            </p>
+        </div>
+
+        <!-- 시나리오 선택 바 -->
+        <div id="activeLifecycleScenario"
+             class="lifecycle-active-scenario">
+            <div class="active-scenario-info">
+                <span class="scenario-badge">진행 시나리오</span>
+                <strong id="activeLifecycleScenarioName">기본 계획</strong>
+            </div>
+            <div class="active-scenario-actions">
+                <button type="button"
+                        id="changeLifecycleScenarioBtn"
+                        class="lifecycle-secondary-button">
+                    <span class="material-symbols-outlined" aria-hidden="true">tune</span>
+                    시나리오 변경 / 새로 만들기
+                </button>
+            </div>
+        </div>
+
+        <!-- 시나리오 생성 및 목록 게이트 -->
+        <section id="lifecycleScenarioGate"
+                 class="lifecycle-scenario-gate"
+                 hidden>
+            <div class="lifecycle-scenario-gate-heading">
+                <div>
+                    <span>SCENARIO MANAGEMENT</span>
+                    <h3>진행할 시나리오를 선택하거나 새로 만드세요</h3>
+                </div>
+                <button type="button"
+                        id="closeScenarioGateBtn"
+                        class="lifecycle-gate-close-btn"
+                        title="닫기">
+                    <span class="material-symbols-outlined" aria-hidden="true">close</span>
+                </button>
+            </div>
+
+            <div class="lifecycle-scenario-create">
+                <label for="newScenarioName">새 시나리오 이름</label>
+                <div>
+                    <input type="text"
+                           id="newScenarioName"
+                           maxlength="100"
+                           placeholder="예: 30대 신혼·내집마련 플랜">
+                    <button type="button"
+                            id="createLifecycleScenarioBtn"
+                            class="lifecycle-primary-button">
+                        새 시나리오 만들기
+                    </button>
+                </div>
+            </div>
+
+            <div class="lifecycle-scenario-history-actions">
+                <button type="button"
+                        id="toggleLifecycleScenarioListBtn"
+                        class="lifecycle-scenario-toggle"
+                        aria-expanded="true"
+                        aria-controls="lifecycleScenarioList">
+                    <span>이전 진행 시나리오 목록</span>
+                    <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+                </button>
+            </div>
+
+            <div id="lifecycleScenarioList"
+                 class="lifecycle-scenario-list"></div>
+        </section>
+
+
+        <!-- =====================================================
+             시나리오 순서 흐름 보드 (Scenario Sequence Flow Board)
+             ===================================================== -->
+        <section class="lifecycle-flow-section"
+                 aria-labelledby="lifecycleFlowTitle">
+
+            <div class="lifecycle-flow-heading">
+                <div>
+                    <span class="flow-eyebrow">LIFE SCENARIO FLOW</span>
+                    <h3 id="lifecycleFlowTitle">생애 이벤트 진행 순서</h3>
+                </div>
+                <div class="flow-guide-badge">
+                    <span class="material-symbols-outlined" aria-hidden="true">drag_indicator</span>
+                    <span>카드를 드래그하여 원하는 순서대로 배치하거나 순서를 변경하세요</span>
+                </div>
+            </div>
+
+            <!-- 시나리오 흐름 보드 및 드롭 트랙 -->
+            <div class="lifecycle-flow-board" id="lifecycleFlowBoard">
+
+                <div class="lifecycle-flow-track"
+                     id="timelineDropTrack"
+                     role="region"
+                     aria-label="시나리오 순서 드롭 영역">
+
+                    <!-- 빈 상태 안내 문구 (이벤트 없을 시 표시) -->
+                    <div id="lifecycleTimelineEmpty"
+                         class="flow-track-placeholder">
+                        <span class="material-symbols-outlined" aria-hidden="true">alt_route</span>
+                        <strong>아래 시나리오 카드를 이곳으로 끌어다 놓으세요.</strong>
+                        <small>카드를 드래그하여 첫 번째, 두 번째 발생할 생애 이벤트 순서를 자유롭게 구성하고 변경할 수 있습니다.</small>
+                    </div>
+
+                    <!-- 순서대로 배치된 이벤트 스텝들이 렌더링되는 스트림 레이어 -->
+                    <div id="lifecycleTimeline"
+                         class="flow-steps-stream"
+                         hidden>
+                        <!-- JS에서 배치된 이벤트 카드 및 화살표 연결선 렌더링 -->
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             시나리오 카드 보관함 (드래그 소스 카드 목록)
+             ===================================================== -->
+        <section class="lifecycle-card-palette-section"
+                 aria-labelledby="cardPaletteTitle">
+
+            <div class="card-palette-header">
+                <div>
+                    <h4 id="cardPaletteTitle">시나리오 카드 보관함</h4>
+                    <p>등록할 이벤트를 마우스로 잡고 위의 순서 흐름 영역으로 끌어다 놓으세요.</p>
+                </div>
+                <span class="card-palette-counter" id="cardPaletteCounter">총 6개 이벤트</span>
+            </div>
+
+            <div class="lifecycle-event-grid" id="scenarioCardPalette">
+
+                <!-- 결혼 카드 -->
+                <div class="lifecycle-event-card"
+                     draggable="true"
+                     data-event-type="marriage"
+                     role="button"
+                     tabindex="0"
+                     aria-grabbed="false">
+                    <span class="card-drag-handle material-symbols-outlined" aria-hidden="true">drag_indicator</span>
+                    <span class="lifecycle-event-icon material-symbols-outlined" aria-hidden="true">favorite</span>
+                    <div class="lifecycle-event-copy">
+                        <strong>결혼</strong>
+                        <small>예식 · 혼수 · 신혼여행</small>
+                    </div>
+                    <span class="card-placement-badge" data-placement-status="marriage">
+                        <span class="status-dot"></span>
+                        <span class="status-text">미배치</span>
+                    </span>
+                </div>
+
+                <!-- 출산 카드 -->
+                <div class="lifecycle-event-card"
+                     draggable="true"
+                     data-event-type="childbirth"
+                     role="button"
+                     tabindex="0"
+                     aria-grabbed="false">
+                    <span class="card-drag-handle material-symbols-outlined" aria-hidden="true">drag_indicator</span>
+                    <span class="lifecycle-event-icon material-symbols-outlined" aria-hidden="true">child_care</span>
+                    <div class="lifecycle-event-copy">
+                        <strong>출산</strong>
+                        <small>출산 · 양육 · 지원제도</small>
+                    </div>
+                    <span class="card-placement-badge" data-placement-status="childbirth">
+                        <span class="status-dot"></span>
+                        <span class="status-text">미배치</span>
+                    </span>
+                </div>
+
+                <!-- 차량 구매 카드 -->
+                <div class="lifecycle-event-card"
+                     draggable="true"
+                     data-event-type="vehicle"
+                     role="button"
+                     tabindex="0"
+                     aria-grabbed="false">
+                    <span class="card-drag-handle material-symbols-outlined" aria-hidden="true">drag_indicator</span>
+                    <span class="lifecycle-event-icon material-symbols-outlined" aria-hidden="true">directions_car</span>
+                    <div class="lifecycle-event-copy">
+                        <strong>차량 구매</strong>
+                        <small>차량가격 · 대출 · 유지비</small>
+                    </div>
+                    <span class="card-placement-badge" data-placement-status="vehicle">
+                        <span class="status-dot"></span>
+                        <span class="status-text">미배치</span>
+                    </span>
+                </div>
+
+                <!-- 월세 카드 -->
+                <div class="lifecycle-event-card"
+                     draggable="true"
+                     data-event-type="monthly-rent"
+                     role="button"
+                     tabindex="0"
+                     aria-grabbed="false">
+                    <span class="card-drag-handle material-symbols-outlined" aria-hidden="true">drag_indicator</span>
+                    <span class="lifecycle-event-icon material-symbols-outlined" aria-hidden="true">apartment</span>
+                    <div class="lifecycle-event-copy">
+                        <strong>월세</strong>
+                        <small>보증금 · 월세 · 관리비</small>
+                    </div>
+                    <span class="card-placement-badge" data-placement-status="monthly-rent">
+                        <span class="status-dot"></span>
+                        <span class="status-text">미배치</span>
+                    </span>
+                </div>
+
+                <!-- 전세 카드 -->
+                <div class="lifecycle-event-card"
+                     draggable="true"
+                     data-event-type="jeonse"
+                     role="button"
+                     tabindex="0"
+                     aria-grabbed="false">
+                    <span class="card-drag-handle material-symbols-outlined" aria-hidden="true">drag_indicator</span>
+                    <span class="lifecycle-event-icon material-symbols-outlined" aria-hidden="true">key</span>
+                    <div class="lifecycle-event-copy">
+                        <strong>전세</strong>
+                        <small>전세금 · 자기자금 · 대출</small>
+                    </div>
+                    <span class="card-placement-badge" data-placement-status="jeonse">
+                        <span class="status-dot"></span>
+                        <span class="status-text">미배치</span>
+                    </span>
+                </div>
+
+                <!-- 주택 구매 카드 -->
+                <div class="lifecycle-event-card"
+                     draggable="true"
+                     data-event-type="home-purchase"
+                     role="button"
+                     tabindex="0"
+                     aria-grabbed="false">
+                    <span class="card-drag-handle material-symbols-outlined" aria-hidden="true">drag_indicator</span>
+                    <span class="lifecycle-event-icon material-symbols-outlined" aria-hidden="true">home</span>
+                    <div class="lifecycle-event-copy">
+                        <strong>주택 구매</strong>
+                        <small>주택가격 · 자기자금 · 주담대</small>
+                    </div>
+                    <span class="card-placement-badge" data-placement-status="home-purchase">
+                        <span class="status-dot"></span>
+                        <span class="status-text">미배치</span>
+                    </span>
+                </div>
+
+                <!-- 대출 상환 카드 -->
+                <div class="lifecycle-event-card"
+                     draggable="true"
+                     data-event-type="repayment-disabled"
+                     hidden
+                     role="button"
+                     tabindex="0"
+                     aria-grabbed="false">
+                    <span class="card-drag-handle material-symbols-outlined" aria-hidden="true">drag_indicator</span>
+                    <span class="lifecycle-event-icon material-symbols-outlined" aria-hidden="true">payments</span>
+                    <div class="lifecycle-event-copy">
+                        <strong>대출 상환</strong>
+                        <small>부분상환 · 추가상환 · 전액상환</small>
+                    </div>
+                    <span class="card-placement-badge" data-placement-status="repayment">
+                        <span class="status-dot"></span>
+                        <span class="status-text">미배치</span>
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             선택한 이벤트 상세 설정 폼 영역
+             ================================================= -->
+        <div id="lifecycleEventFormArea"
+             class="lifecycle-event-form-area">
+
+            <!-- 결혼 설문 -->
+            <div class="lifecycle-event-form"
+                 data-event-form="marriage"
+                 hidden>
+                <th:block th:replace="~{lifecycle/fragments/marriage-form :: marriageForm}"></th:block>
+            </div>
+
+            <!-- 출산 설문 -->
+            <div class="lifecycle-event-form"
+                 data-event-form="childbirth"
+                 hidden>
+                <th:block th:replace="~{lifecycle/fragments/childbirth-form :: childbirthForm}"></th:block>
+            </div>
+
+            <!-- 차량구매 설문 -->
+            <div class="lifecycle-event-form"
+                 data-event-form="vehicle"
+                 hidden>
+                <th:block th:replace="~{lifecycle/fragments/vehicle-form :: vehicleForm}"></th:block>
+            </div>
+
+            <!-- 월세 설문 -->
+            <div class="lifecycle-event-form"
+                 data-event-form="monthly-rent"
+                 hidden>
+                <th:block th:replace="~{lifecycle/fragments/monthly-rent-form :: monthlyRentForm}"></th:block>
+            </div>
+
+            <!-- 전세 설문 -->
+            <div class="lifecycle-event-form"
+                 data-event-form="jeonse"
+                 hidden>
+                <th:block th:replace="~{lifecycle/fragments/jeonse-form :: jeonseForm}"></th:block>
+            </div>
+
+            <!-- 주택구매 설문 -->
+            <div class="lifecycle-event-form"
+                 data-event-form="home-purchase"
+                 hidden>
+                <th:block th:replace="~{lifecycle/fragments/home-purchase-form :: homePurchaseForm}"></th:block>
+            </div>
+
+            <!-- 대출상환 설문 -->
+            <div class="lifecycle-event-form"
+                 data-event-form="repayment-disabled"
+                 hidden>
+                <th:block th:replace="~{lifecycle/fragments/repayment-form :: repaymentForm}"></th:block>
+            </div>
+
+        </div>
+
+
+        <!-- STEP 이동 버튼 -->
+        <div class="lifecycle-form-actions">
+
+            <button type="button"
+                    class="lifecycle-primary-button"
+                    data-go-step="review">
+                입력 내용 확인
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         STEP 2. 입력 내용 확인
+         ===================================================== -->
+    <section class="lifecycle-panel"
+             data-step-panel="review"
+             hidden>
+
+        <div class="lifecycle-panel-heading">
+
+            <div>
+                <span>STEP 2</span>
+                <h2>입력 내용 확인</h2>
+            </div>
+
+            <p>
+                타임라인에 배치한 미래 생활 이벤트와 세부 설정 내용을 확인해주세요.
+            </p>
+
+        </div>
+
+
+        <!-- 이벤트 요약 -->
+        <section class="lifecycle-review-section">
+
+            <h3>미래 생활 이벤트 일정 요약</h3>
+
+            <div id="eventSurveySummary"
+                 class="lifecycle-summary-box">
+
+                <p>
+                    타임라인에 배치된 생활 이벤트가 여기에 표시됩니다.
+                </p>
+
+            </div>
+
+        </section>
+
+        <div class="lifecycle-form-actions">
+
+            <button type="button"
+                    class="lifecycle-secondary-button"
+                    data-go-step="events">
+                이전
+            </button>
+
+            <button type="button"
+                    class="lifecycle-primary-button"
+                    data-go-step="result">
+                시뮬레이션 결과 보기
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         STEP 3. 결과 보기
+         ===================================================== -->
+    <section class="lifecycle-panel lifecycle-result-panel"
+             data-step-panel="result"
+             hidden>
+
+        <div class="lifecycle-panel-heading lifecycle-result-heading">
+            <div>
+                <span>STEP 3</span>
+                <h2>시나리오 결과 보기</h2>
+            </div>
+            <p>선택한 생활 이벤트가 자산과 부채에 미치는 영향과 맞춤 지원 정보를 확인하세요.</p>
+        </div>
+
+        <details class="lifecycle-saved-results-section">
+            <summary class="lifecycle-simulation-heading lifecycle-saved-results-toggle">
+                <div>
+                    <span class="lifecycle-result-eyebrow">SAVED RESULTS</span>
+                    <h3>저장된 시나리오 결과</h3>
+                    <p>완료한 시나리오 결과를 선택하면 저장 당시 결과 화면을 다시 불러옵니다.</p>
+                </div>
+                <span class="material-symbols-outlined lifecycle-saved-results-chevron" aria-hidden="true">expand_more</span>
+            </summary>
+            <div id="lifecycleSavedResultList" class="lifecycle-saved-result-list">
+                <p class="lifecycle-cost-empty">저장된 결과가 없습니다.</p>
+            </div>
+        </details>
+
+        <section class="lifecycle-simulation-section">
+
+            <div class="lifecycle-simulation-heading">
+                <div>
+                    <span class="lifecycle-result-eyebrow">SIMULATION</span>
+                    <h3>시뮬레이션 진행</h3>
+                    <p>
+                        구성된 생애 이벤트 순서를 바탕으로 자산 변화 및 재무 시뮬레이션을 실행합니다.
+                    </p>
+                </div>
+
+                <button type="button"
+                        id="runLifecycleSimulationBtn"
+                        class="lifecycle-primary-button">
+                    시뮬레이션 실행
+                </button>
+            </div>
+
+            <p id="lifecycleSimulationEmpty"
+               class="lifecycle-timeline-empty">
+                시뮬레이션을 실행하면 결과가 여기에 표시됩니다.
+            </p>
+
+            <div id="lifecycleSimulationSnapshots"
+                 class="lifecycle-simulation-snapshots"
+                 hidden></div>
+
+            <section id="lifecycleAssetJourney"
+                     class="lifecycle-asset-journey"
+                     aria-label="생애주기 이벤트 지출 및 순자산 흐름"
+                     hidden>
+                <div class="lifecycle-journey-heading">
+                    <span class="lifecycle-result-eyebrow">EXPENSE TIMELINE</span>
+                    <h4>시나리오 순서별 지출 금액</h4>
+                    <p>타임라인의 각 이벤트에 마우스를 올리면 간략한 소요 지출 요약이 나타나며, 이벤트를 클릭하면 세부 산출 내역 및 맞춤 지원 정보를 모달로 확인할 수 있습니다.</p>
+                </div>
+
+                <div id="lifecycleAssetTimeline"
+                     class="lifecycle-asset-timeline"></div>
+
+                <div class="lifecycle-asset-chart-card lifecycle-event-cost-card">
+                    <div class="lifecycle-chart-heading">
+                        <strong>시나리오 순서별 소요 비용</strong>
+                        <span>각 이벤트 단계별 총 지출 및 본인 부담/대출 필요액을 비교합니다.</span>
+                    </div>
+                    <div id="lifecycleEventCostChart"
+                         class="lifecycle-event-cost-chart"></div>
+                </div>
+            </section>
+
+        </section>
+
+        <div id="lifecycleSnapshotModal"
+             class="lifecycle-snapshot-modal"
+             hidden>
+
+            <div class="lifecycle-snapshot-modal-backdrop"
+                 data-close-snapshot-modal></div>
+
+            <section class="lifecycle-snapshot-modal-panel">
+                <div class="lifecycle-snapshot-modal-header">
+                    <div>
+                        <span id="snapshotModalEventDate"></span>
+                        <h3 id="snapshotModalTitle">이벤트 상세</h3>
+                    </div>
+
+                    <button type="button"
+                            class="lifecycle-snapshot-modal-close"
+                            data-close-snapshot-modal>
+                        닫기
+                    </button>
+                </div>
+
+                <div id="snapshotModalBody"
+                     class="lifecycle-snapshot-modal-body"></div>
+            </section>
+
+        </div>
+
+        <div class="lifecycle-form-actions lifecycle-result-actions">
+
+            <button type="button"
+                    class="lifecycle-secondary-button"
+                    data-go-step="review">
+
+                입력 내용 다시 보기
+
+            </button>
+
+            <button type="button"
+                    id="completeLifecycleSurveyBtn"
+                    class="lifecycle-primary-button">
+
+                시나리오 완료
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- 생애주기 설문 전용 JS -->
+    <script th:src="@{/js/lifecycle-survey.js(v='20260821-2')}"></script>
+
+</main>
+
+</body>
+</html>

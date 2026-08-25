@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.surplusfund.product.etf.mapper.EtfProductMapper">
+
+    <resultMap id="etfProductResultMap"
+               type="com.via.shinvia.surplusfund.product.etf.model.EtfProduct">
+        <id property="investmentProductId" column="investment_product_id"/>
+        <result property="productType" column="product_type"/>
+        <result property="productCode" column="product_code"/>
+        <result property="isinCode" column="isin_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="providerName" column="provider_name"/>
+        <result property="category" column="category"/>
+        <result property="sourceType" column="source_type"/>
+        <result property="active" column="active"/>
+        <result property="lastSyncedAt" column="last_synced_at"/>
+        <result property="priceBaseDate" column="price_base_date"/>
+        <result property="closingPrice" column="closing_price"/>
+        <result property="previousDayChange" column="previous_day_change"/>
+        <result property="fluctuationRate" column="fluctuation_rate"/>
+        <result property="nav" column="nav"/>
+        <result property="openingPrice" column="opening_price"/>
+        <result property="highPrice" column="high_price"/>
+        <result property="lowPrice" column="low_price"/>
+        <result property="tradingVolume" column="trading_volume"/>
+        <result property="tradingValue" column="trading_value"/>
+        <result property="listedShareCount" column="listed_share_count"/>
+        <result property="marketCap" column="market_cap"/>
+        <result property="netAssetTotalAmount" column="net_asset_total_amount"/>
+        <result property="baseIndexName" column="base_index_name"/>
+        <result property="baseIndexClose" column="base_index_close"/>
+    </resultMap>
+
+    <sql id="etfProductColumns">
+        c.investment_product_id,
+        c.product_type,
+        c.product_code,
+        c.isin_code,
+        c.product_name,
+        c.provider_name,
+        c.category,
+        c.source_type,
+        c.active,
+        c.last_synced_at,
+        d.price_base_date,
+        d.closing_price,
+        d.previous_day_change,
+        d.fluctuation_rate,
+        d.nav,
+        d.opening_price,
+        d.high_price,
+        d.low_price,
+        d.trading_volume,
+        d.trading_value,
+        d.listed_share_count,
+        d.market_cap,
+        d.net_asset_total_amount,
+        d.base_index_name,
+        d.base_index_close
+    </sql>
+
+    <insert id="upsertCatalog"
+            parameterType="com.via.shinvia.surplusfund.product.etf.model.EtfProduct"
+            useGeneratedKeys="true"
+            keyProperty="investmentProductId"
+            keyColumn="investment_product_id">
+        INSERT INTO investment_product_catalog (
+            product_type,
+            product_code,
+            isin_code,
+            product_name,
+            provider_name,
+            category,
+            source_type,
+            active,
+            last_synced_at
+        ) VALUES (
+            #{productType},
+            #{productCode},
+            #{isinCode},
+            #{productName},
+            #{providerName},
+            #{category},
+            #{sourceType},
+            #{active},
+            #{lastSyncedAt}
+        ) AS incoming
+        ON DUPLICATE KEY UPDATE
+            investment_product_id = LAST_INSERT_ID(investment_product_catalog.investment_product_id),
+            isin_code = incoming.isin_code,
+            product_name = incoming.product_name,
+            provider_name = incoming.provider_name,
+            category = incoming.category,
+            source_type = incoming.source_type,
+            active = incoming.active,
+            last_synced_at = incoming.last_synced_at
+    </insert>
+
+    <insert id="upsertDetail"
+            parameterType="com.via.shinvia.surplusfund.product.etf.model.EtfProduct">
+        INSERT INTO etf_product_detail (
+            investment_product_id,
+            price_base_date,
+            closing_price,
+            previous_day_change,
+            fluctuation_rate,
+            nav,
+            opening_price,
+            high_price,
+            low_price,
+            trading_volume,
+            trading_value,
+            listed_share_count,
+            market_cap,
+            net_asset_total_amount,
+            base_index_name,
+            base_index_close
+        ) VALUES (
+            #{investmentProductId},
+            #{priceBaseDate},
+            #{closingPrice},
+            #{previousDayChange},
+            #{fluctuationRate},
+            #{nav},
+            #{openingPrice},
+            #{highPrice},
+            #{lowPrice},
+            #{tradingVolume},
+            #{tradingValue},
+            #{listedShareCount},
+            #{marketCap},
+            #{netAssetTotalAmount},
+            #{baseIndexName},
+            #{baseIndexClose}
+        ) AS incoming
+        ON DUPLICATE KEY UPDATE
+            price_base_date = incoming.price_base_date,
+            closing_price = incoming.closing_price,
+            previous_day_change = incoming.previous_day_change,
+            fluctuation_rate = incoming.fluctuation_rate,
+            nav = incoming.nav,
+            opening_price = incoming.opening_price,
+            high_price = incoming.high_price,
+            low_price = incoming.low_price,
+            trading_volume = incoming.trading_volume,
+            trading_value = incoming.trading_value,
+            listed_share_count = incoming.listed_share_count,
+            market_cap = incoming.market_cap,
+            net_asset_total_amount = incoming.net_asset_total_amount,
+            base_index_name = incoming.base_index_name,
+            base_index_close = incoming.base_index_close
+    </insert>
+
+    <select id="findProducts" resultMap="etfProductResultMap">
+        SELECT
+            <include refid="etfProductColumns"/>
+        FROM investment_product_catalog c
+        INNER JOIN etf_product_detail d
+            ON d.investment_product_id = c.investment_product_id
+        WHERE c.product_type = 'ETF'
+          AND c.active = 1
+        <if test="keyword != null and keyword != ''">
+            AND (
+                c.product_name LIKE CONCAT('%', #{keyword}, '%')
+                OR c.product_code LIKE CONCAT('%', #{keyword}, '%')
+                OR d.base_index_name LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        <choose>
+            <when test="sort != null and sort.name() == 'MARKET_CAP_DESC'">
+                ORDER BY d.market_cap DESC, c.product_name ASC
+            </when>
+            <when test="sort != null and sort.name() == 'FLUCTUATION_RATE_DESC'">
+                ORDER BY d.fluctuation_rate DESC, c.product_name ASC
+            </when>
+            <when test="sort != null and sort.name() == 'NAME_ASC'">
+                ORDER BY c.product_name ASC
+            </when>
+            <otherwise>
+                ORDER BY d.trading_value DESC, c.product_name ASC
+            </otherwise>
+        </choose>
+        LIMIT #{limit}
+    </select>
+
+    <select id="findById" resultMap="etfProductResultMap">
+        SELECT
+            <include refid="etfProductColumns"/>
+        FROM investment_product_catalog c
+        INNER JOIN etf_product_detail d
+            ON d.investment_product_id = c.investment_product_id
+        WHERE c.product_type = 'ETF'
+          AND c.active = 1
+          AND c.investment_product_id = #{investmentProductId}
+    </select>
+
+    <select id="findLatestBaseDate" resultType="java.time.LocalDate">
+        SELECT MAX(d.price_base_date)
+        FROM etf_product_detail d
+        INNER JOIN investment_product_catalog c
+            ON c.investment_product_id = d.investment_product_id
+        WHERE c.product_type = 'ETF'
+          AND c.active = 1
+    </select>
+
+</mapper>

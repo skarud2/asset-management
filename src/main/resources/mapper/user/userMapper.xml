@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.user.mapper.UserMapper">
+    <insert id="insertUser"
+            parameterType="User"
+            useGeneratedKeys="true"
+            keyProperty="userId"
+            keyColumn="user_id">
+            INSERT INTO app_user (
+                login_email,
+                password_hash,
+                user_name,
+                phone_number,
+                birth_date,
+                user_status,
+                user_role
+            )
+            VALUES (
+                #{loginEmail},
+                #{passwordHash},
+                #{userName},
+                #{phoneNumber},
+                #{birthDate},
+                #{userStatus},
+                #{userRole}
+            )
+    </insert>
+
+    <select id="existsByLoginEmail" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM app_user
+            WHERE login_email = #{loginEmail}
+        )
+    </select>
+
+    <select id="findByUserId">
+        SELECT
+            user_id,
+            login_email,
+            password_hash,
+            user_name,
+            phone_number,
+            birth_date,
+            user_status,
+            created_at,
+            updated_at,
+            user_role
+        FROM app_user
+        WHERE user_id=#{userId}
+    </select>
+
+    <select id="findByLoginEmail">
+        SELECT
+            user_id,
+            login_email,
+            password_hash,
+            user_name,
+            phone_number,
+            birth_date,
+            user_status,
+            created_at,
+            updated_at,
+            user_role
+        FROM app_user
+        WHERE login_email=#{loginEmail}
+        LIMIT 1
+    </select>
+
+    <select id="findIdByNameAndPhone"
+            resultType="com.via.shinvia.user.domain.User">
+        SELECT
+            user_id,
+            login_email,
+            password_hash,
+            user_name,
+            phone_number,
+            birth_date,
+            user_status,
+            created_at,
+            updated_at,
+            user_role
+        FROM app_user
+        WHERE user_name = #{userName}
+            AND phone_number = #{phoneNumber}
+            AND user_status = 'ACTIVE'
+        LIMIT 1
+    </select>
+
+    <update id="updatePassword">
+        UPDATE app_user
+        SET password_hash = #{passwordHash}
+        WHERE login_email = #{loginEmail}
+            AND user_status = 'ACTIVE'
+    </update>
+
+    <update id="updateProfile">
+        UPDATE app_user
+        SET
+            user_name = #{userName},
+            phone_number = #{phoneNumber},
+            birth_date = #{birthDate}
+        WHERE user_id = #{userId}
+            AND user_status = 'ACTIVE'
+    </update>
+</mapper>

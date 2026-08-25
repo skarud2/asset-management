@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="marriageForm">
+
+    <section class="lifecycle-event-detail">
+
+        <!-- 결혼 이벤트 제목 -->
+        <div class="lifecycle-event-detail-header">
+
+            <div>
+                <span>결혼</span>
+                <h3>결혼 계획을 알려주세요.</h3>
+            </div>
+
+            <p>
+                결혼 예정 시점과 준비 수준을 기준으로
+                예상 필요자금을 계산합니다.
+            </p>
+
+        </div>
+
+
+        <form id="marriageSurveyForm"
+              class="lifecycle-form">
+
+
+            <!-- 결혼 예정 시기 -->
+            <div class="lifecycle-form-group">
+
+                <label for="marriageTargetDate">
+                    결혼 예정 시기
+                </label>
+
+                <input type="month"
+                       id="marriageTargetDate"
+                       name="targetDate"
+                       required>
+
+                <small>
+                    정확한 날짜가 아닌 예상 연도와 월만 선택해주세요.
+                </small>
+
+            </div>
+
+            <div class="lifecycle-form-group">
+                <label for="marriageRegionSido">예상 예식장 위치 시·도</label>
+                <select id="marriageRegionSido"
+                        name="regionSido"
+                        data-region-sido
+                        data-region-target="marriageRegionSigungu"
+                        required>
+                    <option value="">시·도를 선택해주세요</option>
+                </select>
+            </div>
+
+            <div class="lifecycle-form-group">
+                <label for="marriageRegionSigungu">예상 예식장 위치 시·군·구</label>
+                <select id="marriageRegionSigungu"
+                        name="regionSigungu"
+                        data-region-sigungu
+                        required
+                        disabled>
+                    <option value="">먼저 시·도를 선택해주세요</option>
+                </select>
+                <small>선택한 지역과 전국 단위 지원만 추천합니다.</small>
+            </div>
+
+
+            <!-- 결혼 준비 수준 -->
+            <div class="lifecycle-form-group">
+
+                <span class="lifecycle-form-label">
+                    결혼 준비 수준
+                </span>
+
+                <div class="lifecycle-radio-group">
+                    <th:block th:replace="~{lifecycle/fragments/lifestyle-options :: options('marriageLifestyleLevel', true)}"></th:block>
+                </div>
+
+            </div>
+
+
+            <!-- 예상 하객 수 -->
+            <div class="lifecycle-form-group">
+
+                <label for="marriageGuestCount">
+                    예상 하객 수
+                </label>
+
+                <div class="lifecycle-input-unit">
+
+                    <input type="number"
+                           id="marriageGuestCount"
+                           name="guestCount"
+                           min="0"
+                           placeholder="예: 200">
+
+                    <span>명</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- 혼수 포함 여부 -->
+            <div class="lifecycle-form-group">
+
+                <span class="lifecycle-form-label">
+                    혼수를 준비할 예정인가요?
+                </span>
+
+                <label>
+                    <input type="checkbox"
+                           id="marriageFurnitureIncluded"
+                           name="furnitureIncluded">
+
+                    혼수 비용 포함
+                </label>
+
+            </div>
+
+
+            <!-- 신혼여행 포함 여부 -->
+            <div class="lifecycle-form-group">
+
+                <span class="lifecycle-form-label">
+                    신혼여행을 계획하고 있나요?
+                </span>
+
+                <label>
+                    <input type="checkbox"
+                           id="marriageHoneymoonIncluded"
+                           name="honeymoonIncluded">
+
+                    신혼여행 비용 포함
+                </label>
+
+            </div>
+
+
+            <!-- 사용자 부담 비율 -->
+            <div class="lifecycle-form-group">
+
+                <label for="marriageUserContributionRate">
+                    전체 결혼비용 중 본인 부담 비율
+                </label>
+
+                <div class="lifecycle-input-unit">
+
+                    <input type="number"
+                           id="marriageUserContributionRate"
+                           name="userContributionRate"
+                           min="1"
+                           max="100"
+                           step="1"
+                           value="50">
+
+                    <span>%</span>
+
+                </div>
+
+                <small>
+                    배우자와의 분담 등을 고려하여
+                    본인이 부담할 비율을 입력해주세요.
+                </small>
+
+            </div>
+
+
+            <!-- 가족 지원금 -->
+            <div class="lifecycle-form-group">
+
+                <label for="marriageFamilySupportAmount">
+                    가족 지원 예정금액
+                </label>
+
+                <div class="lifecycle-input-unit">
+
+                    <input type="number"
+                           id="marriageFamilySupportAmount"
+                           name="familySupportAmount"
+                           min="0"
+                           value="0">
+
+                    <span>원</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- 직접 입력 예상비용 -->
+            <div class="lifecycle-form-group"
+                 id="marriageCustomCostArea"
+                 hidden>
+
+                <label for="marriageCustomEstimatedCost">
+                    예상 결혼 총비용
+                </label>
+
+                <div class="lifecycle-input-unit">
+
+                    <input type="number"
+                           id="marriageCustomEstimatedCost"
+                           name="customEstimatedCost"
+                           min="0">
+
+                    <span>원</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- 저장 -->
+            <div class="lifecycle-form-actions">
+
+                <button type="button"
+                        id="saveMarriageSurveyBtn"
+                        class="lifecycle-primary-button">
+
+                    결혼 계획 저장
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</th:block>
+
+</html>

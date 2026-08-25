@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>목표 앞당기기 | 미래 금융 시뮬레이터 | Via</title>
+</head>
+<body>
+<main class="futuresim-goal-preset-page">
+    <link rel="stylesheet" th:href="@{/css/lifecycle-survey.css}">
+    <link rel="stylesheet" th:href="@{/css/futuresim-current-status.css}">
+
+    <header class="lifecycle-survey-header">
+        <span>미래 금융 시뮬레이터 · 4단계</span>
+        <h1>어떻게 하면 더 빨라질까요</h1>
+        <p>페이스를 앞당길 수 있는 방법 4가지를 강도별로 비교해보세요</p>
+    </header>
+
+    <!-- 1~3단계와 동일한 스테퍼 — 1·2·3단계는 완료(completed), 4단계가 현재(active) -->
+    <nav class="futuresim-step-nav" aria-label="미래 금융 시뮬레이터 진행 단계">
+        <div class="futuresim-step-track">
+            <a th:href="@{/futuresim}" class="futuresim-step completed"><span>1</span>지금 내 상태</a>
+            <a th:href="@{/futuresim/goal}" class="futuresim-step completed"><span>2</span>목표 설정</a>
+            <a th:href="@{/futuresim/growth}" class="futuresim-step completed"><span>3</span>성장 곡선</a>
+            <a th:href="@{/futuresim/levers}" class="futuresim-step active" aria-current="step"><span>4</span>목표 앞당기기</a>
+            <a th:href="@{/futuresim/combo}" class="futuresim-step"><span>5</span>나만의 실행 계획</a>
+        </div>
+    </nav>
+
+    <section class="fcs-panel">
+        <h2 class="fcs-panel-title">목표 앞당기기</h2>
+        <p class="fcs-panel-sub">각 방법을 기본 강도로 적용했을 때 목표 도달 기간이 얼마나 당겨지는지 비교해요</p>
+        <div class="fp-return-rate-control">
+            <label for="assumedReturnRate">여유자금 예상 수익률</label>
+            <select id="assumedReturnRate">
+                <option value="2.5">안전형 · 연 2.5%</option>
+                <option value="4" selected>균형형 · 연 4.0%</option>
+                <option value="6">성장형 · 연 6.0%</option>
+                <option value="custom">직접 입력</option>
+            </select>
+            <input class="hidden" id="customAssumedReturnRate" type="number" min="0" max="10" step="0.1" aria-label="직접 입력 예상 수익률"> <span class="fp-return-rate-unit">%</span>
+            <p>세전·수수료 전 가정이며, 실제 수익을 보장하지 않아요.</p>
+        </div>
+
+        <!-- ===== 히어로 숫자 ===== -->
+        <section class="fp-pace-card">
+            <div class="fp-pace-header">
+                <span class="fp-pace-label">지금 페이스로는</span>
+                <div class="fp-pace-number" id="leverBaselinePace">
+                    <span class="fp-pace-number-magnitude" id="leverBaselineMagnitude">-</span>
+                    <span class="fp-pace-number-unit" id="leverBaselineUnit"></span>
+                </div>
+            </div>
+            <p class="fp-lever-hero-sub">목표까지 걸려요 — 아래 방법으로 얼마나 당길 수 있는지 확인해보세요</p>
+        </section>
+
+        <!-- ===== 섹션1. 레버 랭킹 막대그래프 + 강도 조절 카드 ===== -->
+        <section class="fp-lever-section">
+            <h3 class="fp-lever-section-title">방법별 효과 비교</h3>
+            <p class="fp-lever-section-sub">효과가 큰 순서예요 — 아래 칩을 눌러 강도를 바꿔볼 수 있어요</p>
+
+            <p class="fp-lever-loading" id="leverRankingLoading">불러오는 중…</p>
+            <ul class="fp-lever-ranking-list hidden" id="leverRankingList"></ul>
+            <p class="fp-lever-best-insight hidden" id="leverBestInsight"></p>
+
+            <!-- 기존 카드형 비교는 유지하고, 대출 부담을 한 표에서 비교할 수 있게 추가한다. -->
+            <section class="fp-lever-loan-comparison hidden" id="leverLoanComparison">
+                <h3 class="fp-lever-section-title">대출 부담 상세 비교</h3>
+                <p class="fp-lever-section-sub">월 부담·총이자·상환기간은 현재 보유 대출 전체를 합산한 값이에요</p>
+                <div class="fp-lever-loan-vertical-list" id="leverLoanComparisonBody"></div>
+            </section>
+        </section>
+
+        <!-- ===== 조합 추천 — 위 방법들을 동시에 쓰면 최선인 조합(DP)을 보여준다 ===== -->
+        <section class="fp-lever-combination-loading" id="leverCombinationLoading" aria-live="polite">
+            <span class="material-symbols-outlined fp-combination-spinner" aria-hidden="true">progress_activity</span>
+            <div><strong>나에게 맞는 조합을 계산하고 있어요</strong><p>가능한 실행 방법을 비교하는 중이에요.</p></div>
+        </section>
+        <section class="fp-lever-combination-card hidden" id="leverCombinationCard">
+            <p class="fp-lever-combination-title" id="leverCombinationTitle">이 조합을 추천해요</p>
+            <p class="fp-lever-combination-note">위에서 선택하신 강도를 기준으로 계산했어요</p>
+            <div class="fp-lever-combination-items" id="leverCombinationItems"></div>
+            <p class="fp-lever-combination-effect" id="leverCombinationEffect"></p>
+            <p class="fp-lever-combination-reason" id="leverCombinationReason"></p>
+        </section>
+
+        <!-- ===== 대출이 2개 이상일 때만 노출 — loananalysis 대출 우선순위 로직 재사용 ===== -->
+        <section class="fp-debt-priority-card hidden" id="debtPriorityCard">
+            <h3 class="fp-lever-section-title">여러 대출이 있다면 이 순서로 갚으세요</h3>
+            <p class="fp-lever-section-sub">연체·금리·수수료·소액대출 여부를 종합한 우선순위예요</p>
+            <ol class="fp-debt-priority-list" id="debtPriorityList"></ol>
+        </section>
+
+        <div class="fp-pace-divider"></div>
+
+        <!-- ===== 섹션2. 금리 리스크 참고 카드 ===== -->
+        <section class="fp-rate-risk-section">
+            <h3 class="fp-lever-section-title">금리가 오르면 어떻게 될까요</h3>
+            <p class="fp-lever-section-sub">지금 보유한 대출 기준 참고용 시나리오예요 — 실제 금리 변동은 시장 상황에 따라 달라져요</p>
+
+            <div class="fp-rate-risk-tabs" role="tablist" id="rateRiskTabs">
+                <button type="button" class="fp-rate-risk-tab active" data-mode="SIMPLE" role="tab" aria-selected="true">즉시 상승</button>
+                <button type="button" class="fp-rate-risk-tab" data-mode="STAGED" role="tab" aria-selected="false">계단식 상승</button>
+                <button type="button" class="fp-rate-risk-tab" data-mode="MARKET_IMPLIED" role="tab" aria-selected="false">시장 내재 금리</button>
+            </div>
+
+            <div class="fp-rate-risk-card" id="rateRiskCard">
+                <p class="fp-lever-loading" id="rateRiskLoading">불러오는 중…</p>
+                <p class="fp-rate-risk-empty hidden" id="rateRiskEmpty">참고할 보유 대출이 없어요.</p>
+                <div class="hidden" id="rateRiskContent">
+                    <table class="fp-detail-table">
+                        <tbody>
+                        <tr><th scope="row">대출 종류</th><td id="rateRiskLoanType">-</td></tr>
+                        <tr><th scope="row">현재 금리</th><td id="rateRiskCurrentRate">-</td></tr>
+                        <tr><th scope="row">현재 월상환액</th><td id="rateRiskCurrentPayment">-</td></tr>
+                        <tr><th scope="row">시나리오 적용 후 월상환액</th><td id="rateRiskFinalPayment">-</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="fp-rate-risk-insight" id="rateRiskInsight">-</p>
+                    <div class="fp-rate-risk-path-wrap">
+                        <table class="fp-rate-risk-path-table">
+                            <thead><tr><th>적용 시점</th><th>적용 금리</th><th>월상환액</th><th>현재 대비</th></tr></thead>
+                            <tbody id="rateRiskPathBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="fp-combo-summary hidden" id="recommendedComboPreview">
+            <strong id="recommendedComboPreviewText"></strong>
+            <span>5단계에서 확인하고 저장하기</span>
+        </section>
+
+        <!-- ===== 이전/다음 ===== -->
+        <div class="fcs-continue-row">
+            <a th:href="@{/futuresim/growth}" class="fcs-back-button">이전</a>
+            <a th:href="@{/futuresim/combo}" class="fcs-continue-button">다음</a>
+        </div>
+
+        <input type="hidden" id="leverGoalAmount" th:value="${goalAmount != null ? goalAmount : 100000000}">
+    </section>
+
+    <script th:src="@{/js/futuresim-levers.js}"></script>
+</main>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="results">
+    <section class="policy-result-summary bank-result-summary" th:if="${productPage != null}">
+        <p>총 <strong th:text="${productPage.totalElements}">0</strong>개의 상품이 있습니다.</p>
+    </section>
+
+    <section class="empty-result" th:if="${loadError}">
+        <h2>상품 정보를 불러오지 못했습니다.</h2>
+        <p>잠시 후 다시 시도해 주세요.</p>
+    </section>
+
+    <section class="empty-result" th:if="${!loadError and #lists.isEmpty(products)}">
+        <h2>검색 결과가 없습니다.</h2>
+        <p>검색어나 상세조건을 변경하여 다시 확인해 주세요.</p>
+    </section>
+
+    <div class="program-list-head" th:if="${!#lists.isEmpty(products)}" aria-hidden="true">
+        <span>상품구분</span>
+        <span>상품명 및 지원대상</span>
+        <span>주요조건</span>
+        <span>취급·운영기관</span>
+        <span>상세</span>
+    </div>
+    <section class="program-grid" th:if="${!#lists.isEmpty(products)}">
+        <article class="program-card" th:each="product : ${products}">
+            <div class="program-card-top">
+                <span class="policy-badge" th:text="${product.badge}">상품</span>
+            </div>
+            <h2 class="program-title" th:text="${product.title}">상품명</h2>
+            <p class="program-target"
+               th:text="${#strings.isEmpty(product.firstValue) ? '지원 조건은 기관에 문의해 주세요.' : product.firstValue}">
+                지원대상
+            </p>
+            <p class="program-institution" th:if="${!#strings.isEmpty(product.institution)}">
+                <span>취급·운영기관</span>
+                <strong th:text="${product.institution}">기관명</strong>
+            </p>
+            <dl class="program-information">
+                <div>
+                    <dt th:text="${product.firstLabel}">지원대상</dt>
+                    <dd th:text="${#strings.isEmpty(product.firstValue) ? '별도 확인' : product.firstValue}">별도 확인</dd>
+                </div>
+                <div>
+                    <dt th:text="${product.secondLabel}">분류</dt>
+                    <dd th:text="${#strings.isEmpty(product.secondValue) ? '별도 확인' : product.secondValue}">별도 확인</dd>
+                </div>
+            </dl>
+            <div class="program-card-actions">
+                <button class="detail-button open-financial-product-modal" type="button"
+                        th:attr="data-product-id=${product.id},data-product-type=${productType}">
+                    상세보기
+                </button>
+            </div>
+        </article>
+    </section>
+
+    <nav class="pagination" aria-label="상품 페이지"
+         th:if="${productPage != null and productPage.totalPages > 1}"
+         th:with="startPage=${(productPage.page / 10) * 10},
+                  endPage=${startPage + 9 < productPage.totalPages ? startPage + 9 : productPage.totalPages - 1}">
+        <button class="page-button page-navigation-button financial-product-page-button" type="button"
+                th:disabled="${productPage.first}" th:classappend="${productPage.first} ? ' disabled'"
+                data-page="0">처음</button>
+        <button class="page-button page-navigation-button financial-product-page-button" type="button"
+                th:disabled="${startPage == 0}" th:classappend="${startPage == 0} ? ' disabled'"
+                th:attr="data-page=${startPage - 1}">이전</button>
+        <button class="page-button financial-product-page-button" type="button"
+                th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}"
+                th:text="${pageNumber + 1}"
+                th:classappend="${pageNumber == productPage.page} ? ' active'"
+                th:disabled="${pageNumber == productPage.page}"
+                th:attr="data-page=${pageNumber}">1</button>
+        <span class="mobile-page-status">
+            <strong th:text="${productPage.page + 1}">1</strong> /
+            <span th:text="${productPage.totalPages}">1</span>
+        </span>
+        <button class="page-button page-navigation-button financial-product-page-button" type="button"
+                th:disabled="${endPage >= productPage.totalPages - 1}"
+                th:classappend="${endPage >= productPage.totalPages - 1} ? ' disabled'"
+                th:attr="data-page=${endPage + 1}">다음</button>
+    </nav>
+</th:block>
+
+<th:block th:fragment="modal">
+    <div id="financialProductModal" class="policy-modal" aria-hidden="true">
+        <div class="policy-modal-backdrop" data-financial-modal-close></div>
+        <section class="policy-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="financialModalTitle">
+            <header class="policy-modal-header">
+                <div>
+                    <span id="financialModalBadge" class="policy-badge">상품</span>
+                    <h2 id="financialModalTitle">상품 상세정보</h2>
+                </div>
+                <button type="button" class="policy-modal-close" aria-label="팝업 닫기" data-financial-modal-close>×</button>
+            </header>
+            <div id="financialModalLoading" class="modal-loading">
+                <div class="loading-spinner"></div><p>상세정보를 불러오는 중입니다.</p>
+            </div>
+            <div id="financialModalError" class="modal-error" hidden><p>상세정보를 불러오지 못했습니다.</p></div>
+            <div id="financialModalContent" class="policy-modal-content" hidden>
+                <section class="modal-section"><h3>상품 정보</h3><dl id="financialModalSummary" class="modal-definition-list"></dl></section>
+                <section class="modal-section"><h3>지원대상 및 조건</h3><dl id="financialModalConditions" class="modal-definition-list"></dl></section>
+                <section class="modal-section"><h3>신청 및 문의</h3><dl id="financialModalApplication" class="modal-definition-list"></dl></section>
+            </div>
+            <footer class="policy-modal-footer">
+                <a id="financialModalSite" class="primary-button" href="#" target="_blank"
+                   rel="noopener noreferrer" hidden>관련 사이트 확인</a>
+                <button type="button" class="secondary-button" data-financial-modal-close>닫기</button>
+            </footer>
+        </section>
+    </div>
+</th:block>
+
+</body>
+</html>

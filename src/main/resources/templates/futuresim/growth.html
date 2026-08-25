@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>성장 곡선 | 미래 금융 시뮬레이터 | Via</title>
+</head>
+<body>
+<main class="futuresim-goal-preset-page">
+    <link rel="stylesheet" th:href="@{/css/lifecycle-survey.css}">
+    <link rel="stylesheet" th:href="@{/css/futuresim-current-status.css}">
+
+    <header class="lifecycle-survey-header">
+        <span>미래 금융 시뮬레이터 · 3단계</span>
+        <h1>목표까지 이렇게 성장해요</h1>
+        <p>월 저축 가능액에 여유자금 평균 수익률을 반영해 순자산이 어떻게 늘어나는지 보여드려요</p>
+    </header>
+
+    <!-- 1~2단계와 동일한 스테퍼 — 1·2단계는 완료(completed), 3단계가 현재(active) -->
+    <nav class="futuresim-step-nav" aria-label="미래 금융 시뮬레이터 진행 단계">
+        <div class="futuresim-step-track">
+            <a th:href="@{/futuresim}" class="futuresim-step completed"><span>1</span>지금 내 상태</a>
+            <a th:href="@{/futuresim/goal}" class="futuresim-step completed"><span>2</span>목표 설정</a>
+            <a th:href="@{/futuresim/growth}" class="futuresim-step active" aria-current="step"><span>3</span>성장 곡선</a>
+            <a th:href="@{/futuresim/levers}" class="futuresim-step"><span>4</span>목표 앞당기기</a>
+            <a th:href="@{/futuresim/combo}" class="futuresim-step"><span>5</span>나만의 실행 계획</a>
+        </div>
+    </nav>
+
+    <section class="fcs-panel">
+        <h2 class="fcs-panel-title">성장 곡선</h2>
+        <p class="fcs-panel-sub">여유자금 평균 수익률(연 3.08% 가정)을 반영한 복리 성장 경로예요</p>
+
+        <!-- ===== 1. 히어로 숫자 ===== -->
+        <section class="fp-pace-card">
+            <div class="fp-pace-header">
+                <span class="fp-pace-label">목표까지</span>
+                <div class="fp-pace-number" id="growthPacePreview">
+                    <span class="fp-pace-number-magnitude" id="growthPaceMagnitude">-</span>
+                    <span class="fp-pace-number-unit" id="growthPaceUnit"></span>
+                </div>
+            </div>
+
+            <p class="fp-goal-detail-note-danger hidden" id="growthWarningNote"></p>
+
+            <!-- 그래프보다 먼저, 목표까지의 실제 여정을 숫자와 마일스톤으로 읽는다. -->
+            <section class="fp-goal-journey" aria-label="내 목표 진행 상황">
+                <div class="fp-goal-journey-head"><span>내 목표</span><strong id="growthJourneyGoal">-</strong></div>
+                <div class="fp-goal-journey-progress"><span id="growthJourneyProgress"></span></div>
+                <p id="growthJourneyNow">-</p>
+                <div class="fp-goal-journey-milestones">
+                    <div><span>1년 뒤</span><strong id="growthJourneyYear1">-</strong></div>
+                    <div><span>3년 뒤</span><strong id="growthJourneyYear3">-</strong></div>
+                    <div><span>목표 도달</span><strong id="growthJourneyArrival">-</strong></div>
+                </div>
+            </section>
+
+            <!-- ===== 2. 누적구성 영역 차트 — 원금(진한 파랑) + 투자수익(연한 파랑) 스택 + 목표선/벤치마크선 ===== -->
+            <div class="fp-growth-chart-wrap">
+                <svg class="fp-growth-chart-svg" id="growthChartSvg" viewBox="0 0 600 220" preserveAspectRatio="none" aria-hidden="true">
+                    <path class="fp-growth-area-contribution" id="growthContributionArea" d=""></path>
+                    <path class="fp-growth-area-return" id="growthReturnArea" d=""></path>
+                    <line class="fp-growth-benchmark-line hidden" id="growthBenchmarkLine" x1="0" y1="0" x2="600" y2="0"></line>
+                    <line class="fp-growth-goal-line" id="growthGoalLine" x1="0" y1="0" x2="600" y2="0"></line>
+                    <path class="fp-growth-curve" id="growthCurvePath" d=""></path>
+                    <circle class="fp-growth-benchmark-marker hidden" id="growthBenchmarkMarker" r="4.5" cx="0" cy="0"></circle>
+                    <circle class="fp-growth-goal-marker hidden" id="growthGoalMarker" r="4.5" cx="0" cy="0"></circle>
+                    <line class="fp-growth-scrubber-line" id="growthScrubberLine" x1="0" y1="0" x2="0" y2="220"></line>
+                    <circle class="fp-growth-scrubber-dot" id="growthScrubberDot" r="5" cx="0" cy="0"></circle>
+                    <line class="fp-growth-hover-line hidden" id="growthHoverLine" x1="0" y1="0" x2="0" y2="220"></line>
+                    <circle class="fp-growth-hover-dot hidden" id="growthHoverDot" r="4" cx="0" cy="0"></circle>
+                </svg>
+                <div class="fp-growth-tooltip" id="growthTooltip"></div>
+            </div>
+
+            <div class="fp-growth-legend">
+                <span class="fp-growth-legend-item"><span class="fp-growth-legend-swatch fp-growth-legend-swatch-contribution"></span>내가 모은 돈</span>
+                <span class="fp-growth-legend-item"><span class="fp-growth-legend-swatch fp-growth-legend-swatch-return"></span>투자수익</span>
+                <span class="fp-growth-legend-item"><span class="fp-growth-legend-swatch fp-growth-legend-swatch-goal"></span>목표</span>
+                <span class="fp-growth-legend-item hidden" id="growthBenchmarkLegendItem"><span class="fp-growth-legend-swatch fp-growth-legend-swatch-benchmark"></span>또래 중앙값</span>
+            </div>
+
+            <div class="fp-pace-divider"></div>
+
+            <!-- ===== 3. 타임라인 탐색기 — 슬라이더로 임의 시점을 골라 그 시점 상세를 본다(추가 API 호출 없음) ===== -->
+            <div class="fp-scrubber-block">
+                <div class="fp-scrubber-header">
+                    <span class="fp-pace-label">타임라인 탐색기</span>
+                    <span class="fp-scrubber-month" id="growthScrubberLabel">-</span>
+                </div>
+                <input type="range" class="fp-scrubber-input" id="growthScrubberInput" min="0" max="0" value="0" step="1"
+                       aria-label="타임라인 시점 선택">
+                <table class="fp-detail-table" id="growthScrubberTable">
+                    <tbody>
+                    <tr><th scope="row">이 시점 순자산</th><td id="growthScrubberNetWorth">-</td></tr>
+                    <tr><th scope="row">목표까지 남은 금액</th><td id="growthScrubberRemaining">-</td></tr>
+                    <tr><th scope="row">직접 모은 돈</th><td id="growthScrubberContribution">-</td></tr>
+                    <tr><th scope="row">투자수익</th><td id="growthScrubberReturn">-</td></tr>
+                    <tr class="hidden" id="growthScrubberLoanRow"><th scope="row">대출 잔액</th><td id="growthScrubberLoanBalance">-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="fp-pace-divider"></div>
+
+            <!-- ===== 4. 목표 도달 시점 기준 원금/투자수익 요약 카드 ===== -->
+            <div class="fp-growth-summary-card" id="growthSummaryCard">
+                <p id="growthSummaryText">-</p>
+            </div>
+
+            <div class="fp-pace-divider"></div>
+
+            <!-- ===== 이 곡선을 만드는 계산 값 ===== -->
+            <div class="fp-savings-breakdown">
+                <p class="fp-savings-breakdown-title">이 곡선을 만드는 계산 값</p>
+                <table class="fp-detail-table fp-detail-table-breakdown">
+                    <tbody>
+                    <tr><th scope="row">월 소득</th><td id="growthDetailIncome">-</td></tr>
+                    <tr><th scope="row">− 월 생활비</th><td id="growthDetailExpense">-</td></tr>
+                    <tr><th scope="row">− 월 원리금상환액</th><td id="growthDetailLoanPayment">-</td></tr>
+                    <tr class="fp-detail-table-total"><th scope="row">= 월 저축 가능액</th><td id="growthDetailSavings">-</td></tr>
+                    <tr><th scope="row">가정 수익률(연, 복리)</th><td id="growthDetailReturnRate">-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="fp-pace-divider"></div>
+
+            <!-- ===== 5. 마일스톤 리스트 (+ 또래 대비, 조건부) ===== -->
+            <ul class="fp-milestone-list" id="growthMilestones"></ul>
+
+            <!-- 기간 내 벤치마크를 넘어서는 경우에만: 2단계 순자산 스펙트럼과 같은 % 콜아웃 -->
+            <div class="fp-age-spectrum-result hidden" id="growthBenchmarkCallout">
+                <span class="fp-age-spectrum-percent" id="growthBenchmarkPercent">-</span>
+                <span class="fp-age-spectrum-percent-text" id="growthBenchmarkPercentText"></span>
+                <p class="fp-age-spectrum-caption" id="growthBenchmarkCaption"></p>
+            </div>
+
+            <!-- 기간 내 못 넘어서는 경우: 담담한 중립 톤 문구(경고색 없음) -->
+            <p class="fp-goal-detail-note hidden" id="growthBenchmarkNeutralNote"></p>
+        </section>
+
+        <!-- ===== 6. 4단계 미리보기 ===== -->
+        <a th:href="@{/futuresim/levers}" class="fp-preview-card fp-preview-card-link">
+            <p class="fp-preview-card-title">이 페이스를 더 빠르게 만들 수 있는 방법 4가지를 비교해볼 수 있어요</p>
+            <div class="fp-preview-methods">
+                <div class="fp-preview-method"><span class="material-symbols-outlined" aria-hidden="true">trending_up</span>소득 변화</div>
+                <div class="fp-preview-method"><span class="material-symbols-outlined" aria-hidden="true">payments</span>대출 조기상환</div>
+                <div class="fp-preview-method"><span class="material-symbols-outlined" aria-hidden="true">event_repeat</span>만기 연장</div>
+                <div class="fp-preview-method"><span class="material-symbols-outlined" aria-hidden="true">add_card</span>추가 대출 실행</div>
+            </div>
+        </a>
+
+        <!-- ===== 7. 이전/다음 ===== -->
+        <div class="fcs-continue-row">
+            <a th:href="@{/futuresim/goal}" class="fcs-back-button">이전</a>
+            <a th:href="@{/futuresim/levers}" class="fcs-continue-button">다음</a>
+        </div>
+
+        <input type="hidden" id="growthGoalAmount" th:value="${goalAmount != null ? goalAmount : 100000000}">
+    </section>
+
+    <script th:src="@{/js/futuresim-growth.js}"></script>
+</main>
+</body>
+</html>

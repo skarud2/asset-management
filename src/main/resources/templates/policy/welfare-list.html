@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head><title>복합지원 | SHINVIA</title></head>
+<body>
+<main class="policy-container bank-policy-page">
+    <section class="page-header"><p class="page-label">WELFARE SUPPORT</p><h1>복합지원</h1>
+        <p class="page-description">금융·고용·복지 서비스를 연계한 지원 정보를 확인할 수 있습니다.</p></section>
+    <section class="policy-notice"><p>서민금융진흥원 제공 정보를 기반으로 조회됩니다. 신청 전 운영기관의 공식 안내를 확인해 주세요.</p></section>
+    <section class="policy-search-area">
+        <form method="get" th:action="@{/welfare-support}" id="financialProductSearchForm">
+            <input type="hidden" name="page" value="0">
+            <div class="policy-filter-form">
+                <div class="search-input-group"><label for="keyword" class="sr-only">지원사업 검색</label><input id="keyword" class="policy-search-input" type="search" name="keyword" th:value="${search.keyword}" placeholder="사업명, 지원대상, 운영기관을 검색하세요"></div>
+                <div class="page-size-group"><label for="size" class="sr-only">페이지당 표시 개수</label><select id="size" class="page-size-select" name="size" onchange="this.form.submit()">
+                    <option th:each="option : ${ {10,20,30,40,50} }" th:value="${option}" th:selected="${search.size == option}" th:text="${option + '개씩 보기'}">20개씩 보기</option></select></div>
+                <button class="search-button" type="submit">검색</button>
+            </div>
+            <div class="detail-filter-header"><h2>상세검색 필터</h2><button type="button" id="detailFilterToggle" class="detail-filter-toggle collapsed" aria-expanded="false" aria-controls="detailFilterPanel"><span id="filterToggleText">펼치기</span><span class="filter-toggle-icon">▲</span></button></div>
+            <div id="detailFilterPanel" class="detail-filter-panel hidden">
+                <div class="detail-filter-row"><div class="detail-filter-label">지원대상</div><div class="detail-filter-options">
+                    <label class="filter-chip" th:each="option : ${ {'자영업·소상공인','초중고등학생','대학생','취업준비생','장애인','북한이탈주민','환자 등','한부모가정','다문화가정','특수직종사자','여성','기타'} }"><input type="checkbox" name="targets" th:value="${option}" th:checked="${#lists.contains(search.targets, option)}"><span th:text="${option}">대상</span></label>
+                </div></div>
+                <div class="detail-filter-row"><div class="detail-filter-label">연령대</div><div class="detail-filter-options">
+                    <label class="filter-chip" th:each="option : ${ageOptions}"><input type="checkbox" name="ages" th:value="${option}" th:checked="${#lists.contains(search.ages, option)}"><span th:text="${option}">연령</span></label>
+                </div></div>
+                <div class="detail-filter-actions"><a class="filter-reset-button" th:href="@{/welfare-support}">초기화</a><button class="filter-submit-button" type="submit">조건 검색</button></div>
+            </div>
+        </form>
+    </section>
+    <th:block th:replace="~{policy/product-fragments :: results}"></th:block>
+    <th:block th:replace="~{policy/product-fragments :: modal}"></th:block>
+</main>
+</body>
+</html>

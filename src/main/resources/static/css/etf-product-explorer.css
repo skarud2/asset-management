@@ -1,0 +1,613 @@
+.surplus-guide #productGrid > .etf-explorer,
+.surplus-guide #productGrid > .etf-explorer__loading,
+.surplus-guide #productGrid > .etf-explorer__error {
+    grid-column: 1 / -1;
+    min-width: 0;
+}
+
+.surplus-guide .etf-explorer {
+    position: relative;
+    display: grid;
+    gap: 20px;
+    width: 100%;
+    min-width: 0;
+}
+
+.surplus-guide .etf-explorer.has-compare-selection {
+    padding-bottom: 104px;
+}
+
+.surplus-guide .etf-explorer__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    min-width: 0;
+}
+
+.surplus-guide .etf-explorer__title-group {
+    min-width: 0;
+}
+
+.surplus-guide .etf-explorer__title {
+    margin: 0;
+    color: #111827;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.surplus-guide .etf-explorer__description {
+    margin: 8px 0 0;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.surplus-guide .etf-explorer__meta {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.surplus-guide .etf-explorer__date,
+.surplus-guide .etf-explorer__count {
+    padding: 8px 12px;
+    border: 1px solid #d7dee8;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #475569;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.surplus-guide .etf-explorer__count {
+    border-color: #b9cbe2;
+    color: #1e3a5f;
+    font-weight: 700;
+}
+
+.surplus-guide .etf-explorer__sort-notice {
+    margin: 0;
+    padding: 14px 16px;
+    border-left: 3px solid #255691;
+    background: #f4f7fb;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.surplus-guide .etf-explorer__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #d7dee8;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.surplus-guide .etf-explorer__search-group,
+.surplus-guide .etf-explorer__sort-group {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.surplus-guide .etf-explorer__search-group {
+    flex: 1 1 300px;
+}
+
+.surplus-guide .etf-explorer__sort-group {
+    flex: 1 1 210px;
+}
+
+.surplus-guide .etf-explorer__search-label,
+.surplus-guide .etf-explorer__sort-label {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.surplus-guide .etf-explorer__search,
+.surplus-guide .etf-explorer__sort {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #111827;
+    padding: 0 12px;
+}
+
+.surplus-guide .etf-explorer__search:focus-visible,
+.surplus-guide .etf-explorer__sort:focus-visible,
+.surplus-guide .etf-explorer__search-button:focus-visible,
+.surplus-guide .etf-explorer__load-more:focus-visible,
+.surplus-guide .etf-product-card__compare:focus-visible,
+.surplus-guide .etf-product-card__details summary:focus-visible,
+.surplus-guide .etf-compare-bar__clear:focus-visible,
+.surplus-guide .etf-compare-bar__open:focus-visible,
+.surplus-guide .etf-compare__close:focus-visible,
+.surplus-guide .etf-compare__table-wrap:focus-visible {
+    outline: 3px solid rgba(37, 86, 145, 0.24);
+    outline-offset: 2px;
+}
+
+.surplus-guide .etf-explorer__search-button,
+.surplus-guide .etf-explorer__load-more,
+.surplus-guide .etf-product-card__compare,
+.surplus-guide .etf-compare-bar__clear,
+.surplus-guide .etf-compare-bar__open,
+.surplus-guide .etf-compare__close {
+    min-height: 44px;
+    border: 1px solid #172230;
+    border-radius: 4px;
+    background: #172230;
+    color: #ffffff;
+    padding: 0 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.surplus-guide .etf-explorer__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+    gap: 18px;
+    min-width: 0;
+}
+
+.surplus-guide .etf-product-card {
+    display: grid;
+    align-content: start;
+    gap: 16px;
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid #d7dee8;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+.surplus-guide .etf-product-card.is-selected {
+    border: 2px solid #255691;
+    padding: 19px;
+    background: #f4f8fd;
+}
+
+.surplus-guide .etf-product-card__action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+}
+
+.surplus-guide .etf-product-card__badge {
+    display: inline-flex;
+    flex: 0 0 auto;
+    padding: 5px 8px;
+    border-radius: 4px;
+    background: #e8f2ff;
+    color: #1d5d96;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.surplus-guide .etf-product-card__compare {
+    flex: 0 0 auto;
+    min-height: 34px;
+    padding: 0 12px;
+    border-color: #8ca4c0;
+    background: #ffffff;
+    color: #172230;
+    font-size: 12px;
+}
+
+.surplus-guide .etf-product-card.is-selected .etf-product-card__compare {
+    border-color: #255691;
+    background: #255691;
+    color: #ffffff;
+}
+
+.surplus-guide .etf-product-card__name {
+    display: -webkit-box;
+    min-width: 0;
+    min-height: 2.8em;
+    margin: 0;
+    overflow: hidden;
+    color: #101827;
+    font-size: 19px;
+    line-height: 1.4;
+    overflow-wrap: break-word;
+    word-break: keep-all;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.surplus-guide .etf-product-card__meta {
+    min-width: 0;
+    margin: -8px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.55;
+    overflow-wrap: break-word;
+    word-break: keep-all;
+}
+
+.surplus-guide .etf-product-card__core {
+    display: grid;
+    grid-template-columns: minmax(150px, 0.8fr) minmax(260px, 1.2fr);
+    gap: 14px;
+    min-width: 0;
+}
+
+.surplus-guide .etf-product-card__price-group,
+.surplus-guide .etf-product-card__estimate {
+    min-width: 0;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.surplus-guide .etf-product-card__price-group {
+    display: grid;
+    align-content: center;
+    gap: 5px;
+    border: 1px solid #dce3ec;
+    background: #ffffff;
+}
+
+.surplus-guide .etf-product-card__core-label,
+.surplus-guide .etf-product-card__estimate-title {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.surplus-guide .etf-product-card__price {
+    color: #10233d;
+    font-size: clamp(20px, 3vw, 26px);
+    line-height: 1.25;
+    white-space: nowrap;
+}
+
+.surplus-guide .etf-product-card__rate {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.surplus-guide .etf-product-card__estimate {
+    border-left: 3px solid #255691;
+    background: #eef5fd;
+}
+
+.surplus-guide .etf-product-card__estimate-title {
+    color: #1e3a5f;
+}
+
+.surplus-guide .etf-product-card__estimate-value {
+    margin: 7px 0;
+    color: #10233d;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.35;
+    word-break: keep-all;
+}
+
+.surplus-guide .etf-product-card__estimate-notice {
+    display: block;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.surplus-guide .etf-product-card__metrics,
+.surplus-guide .etf-product-card__detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+    gap: 14px;
+    min-width: 0;
+    margin: 0;
+    padding: 16px;
+    border: 1px solid #e5eaf1;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.surplus-guide .etf-product-card__metric {
+    min-width: 0;
+}
+
+.surplus-guide .etf-product-card__metric.is-full-width {
+    grid-column: 1 / -1;
+}
+
+.surplus-guide .etf-product-card__metric dt {
+    color: #7a8797;
+    font-size: 12px;
+}
+
+.surplus-guide .etf-product-card__metric dd {
+    min-width: 0;
+    margin: 4px 0 0;
+    color: #18314f;
+    font-weight: 750;
+    line-height: 1.4;
+    word-break: keep-all;
+}
+
+.surplus-guide .etf-product-card__metric dd.is-compact-money {
+    white-space: nowrap;
+}
+
+.surplus-guide .etf-product-card__details {
+    min-width: 0;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 12px;
+}
+
+.surplus-guide .etf-product-card__details summary {
+    color: #255691;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.surplus-guide .etf-product-card__details[open] summary {
+    margin-bottom: 12px;
+}
+
+.surplus-guide .etf-product-card__detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 14px;
+    background: #ffffff;
+}
+
+.surplus-guide .etf-product-card__detail-grid dd {
+    overflow-wrap: break-word;
+}
+
+.surplus-guide .etf-explorer__load-more {
+    justify-self: center;
+    min-width: 180px;
+    border-color: #255691;
+    background: #ffffff;
+    color: #255691;
+}
+
+.surplus-guide .etf-compare-bar {
+    position: sticky;
+    bottom: 16px;
+    z-index: 8;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid #b7c6d9;
+    border-top: 3px solid #172230;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 -6px 20px rgba(15, 23, 42, 0.14);
+}
+
+.surplus-guide .etf-compare-bar__count {
+    color: #172230;
+    white-space: nowrap;
+}
+
+.surplus-guide .etf-compare-bar__chips {
+    display: flex;
+    gap: 7px;
+    min-width: 0;
+    overflow-x: auto;
+    padding: 2px 0 4px;
+    scrollbar-width: thin;
+}
+
+.surplus-guide .etf-compare-bar__chip {
+    max-width: 220px;
+    flex: 0 0 auto;
+    overflow: hidden;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #edf3fa;
+    color: #1e3a5f;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.surplus-guide .etf-compare-bar__actions {
+    display: flex;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.surplus-guide .etf-compare-bar__clear {
+    border-color: #94a3b8;
+    background: #ffffff;
+    color: #334155;
+}
+
+.surplus-guide .etf-compare {
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid #cbd5e1;
+    border-top: 3px solid #172230;
+    border-radius: 8px;
+    background: #ffffff;
+    scroll-margin-top: 24px;
+}
+
+.surplus-guide .etf-compare__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.surplus-guide .etf-compare__title {
+    margin: 0;
+    color: #111827;
+    font-size: 18px;
+}
+
+.surplus-guide .etf-compare__count {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.surplus-guide .etf-compare__close {
+    min-height: 36px;
+    margin-left: auto;
+    border-color: #94a3b8;
+    background: #ffffff;
+    color: #334155;
+}
+
+.surplus-guide .etf-compare__table-wrap {
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.surplus-guide .etf-compare__table {
+    width: 100%;
+    min-width: 860px;
+    border-collapse: collapse;
+}
+
+.surplus-guide .etf-compare__table th,
+.surplus-guide .etf-compare__table td {
+    padding: 12px;
+    border: 1px solid #d7dee8;
+    text-align: left;
+    vertical-align: top;
+    word-break: keep-all;
+}
+
+.surplus-guide .etf-compare__table th {
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 13px;
+}
+
+.surplus-guide .etf-compare__compact-money {
+    white-space: nowrap;
+}
+
+.surplus-guide .etf-compare__notice,
+.surplus-guide .etf-explorer__notice,
+.surplus-guide .etf-explorer__empty,
+.surplus-guide .etf-explorer__loading,
+.surplus-guide .etf-explorer__error {
+    margin: 0;
+    padding: 16px;
+    border: 1px solid #d7dee8;
+    background: #f8fafc;
+    color: #475569;
+    line-height: 1.6;
+}
+
+.surplus-guide .etf-compare__notice {
+    font-size: 13px;
+}
+
+.surplus-guide .etf-explorer__error {
+    border-color: #f0b4b4;
+    background: #fff6f6;
+    color: #9b1c1c;
+}
+
+@media (max-width: 900px) {
+    .surplus-guide .etf-explorer__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .surplus-guide .etf-explorer__header {
+        flex-direction: column;
+    }
+
+    .surplus-guide .etf-explorer__meta {
+        justify-content: flex-start;
+    }
+
+    .surplus-guide .etf-compare-bar {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .surplus-guide .etf-compare-bar__actions {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 640px) {
+    .surplus-guide .etf-explorer.has-compare-selection {
+        padding-bottom: 150px;
+    }
+
+    .surplus-guide .etf-explorer__toolbar,
+    .surplus-guide .etf-product-card__core,
+    .surplus-guide .etf-compare-bar {
+        grid-template-columns: 1fr;
+    }
+
+    .surplus-guide .etf-explorer__search-group,
+    .surplus-guide .etf-explorer__sort-group {
+        flex-basis: 100%;
+    }
+
+    .surplus-guide .etf-explorer__search-button,
+    .surplus-guide .etf-explorer__load-more {
+        width: 100%;
+    }
+
+    .surplus-guide .etf-product-card {
+        padding: 16px;
+    }
+
+    .surplus-guide .etf-product-card.is-selected {
+        padding: 15px;
+    }
+
+    .surplus-guide .etf-product-card__core {
+        display: grid;
+    }
+
+    .surplus-guide .etf-product-card__metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .surplus-guide .etf-product-card__detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .surplus-guide .etf-compare-bar__chips,
+    .surplus-guide .etf-compare-bar__actions {
+        grid-column: 1;
+    }
+
+    .surplus-guide .etf-compare-bar__actions,
+    .surplus-guide .etf-compare-bar__clear,
+    .surplus-guide .etf-compare-bar__open {
+        width: 100%;
+    }
+
+    .surplus-guide .etf-compare__header {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 420px) {
+    .surplus-guide .etf-product-card__metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .surplus-guide .etf-compare-bar__actions {
+        flex-direction: column;
+    }
+}

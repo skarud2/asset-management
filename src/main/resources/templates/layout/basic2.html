@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<th:block th:fragment="layout(pageTitle, pageContent, script, serviceName)">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="_csrf" th:content="${_csrf.token}">
+        <meta name="_csrf_header" th:content="${_csrf.headerName}">
+        <title th:replace="${pageTitle}">SHINVIA</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+        <link rel="stylesheet" th:href="@{/css/frame.css}">
+        <link rel="stylesheet" th:href="@{/css/via-theme.css(v='layout-20260820-2')}">
+        <link rel="stylesheet" th:href="@{/css/dsr-calculation.css}">
+        <link rel="stylesheet" th:href="@{/css/email.css}">
+        <link rel="stylesheet" th:href="@{/css/find-idpw.css}">
+        <link rel="stylesheet" th:href="@{/css/financial-profile.css}">
+        <link rel="stylesheet" th:href="@{/css/find-idpw.css}">
+        <link rel="stylesheet" th:href="@{/css/signup.css}">
+        <link rel="stylesheet" th:href="@{/css/login.css}">
+        <link rel="stylesheet" th:href="@{/css/signup.css}">
+        <link rel="stylesheet" th:href="@{/css/mydata-result.css}">
+        <link rel="stylesheet" th:href="@{/css/mydata-connection.css}">
+        <link rel="stylesheet" th:href="@{/css/profile.css}">
+        <script defer th:src="@{/js/script.js}"></script>
+        <script defer th:src="@{/js/policy.js}"></script>
+        <script defer th:src="@{/js/loan-recommendation.js}"></script>
+        <script defer th:src="@{/js/financial-profile.js}"></script>
+    </head>
+
+    <body>
+    <th:block th:replace="~{fragments/main-header :: mainHeader}"></th:block>
+
+    <div class="site-layout">
+        <div class="site-content">
+            <main th:replace="${pageContent}">페이지 본문</main>
+        </div>
+    </div>
+
+    <th:block th:replace="~{fragments/main-footer :: mainFooter}"></th:block>
+    <th:block th:replace="${script}"></th:block>
+    </body>
+</th:block>
+</html>

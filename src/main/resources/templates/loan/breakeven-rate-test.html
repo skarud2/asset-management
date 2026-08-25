@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>한계금리 역산 테스트 | Via</title>
+</head>
+<body>
+<main class="page-shell">
+    <link rel="stylesheet" th:href="@{/css/loan-ratesimulation-common.css}">
+    <link rel="stylesheet" th:href="@{/css/loan-breakeven-rate.css}">
+
+    <header class="page-header">
+        <h1>한계금리 역산 테스트</h1>
+        <p class="hint">이 대출 금리가 몇 %까지 오르면 위험해지는지 계산합니다. (로컬 테스트 전용 페이지)</p>
+        <p class="hint">
+            로컬 시드 데이터 예시 — 대출 ID 1(정상, 주택담보대출), 대출 ID 2(연체, 신용대출 — 에러 확인용)
+        </p>
+    </header>
+
+    <section class="card my-loans-card" id="myLoansSection" data-target-input="loanId">
+        <h2 class="card-title">내 보유 대출</h2>
+        <div id="myLoansList" class="my-loans-list">
+            <p class="my-loans-empty">불러오는 중...</p>
+        </div>
+    </section>
+
+    <section class="scenario-section" aria-labelledby="breakevenFormTitle">
+        <div class="scenario-section-heading">
+            <div>
+                <h2 id="breakevenFormTitle">시나리오 조건 입력</h2>
+                <p>선택한 대출을 기준으로 임계값 조건을 입력한 후 실행하기 버튼을 눌러 주세요.</p>
+            </div>
+            <span><b>*</b> 필수 입력</span>
+        </div>
+
+        <form id="breakevenForm" class="scenario-form">
+            <input type="hidden" id="loanId" name="loanId" value="1" required min="1">
+
+            <div class="scenario-form-row single-row">
+                <label for="thresholdType">임계값 기준 <b>*</b></label>
+                <div class="scenario-field">
+                    <select id="thresholdType" name="thresholdType">
+                        <option value="MONTHLY_PAYMENT_AMOUNT">월상환액 기준</option>
+                        <option value="INCOME_RATIO">소득 대비 비율 (현재 미지원)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="scenario-form-row single-row">
+                <label for="thresholdValue">임계값 <b>*</b></label>
+                <div class="scenario-field field-with-unit">
+                    <input type="number" id="thresholdValue" name="thresholdValue" value="1300000" required step="any">
+                    <span>원</span>
+                </div>
+            </div>
+
+            <div class="scenario-actions">
+                <button type="button" id="resetButton" class="scenario-button secondary">초기화</button>
+                <button type="submit" id="submitButton" class="scenario-button primary">실행하기</button>
+            </div>
+        </form>
+
+        <p id="errorMessage" class="banner banner-error hidden"></p>
+    </section>
+
+    <section id="resultArea" class="card hidden">
+        <h2 class="card-title">결과</h2>
+
+        <div class="result-heading">
+            <div class="loan-label">
+                <span class="loan-type" id="resultLoanType"></span>
+                <span class="rate-type">· <span id="resultRateType"></span></span>
+            </div>
+            <span id="resultStatusBadge" class="badge"></span>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-tile">
+                <span class="stat-label">현재 금리</span>
+                <span class="stat-value"><span id="resultCurrentRate">-</span><span class="unit">%</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">현재 월상환액</span>
+                <span class="stat-value"><span id="resultCurrentMonthlyPayment">-</span><span class="unit">원</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">한계금리</span>
+                <span class="stat-value"><span id="resultBreakevenRate">-</span></span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-label">여유 %p</span>
+                <span class="stat-value"><span id="resultMarginPercent">-</span></span>
+            </div>
+            <div id="resultExcessTile" class="stat-tile stat-tile-critical hidden">
+                <span class="stat-label">초과액</span>
+                <span class="stat-value"><span id="resultExcessAmount">-</span><span class="unit">원</span></span>
+            </div>
+        </div>
+
+        <p id="resultMessage" class="banner banner-info"></p>
+
+        <details>
+            <summary>원본 JSON</summary>
+            <pre id="resultRawJson" class="raw-json"></pre>
+        </details>
+    </section>
+
+    <script th:src="@{/js/my-loans-widget.js}"></script>
+    <script th:src="@{/js/loan-breakeven-rate.js}"></script>
+</main>
+</body>
+</html>

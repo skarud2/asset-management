@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<th:block th:fragment="layout(pageTitle, pageContent, serviceName)">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title th:replace="${pageTitle}">SHINVIA</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+        <link rel="stylesheet" th:href="@{/css/frame.css}">
+        <link rel="stylesheet" th:href="@{/css/policy.css}">
+        <link rel="stylesheet" th:href="@{/css/loan-recommendation.css}">
+        <link rel="stylesheet" th:href="@{/css/via-theme.css(v='layout-20260820-2')}">
+        <link rel="stylesheet" th:href="@{/css/mydata-result.css}">
+        <script defer th:src="@{/js/script.js}"></script>
+        <script defer th:src="@{/js/policy.js}"></script>
+        <script defer th:src="@{/js/loan-recommendation.js}"></script>
+    </head>
+
+    <body>
+    <th:block th:replace="~{fragments/main-header :: mainHeader}"></th:block>
+
+    <div class="site-layout">
+        <aside class="service-sidebar"
+               aria-label="금융 라이프 플랜 메뉴"
+               th:if="${serviceName == '금융 라이프 플랜'}">
+            <nav class="sidebar-navigation">
+                <ul class="lifecycle-sidebar-menu">
+                    <li th:each="category : ${assetServiceMenus}"
+                        th:with="item=${category.items[0]}">
+                        <a th:if="${item.enabled}"
+                           th:href="@{${item.path}}"
+                           th:classappend="${currentRequestPath == item.path or (item.path == '/futuresim' and #strings.startsWith(currentRequestPath, '/futuresim/'))} ? ' active' : ''"
+                           th:text="${category.name}">서비스</a>
+                        <span th:unless="${item.enabled}" class="sidebar-menu-disabled">
+                            <span th:text="${category.name}">서비스</span> <small>준비중</small>
+                        </span>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <aside class="service-sidebar"
+               aria-label="금융 서비스 메뉴"
+               th:unless="${serviceName == '금융 라이프 플랜'}">
+            <nav class="sidebar-navigation">
+                <details class="sidebar-menu-group"
+                         th:each="category : ${loanServiceMenus}"
+                         th:attr="open=${category.name == serviceName} ? 'open' : null">
+                    <summary th:text="${category.name}">서비스</summary>
+                    <ul>
+                        <li th:each="item : ${category.items}">
+                            <a th:if="${item.enabled}"
+                               th:href="@{${item.path}}"
+                               th:classappend="${currentRequestPath == item.path} ? ' active' : ''"
+                               th:text="${item.name}">서비스</a>
+                            <span th:unless="${item.enabled}" class="sidebar-menu-disabled">
+                                <span th:text="${item.name}">서비스</span> <small>준비중</small>
+                            </span>
+                        </li>
+                    </ul>
+                </details>
+            </nav>
+        </aside>
+
+        <div class="site-content">
+            <main th:replace="${pageContent}">페이지 본문</main>
+        </div>
+    </div>
+
+    <th:block th:replace="~{fragments/main-footer :: mainFooter}"></th:block>
+    </body>
+</th:block>
+</html>

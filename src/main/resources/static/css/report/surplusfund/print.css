@@ -1,0 +1,277 @@
+.report-surplusfund-document {
+    color: #1b2430;
+}
+
+.report-surplusfund-header {
+    margin-bottom: 18px;
+}
+
+.report-surplusfund-eyebrow {
+    margin: 0 0 6px;
+    color: #657080;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.report-surplusfund-header h2 {
+    margin: 0;
+    color: #1b2c52;
+    font-size: 24px;
+}
+
+.report-surplusfund-meta {
+    display: flex;
+    gap: 14px;
+    margin-top: 8px;
+    color: #758195;
+    font-size: 10px;
+}
+
+/*공통 섹션*/
+.report-surplusfund-section {
+    margin-top: 12px;
+    padding: 14px;
+    border: 1px solid #dce3ec;
+    break-inside: avoid;
+}
+
+.report-surplusfund-section h3 {
+    margin: 0 0 10px;
+    color: #273b60;
+    font-size: 14px;
+}
+
+/* 최종 운용 가능 금액*/
+.report-surplusfund-main-amount {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+    padding: 13px 14px;
+    background: #1d355b;
+    color: #ffffff;
+}
+
+.report-surplusfund-main-amount span {
+    color: #c6d4e7;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.report-surplusfund-main-amount strong {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+/*여유자금 계산 결과*/
+.report-surplusfund-calculation {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+
+    margin: 0;
+}
+
+.report-surplusfund-calculation > div {
+    padding: 9px 10px;
+    border: 1px solid #e1e7ef;
+}
+
+.report-surplusfund-calculation dt {
+    color: #6d798a;
+    font-size: 10px;
+}
+
+.report-surplusfund-calculation dd {
+    margin: 4px 0 0;
+    color: #1c2e4f;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+}
+
+/*자산배분*/
+.report-surplusfund-allocation {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.report-surplusfund-allocation-item {
+    padding: 11px;
+    border: 1px solid #e1e7ef;
+}
+
+.report-surplusfund-allocation-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.report-surplusfund-allocation-head strong {
+    color: #223655;
+    font-size: 12px;
+}
+
+.report-surplusfund-allocation-head span {
+    color: #536174;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.report-surplusfund-allocation-item p {
+    margin: 8px 0 10px;
+    color: #1d2e4b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.report-surplusfund-allocation-track {
+    width: 100%;
+    height: 6px;
+    overflow: hidden;
+
+    background: #e5eaf0;
+}
+
+.report-surplusfund-allocation-track span {
+    display: block;
+    height: 100%;
+    background: #315b8f;
+}
+
+/*안내 문구*/
+.report-surplusfund-note {
+    margin: 10px 0 0;
+    color: #738094;
+    font-size: 9.5px;
+    line-height: 1.5;
+}
+
+
+/*배분 이유*/
+.report-surplusfund-reasons {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.report-surplusfund-reasons li {
+    position: relative;
+    padding: 8px 8px 8px 17px;
+    border-top: 1px solid #edf0f4;
+    color: #4c5d74;
+    font-size: 10.5px;
+    line-height: 1.55;
+}
+
+.report-surplusfund-reasons li:first-child {
+    border-top: none;
+}
+
+.report-surplusfund-reasons li::before {
+    content: '';
+    position: absolute;
+    top: 13px;
+    left: 4px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #315b8f;
+}
+
+/*ETF*/
+.report-surplusfund-etfs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.report-surplusfund-etf {
+    padding: 11px;
+    border: 1px solid #e2e8f0;
+    break-inside: avoid;
+}
+
+.report-surplusfund-etf-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.report-surplusfund-etf-title > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 22px;
+    height: 22px;
+    background: #1d355b;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.report-surplusfund-etf-title > div {
+    min-width: 0;
+}
+
+.report-surplusfund-etf-title strong {
+    display: block;
+    color: #223655;
+    font-size: 11px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.report-surplusfund-etf-title small {
+    display: block;
+    margin-top: 2px;
+    color: #758195;
+    font-size: 9px;
+}
+
+.report-surplusfund-etf dl {
+    margin: 10px 0 0;
+}
+
+.report-surplusfund-etf dl > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 5px 0;
+    border-top: 1px solid #edf0f4;
+}
+
+.report-surplusfund-etf dt {
+    color: #758195;
+    font-size: 9.5px;
+}
+
+.report-surplusfund-etf dd {
+    margin: 0;
+    color: #273d61;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: right;
+}
+
+/*ETF 등락률*/
+.report-surplusfund-rate-up {
+    color: #15634b !important;
+}
+
+.report-surplusfund-rate-down {
+    color: #b43a38 !important;
+}
+
+/*빈 데이터*/
+.report-surplusfund-empty {
+    margin: 0;
+    color: #758195;
+    font-size: 10.5px;
+    line-height: 1.5;
+}

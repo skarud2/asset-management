@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>개인화 리포트 | Via</title>
+</head>
+<body>
+<main class="futuresim-goal-preset-page" th:classappend="${pdfMode} ? ' report-pdf-mode' : ''"
+      th:attr="data-pdf-mode=${pdfMode}">
+    <link rel="stylesheet" th:href="@{/css/lifecycle-survey.css}">
+    <link rel="stylesheet" th:href="@{/css/futuresim-current-status.css}">
+    <link rel="stylesheet" th:href="@{/css/report.css}">
+    <link rel="stylesheet" th:href="@{/css/report/futuresim/print.css}">
+    <link rel="stylesheet" th:href="@{/css/report/surplusfund/print.css}">
+    <link rel="stylesheet" th:href="@{/css/report/overview/print.css}">
+    <link rel="stylesheet" th:href="@{/css/report/lifecycle/print.css(v='20260822-7')}">
+
+    <input type="hidden" id="csrfTokenValue" th:value="${_csrf.token}">
+    <input type="hidden" id="csrfHeaderName" th:value="${_csrf.headerName}">
+
+    <header class="lifecycle-survey-header">
+        <span>개인화 리포트</span>
+        <h1>나의 금융 상태를 한눈에</h1>
+        <p>여러 진단 결과를 카드로 담아보고 PDF로 받아볼 수 있어요</p>
+    </header>
+
+    <section class="fcs-panel report-pdf-header-section">
+        <h2 class="fcs-panel-title">종합 점수</h2>
+        <p class="fcs-panel-sub">DSR건전성·저축률·부채비율·취약도·소비안정성을 종합한 점수예요</p>
+
+        <p class="fp-lever-loading" id="reportHeaderLoading">불러오는 중…</p>
+        <section class="report-score-box hidden" id="reportHeaderBox">
+            <div class="report-score-total">
+                <span id="reportTotalScore">0</span>점
+                <span class="report-score-grade" id="reportGrade"></span>
+            </div>
+            <ul class="report-bar-list" id="reportBarList"></ul>
+        </section>
+        <div class="report-overview" id="reportOverview"></div>
+    </section>
+
+    <section class="fcs-panel report-pdf-cards-section">
+        <div class="report-cards-header report-interactive-only">
+            <h2 class="fcs-panel-title">내 카드</h2>
+            <div class="report-pdf-actions">
+                <a class="report-pdf-link report-pdf-link-secondary" th:href="@{/api/report/pdf(preview=true)}" target="_blank" rel="noopener">미리보기</a>
+                <a class="report-pdf-link" th:href="@{/api/report/pdf}" target="_blank" rel="noopener">PDF로 받기</a>
+            </div>
+        </div>
+        <p class="fcs-panel-sub report-interactive-only">최대 4개까지 담을 수 있어요 — 빈 칸을 눌러 카드를 추가하세요</p>
+
+        <div class="report-card-grid" id="reportCardGrid"></div>
+    </section>
+
+    <div class="report-modal-backdrop hidden" id="reportModalBackdrop">
+        <div class="report-modal" role="dialog" aria-modal="true" aria-label="카드 추가">
+            <div class="report-modal-header">
+                <h3 id="reportModalTitle">카드 추가</h3>
+                <button type="button" class="report-modal-close" id="reportModalClose" aria-label="닫기">×</button>
+            </div>
+            <ul class="report-modal-list" id="reportModalList"></ul>
+        </div>
+    </div>
+
+    <div class="fcs-continue-row report-interactive-only">
+        <a th:href="@{/futuresim}" class="fcs-back-button">미래 금융 시뮬레이터로</a>
+    </div>
+
+    <script th:src="@{/js/report/futuresim/print.js}"></script>
+    <script th:src="@{/js/report/surplusfund/print.js}"></script>
+    <script th:src="@{/js/report/overview/print.js}"></script>
+    <script th:src="@{/js/report/lifecycle/print.js}"></script>
+    <script th:src="@{/js/report.js}"></script>
+</main>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic2 :: layout(~{::title}, ~{::main}, ~{::script}, ${serviceName})}">
+
+<head>
+  <meta charset="UTF-8">
+  <title>비밀번호 재설정</title>
+
+  <link rel="stylesheet"
+        th:href="@{/css/find-idpw.css}">
+</head>
+
+<body>
+
+<main class="page">
+  <section class="wrap">
+
+    <h1 class="title">비밀번호 재설정</h1>
+
+    <div class="line"></div>
+
+    <p class="description">
+      새로 사용할 비밀번호를 입력해주세요.
+    </p>
+
+    <div class="box">
+
+      <form id="resetForm"
+            class="form"
+            th:action="@{/find/pw/reset}"
+            th:object="${resetPasswordRequest}"
+            method="post">
+
+        <div class="field">
+          <label for="password">
+            새 비밀번호
+          </label>
+
+          <input type="password"
+                 id="password"
+                 th:field="*{password}"
+                 placeholder="8~64자로 입력해주세요"
+                 autocomplete="new-password">
+
+          <p class="field-error"
+             th:if="${#fields.hasErrors('password')}"
+             th:errors="*{password}">
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="passwordConfirm">
+            새 비밀번호 확인
+          </label>
+
+          <input type="password"
+                 id="passwordConfirm"
+                 th:field="*{passwordConfirm}"
+                 placeholder="비밀번호를 다시 입력해주세요"
+                 autocomplete="new-password">
+
+          <p class="field-error"
+             th:if="${#fields.hasErrors('passwordConfirm')}"
+             th:errors="*{passwordConfirm}">
+          </p>
+
+          <p id="passwordMessage" class="field-error1"></p>
+        </div>
+
+        <button type="submit"
+                class="submit-button">
+          비밀번호 변경
+        </button>
+
+      </form>
+    </div>
+
+  </section>
+</main>
+
+<script defer th:src="@{/js/reset-pw.js}"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.surplusfund.plan.mapper.SurplusFundPlanMapper">
+
+    <insert id="insertPlan"
+            parameterType="com.via.shinvia.surplusfund.plan.model.SurplusFundPlan"
+            useGeneratedKeys="true"
+            keyProperty="surplusFundPlanId"
+            keyColumn="surplus_fund_plan_id">
+
+        INSERT INTO surplus_fund_plan (
+        user_id,
+        operation_amount,
+        amount_source,
+        investment_purpose,
+        investment_period_months,
+        loss_tolerance_level,
+        liquidity_need,
+        experience_level,
+        surplus_amount_confirmed,
+        guide_notice_confirmed,
+        investment_style,
+        rule_version,
+        confirmed_at
+        ) VALUES (
+        #{userId},
+        #{operationAmount},
+        'SURPLUS_FUND_CALCULATION',
+        #{investmentPurpose},
+        #{investmentPeriodMonths},
+        #{lossToleranceLevel},
+        #{liquidityNeed},
+        #{experienceLevel},
+        #{surplusAmountConfirmed},
+        #{guideNoticeConfirmed},
+        #{investmentStyle},
+        #{ruleVersion},
+        CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertAllocations">
+        INSERT INTO surplus_fund_plan_allocation (
+        surplus_fund_plan_id,
+        asset_type,
+        allocation_ratio,
+        allocation_amount
+        ) VALUES
+        <foreach collection="allocations"
+                 item="allocation"
+                 separator=",">
+            (
+            #{planId},
+            #{allocation.assetType},
+            #{allocation.ratio},
+            #{allocation.amount}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertReason">
+        INSERT INTO surplus_fund_plan_reason (
+            surplus_fund_plan_id,
+            reason_order,
+            reason_text
+        ) VALUES (
+            #{planId},
+            #{reasonOrder},
+            #{reasonText}
+        )
+    </insert>
+
+</mapper>

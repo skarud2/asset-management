@@ -1,0 +1,294 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: #000;
+    background: #fff;
+    font-family: Pretendard, Arial, sans-serif;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.page {
+    min-height: 100vh;
+    padding: 70px 20px;
+}
+
+.wrap {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.title {
+    margin: 0;
+    font-size: 35px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.description {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.line {
+    width: 100%;
+    height: 2px;
+    margin: 24px 0 30px;
+    background: #000;
+}
+
+.box {
+    padding: 38px;
+    background: #fff;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* 아이디 찾기 입력 영역 */
+
+.field,
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.field label,
+.form-group label {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.field input,
+.input-button-row input {
+    width: 100%;
+    height: 54px;
+    padding: 0 16px;
+    color: #000;
+    border: 1px solid #000;
+    border-radius: 0;
+    background: #fff;
+    outline: none;
+}
+
+.field input::placeholder,
+.input-button-row input::placeholder {
+    color: #000;
+    opacity: 0.45;
+}
+
+.field input:focus,
+.input-button-row input:focus {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+}
+
+/* 비밀번호 찾기 이메일 인증 영역 */
+
+.input-button-row {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+}
+
+.input-button-row input {
+    flex: 1;
+    min-width: 0;
+}
+
+.verification-button {
+    flex-shrink: 0;
+    min-width: 120px;
+    height: 54px;
+    padding: 0 14px;
+    color: #fff;
+    border: 1px solid #000;
+    border-radius: 0;
+    background: #000;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.verification-button:hover {
+    color: #000;
+    background: #fff;
+}
+
+.verification-button:disabled {
+    color: #777;
+    background: #eee;
+    cursor: not-allowed;
+}
+
+/* 오류 및 인증 메시지 */
+
+.error,
+.field-error {
+    min-height: 20px;
+    margin: 0;
+    color: #000;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.error:not(:empty)::before,
+.field-error1:not(:empty)::before {
+    content: "※ ";
+}
+
+/* 제출 버튼 */
+
+.submit-button {
+    width: 100%;
+    height: 56px;
+    margin-top: 6px;
+    color: #fff;
+    border: 1px solid #000;
+    border-radius: 0;
+    background: #000;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    color: #000;
+    background: #fff;
+}
+
+.submit-button:disabled {
+    color: #777;
+    background: #eee;
+    cursor: not-allowed;
+}
+
+/* 아이디 찾기 결과 */
+
+.result-section-find {
+    margin-top: 28px;
+}
+
+.result-box {
+    padding: 24px;
+    border: 1px solid #000;
+    background: #fff;
+}
+
+.result-title-find {
+    margin: 0 0 20px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 0;
+    border-top: 1px solid #000;
+    font-size: 15px;
+}
+
+.result-item strong {
+    font-weight: 700;
+    text-align: right;
+}
+
+.result-error {
+    padding: 18px;
+    border: 1px solid #000;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* 하단 링크 */
+
+.link-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.link-group a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30%;
+    height: 54px;
+    color: #000;
+    border: 1px solid #000;
+    background: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.primary-link {
+    color: #fff !important;
+    background: #555 !important;
+}
+
+.primary-link:hover {
+    color: #000 !important;
+    background: #fff !important;
+}
+
+.secondary-link:hover {
+    color: #fff;
+    background: #000;
+}
+
+@media (max-width: 600px) {
+    .page {
+        padding: 45px 16px;
+    }
+
+    .title {
+        font-size: 34px;
+    }
+
+    .box {
+        padding: 28px 20px;
+    }
+
+    .input-button-row {
+        flex-direction: column;
+    }
+
+    .verification-button {
+        width: 100%;
+        height: 48px;
+    }
+
+    .result-item {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .result-item strong {
+        text-align: left;
+    }
+}

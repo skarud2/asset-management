@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>나만의 실행 계획 | 미래 금융 시뮬레이터 | Via</title>
+</head>
+<body>
+<main class="futuresim-goal-preset-page">
+    <link rel="stylesheet" th:href="@{/css/lifecycle-survey.css}">
+    <link rel="stylesheet" th:href="@{/css/futuresim-current-status.css}">
+
+    <header class="lifecycle-survey-header">
+        <span>미래 금융 시뮬레이터 · 5단계</span>
+        <h1>나만의 실행 계획을 확인하세요</h1>
+        <p>선택한 방법과 목표 도달 예상 시점을 확인한 뒤 계획을 저장하세요</p>
+    </header>
+
+    <!-- 1~4단계와 동일한 스테퍼 — 1~4단계는 완료(completed), 5단계가 현재(active) -->
+    <nav class="futuresim-step-nav" aria-label="미래 금융 시뮬레이터 진행 단계">
+        <div class="futuresim-step-track">
+            <a th:href="@{/futuresim}" class="futuresim-step completed"><span>1</span>지금 내 상태</a>
+            <a th:href="@{/futuresim/goal}" class="futuresim-step completed"><span>2</span>목표 설정</a>
+            <a th:href="@{/futuresim/growth}" class="futuresim-step completed"><span>3</span>성장 곡선</a>
+            <a th:href="@{/futuresim/levers}" class="futuresim-step completed"><span>4</span>레버 랭킹</a>
+            <a th:href="@{/futuresim/combo}" class="futuresim-step active" aria-current="step"><span>5</span>나만의 실행 계획</a>
+        </div>
+    </nav>
+
+    <section class="fcs-panel">
+        <h2 class="fcs-panel-title">나만의 실행 계획</h2>
+        <p class="fcs-panel-sub">방법을 선택해 결과를 확인하고, 마지막에 내 계획으로 저장하세요</p>
+
+        <!-- ===== 현재 페이스 히어로 ===== -->
+        <section class="fp-plan-hero" aria-live="polite">
+            <div class="fp-plan-hero-top">
+                <div>
+                    <span class="fp-plan-hero-eyebrow">현재 방식으로 계속하면</span>
+                    <h3>목표까지 남은 시간</h3>
+                </div>
+                <span class="material-symbols-outlined fp-plan-hero-icon" aria-hidden="true">schedule</span>
+            </div>
+            <div class="fp-plan-hero-time" id="comboBaselinePace">
+                <span class="fp-plan-hero-number" id="comboBaselineMagnitude">-</span>
+                <span class="fp-plan-hero-unit" id="comboBaselineUnit"></span>
+                <span class="fp-plan-hero-suffix">후 도달</span>
+            </div>
+            <div class="fp-plan-hero-route" aria-hidden="true">
+                <span>지금</span><i></i><span>목표</span>
+            </div>
+            <div class="fp-plan-hero-footer">
+                <span>목표 금액</span><strong id="comboHeroGoal">-</strong>
+                <span class="fp-plan-hero-dot">•</span>
+                <span id="comboHeroMessage">추천 실행 계획으로 얼마나 앞당길 수 있는지 확인해보세요.</span>
+            </div>
+        </section>
+
+        <!-- ===== 기본 접힘: 추천안을 바꿀 때만 여는 계획 수정 영역 ===== -->
+        <button type="button" class="fp-plan-edit-toggle" id="comboEditToggle" aria-expanded="false">계획 수정하기</button>
+        <section class="fp-lever-section hidden" id="comboEditSection">
+            <h3 class="fp-lever-section-title">실행 방법 수정</h3>
+            <p class="fp-lever-section-sub">체크하면 바로 아래에 강도를 조절할 수 있는 칸이 열려요</p>
+
+            <p class="fp-lever-loading" id="comboLeverLoading">불러오는 중…</p>
+            <ul class="fp-combo-lever-list hidden" id="comboLeverList"></ul>
+        </section>
+
+        <div class="fp-pace-divider"></div>
+
+        <section class="fp-plan-summary" aria-live="polite">
+            <h3 class="fp-lever-section-title">저장할 계획 요약</h3>
+            <dl class="fp-plan-summary-grid">
+                <div><dt>내 목표</dt><dd id="planSummaryGoal">-</dd></div>
+                <div><dt>현재 순자산</dt><dd id="planSummaryCurrentNetWorth">-</dd></div>
+                <div><dt>예상 도달 시점</dt><dd id="planSummaryMonths">-</dd></div>
+                <div><dt>앞당긴 기간</dt><dd id="planSummaryDiff">선택한 방법 없음</dd></div>
+            </dl>
+            <div class="fp-plan-summary-levers">
+                <span>선택한 방법</span>
+                <ul class="fp-plan-summary-lever-list" id="planSummaryLevers">
+                    <li class="fp-plan-summary-lever-empty">기존 페이스 유지</li>
+                </ul>
+            </div>
+            <p class="fp-plan-summary-note" id="planSummaryNote">개별 효과 합이 아니라 조합 재계산 결과예요.</p>
+        </section>
+
+        <section class="fp-plan-summary" aria-live="polite">
+            <h3 class="fp-lever-section-title">실행 전후 비교</h3>
+            <div class="fp-plan-compare-card">
+                <div class="fp-plan-compare-row">
+                    <div class="fp-plan-compare-side">
+                        <span class="fp-plan-compare-label">지금 페이스</span>
+                        <strong class="fp-plan-compare-value" id="planBaselineMonths">-</strong>
+                    </div>
+                    <span class="material-symbols-outlined fp-plan-compare-arrow" aria-hidden="true">arrow_forward</span>
+                    <div class="fp-plan-compare-side">
+                        <span class="fp-plan-compare-label">실행 계획 적용</span>
+                        <strong class="fp-plan-compare-value fp-plan-compare-value-after" id="planProjectedMonths">-</strong>
+                    </div>
+                </div>
+                <span class="fp-plan-compare-badge" id="planCompareBadge">-</span>
+            </div>
+            <p class="fp-plan-summary-note" id="planRetirementNote">정년 전 목표 도달 여부를 기준으로 계산해요.</p>
+            <p class="fp-plan-summary-note" id="planActionGuide">계획을 저장하면 선택한 실행 방법과 현재 계산 기준이 한 개의 계획으로 보관돼요.</p>
+        </section>
+
+        <section class="fp-plan-summary hidden" id="planLoanImpact">
+            <h3 class="fp-lever-section-title">대출 영향</h3>
+            <div class="fp-plan-loan-impact-list" id="planLoanImpactText"></div>
+        </section>
+
+        <div class="fp-pace-divider"></div>
+
+        <!-- ===== 오버레이 차트 — 3단계 성장 곡선과 같은 SVG 구조 위에 기존/조합 두 곡선을 겹쳐 그린다.
+             레버 적용(결과) 곡선만 3단계처럼 원금/투자수익 스택으로 쌓고, 기존 페이스는 얇은 회색
+             참조선으로 유지한다 — 둘 다 스택으로 쌓으면 비교가 오히려 안 읽혀서 절충안으로 간다. ===== -->
+        <section class="fp-combo-chart-section">
+            <h3 class="fp-lever-section-title">성장 곡선 비교</h3>
+            <div class="fp-growth-chart-wrap">
+                <svg class="fp-growth-chart-svg" id="comboChartSvg" viewBox="0 0 600 220" preserveAspectRatio="none" aria-hidden="true">
+                    <path class="fp-growth-area-contribution hidden" id="comboContributionArea" d=""></path>
+                    <path class="fp-growth-area-return hidden" id="comboReturnArea" d=""></path>
+                    <line class="fp-growth-benchmark-line hidden" id="comboBenchmarkLine" x1="0" y1="0" x2="600" y2="0"></line>
+                    <line class="fp-growth-goal-line" id="comboGoalLine" x1="0" y1="0" x2="600" y2="0"></line>
+                    <path class="fp-combo-baseline-curve" id="comboBaselineCurve" d=""></path>
+                    <path class="fp-combo-result-curve hidden" id="comboResultCurve" d=""></path>
+                    <circle class="fp-growth-benchmark-marker hidden" id="comboBenchmarkMarker" r="4.5" cx="0" cy="0"></circle>
+                    <circle class="fp-growth-goal-marker hidden" id="comboGoalMarker" r="4.5" cx="0" cy="0"></circle>
+                    <line class="fp-growth-scrubber-line" id="comboScrubberLine" x1="0" y1="0" x2="0" y2="220"></line>
+                    <circle class="fp-growth-scrubber-dot" id="comboScrubberDot" r="5" cx="0" cy="0"></circle>
+                </svg>
+            </div>
+            <div class="fp-growth-legend">
+                <span class="fp-growth-legend-item"><span class="fp-growth-legend-swatch fp-combo-legend-swatch-baseline"></span>기존 페이스</span>
+                <span class="fp-growth-legend-item hidden" id="comboResultLegendItem"><span class="fp-growth-legend-swatch fp-combo-legend-swatch-result"></span>레버 적용</span>
+                <span class="fp-growth-legend-item"><span class="fp-growth-legend-swatch fp-growth-legend-swatch-contribution"></span>내가 모은 돈</span>
+                <span class="fp-growth-legend-item"><span class="fp-growth-legend-swatch fp-growth-legend-swatch-return"></span>투자수익</span>
+                <span class="fp-growth-legend-item"><span class="fp-growth-legend-swatch fp-growth-legend-swatch-goal"></span>목표</span>
+                <span class="fp-growth-legend-item hidden" id="comboBenchmarkLegendItem"><span class="fp-growth-legend-swatch fp-growth-legend-swatch-benchmark"></span>또래 중앙값</span>
+            </div>
+            <p class="fp-combo-summary" id="comboSummaryText">아직 고른 방법이 없어요 — 위에서 방법을 체크해보세요</p>
+
+            <div class="fp-pace-divider"></div>
+
+            <!-- ===== 3단계와 동일한 타임라인 탐색기(슬라이더) — 기존 페이스 vs 레버 적용을 같은 시점에서 비교 ===== -->
+            <div class="fp-scrubber-block">
+                <div class="fp-scrubber-header">
+                    <span class="fp-pace-label">타임라인 탐색기</span>
+                    <span class="fp-scrubber-month" id="comboScrubberLabel">-</span>
+                </div>
+                <input type="range" class="fp-scrubber-input" id="comboScrubberInput" min="0" max="0" value="0" step="1"
+                       aria-label="타임라인 시점 선택">
+                <table class="fp-detail-table fp-detail-table-compare" id="comboScrubberTable">
+                    <thead>
+                    <tr><th scope="col"></th><th scope="col">기존 페이스</th><th scope="col">레버 적용</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr><th scope="row">이 시점 순자산</th><td id="comboScrubberBaselineNetWorth">-</td><td id="comboScrubberResultNetWorth">-</td></tr>
+                    <tr><th scope="row">직접 모은 돈</th><td id="comboScrubberBaselineContribution">-</td><td id="comboScrubberResultContribution">-</td></tr>
+                    <tr><th scope="row">투자수익</th><td id="comboScrubberBaselineReturn">-</td><td id="comboScrubberResultReturn">-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="fp-pace-divider"></div>
+
+            <!-- ===== 3단계와 동일한 마일스톤 리스트(점+라벨+텍스트) — 아래 요약 문구를 여기로 옮겼다 ===== -->
+            <ul class="fp-milestone-list" id="comboMilestones"></ul>
+        </section>
+
+        <div class="fp-pace-divider"></div>
+
+        <!-- ===== 이전/다음 — 저장할 이름을 상시 입력칸으로 받는다. 비워두면 서버가 날짜 기반
+             기본 이름을 붙인다(PlanSnapshotService.save 참고). 불러온 계획이면 그 이름으로 채워둬서
+             그대로 "저장"을 누르면 덮어쓰기가 된다. ===== -->
+        <div class="fp-combo-plan-name-row">
+            <label for="comboPlanName">계획 이름</label>
+            <input type="text" id="comboPlanName" class="fp-combo-plan-name-input" maxlength="50"
+                   placeholder="예: 3년 안에 내집마련" th:value="${loadedPlanName}">
+            <a th:href="@{/futuresim/plans}" class="fp-combo-plan-list-link">저장된 계획 목록</a>
+        </div>
+        <p class="fp-combo-save-note hidden" id="comboSaveNote"></p>
+        <div class="fcs-continue-row">
+            <a th:href="@{/futuresim/levers}" class="fcs-back-button">이전</a>
+            <button type="button" class="fcs-continue-button" id="comboSaveButton">이 계획 저장하기</button>
+        </div>
+
+        <input type="hidden" id="comboGoalAmount" th:value="${goalAmount != null ? goalAmount : 100000000}">
+        <input type="hidden" id="loadedPlanLevers" th:value="${loadedPlanLeversJson}">
+        <input type="hidden" id="csrfTokenValue" th:value="${_csrf.token}">
+        <input type="hidden" id="csrfHeaderName" th:value="${_csrf.headerName}">
+    </section>
+
+    <script th:src="@{/js/futuresim-combo.js}"></script>
+</main>
+</body>
+</html>

@@ -1,0 +1,242 @@
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    color: #000;
+    background: #fff;
+    font-family: Pretendard, Arial, sans-serif;
+}
+
+button, input, select { font: inherit; }
+[hidden] { display: none !important; }
+
+.profile-page {
+    min-height: 100vh;
+    padding: 70px 20px;
+}
+
+.profile-container {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+.profile-heading { text-align: center; }
+
+.profile-heading h1 {
+    margin: 0;
+    font-size: 35px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.profile-divider {
+    width: 100%;
+    height: 2px;
+    margin: 24px 0 30px;
+    background: #000;
+    font-size: 14px;
+}
+
+.description {
+    margin: 14px 0 0;
+    color: #555;
+    font-size: 14px;
+}
+
+.profile-box {
+    padding: 38px;
+    background: #fff;
+}
+
+.profile-box {
+    padding: 38px;
+    background: #fff;
+}
+
+.profile-box > p {
+    margin: 0 0 24px;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.form-field {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #ddd;
+}
+
+.form-field:last-of-type {
+    border-bottom: 0;
+}
+
+.form-field > label {
+    padding-top: 17px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.input-area {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.input-area input,
+.input-area select {
+    width: 100%;
+    height: 54px;
+    padding: 0 16px;
+    color: #000;
+    border: 1px solid #000;
+    border-radius: 0;
+    background: #fff;
+    outline: none;
+}
+
+.input-area input:focus,
+.input-area select:focus {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+}
+
+.input-area input:disabled,
+.input-area select:disabled {
+    color: #444;
+    border-color: #bbb;
+    background: #f3f3f3;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+.field-error {
+    margin: 0;
+    color: #d00000;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.field-error::before {
+    content: "※ ";
+}
+
+.profile-form > .primary-button {
+    margin-top: 6px;
+}
+
+.button-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.button-group.is-editing {
+    grid-template-columns: 1fr 1fr;
+}
+
+.primary-button,
+.secondary-button {
+    width: 100%;
+    height: 56px;
+    border: 1px solid #000;
+    border-radius: 0;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.primary-button {
+    color: #fff;
+    background: #000;
+}
+
+.secondary-button {
+    color: #000;
+    background: #fff;
+}
+
+.primary-button:hover {
+    color: #000;
+    background: #fff;
+}
+
+.secondary-button:hover {
+    color: #fff;
+    background: #000;
+}
+
+@media (max-width: 600px) {
+    .profile-page {
+        padding: 45px 16px;
+    }
+
+    .profile-heading h1 {
+        font-size: 34px;
+    }
+
+    .profile-box {
+        padding: 28px 20px;
+        box-shadow: 5px 5px 0 #000;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .form-field > label {
+        padding-top: 0;
+    }
+
+    .button-group.is-editing {
+        grid-template-columns: 1fr;
+    }
+}
+
+.profile-form fieldset:disabled input,
+.profile-form fieldset:disabled select {
+    color: #444;
+    border-color: #bbb;
+    background: #f3f3f3;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+.button-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.button-group.is-editing { grid-template-columns: 1fr 1fr; }
+
+.primary-button,
+.secondary-button {
+    width: 100%;
+    height: 56px;
+    border: 1px solid #000;
+    border-radius: 0;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.primary-button { color: #fff; background: #000; }
+.secondary-button { color: #000; background: #fff; }
+.primary-button:hover { color: #000; background: #fff; }
+.secondary-button:hover { color: #fff; background: #000; }

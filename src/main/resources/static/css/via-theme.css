@@ -1,0 +1,378 @@
+:root {
+    --via-navy-950: #16191e;
+    --via-navy-900: #252a31;
+    --via-blue-700: #484f59;
+    --via-blue-600: #30343b;
+    --via-blue-100: #dfe1e4;
+    --via-blue-50: #f2f3f4;
+    --via-ink: #20242a;
+    --via-text: #545a63;
+    --via-muted: #7b8088;
+    --via-line: #dcdfe3;
+    --via-surface: #ffffff;
+    --via-background: #f6f7f8;
+
+    /* frame.css에서 사용하는 index 디자인 토큰 */
+    --color-primary: var(--via-navy-950);
+    --color-interface-navy: #161d26;
+    --color-on-primary: #ffffff;
+    --color-on-primary-container: #7e8590;
+    --color-background: var(--via-background);
+    --color-on-background: var(--via-ink);
+    --color-on-surface-variant: var(--via-text);
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f3f4f5;
+    --color-surface-container-high: #e8e9eb;
+    --color-surface-container-highest: #e1e3e6;
+    --color-secondary-container: var(--via-blue-100);
+    --color-on-secondary-container: #555c66;
+    --color-secondary-fixed: #e0e2e5;
+    --color-action-orange: var(--via-blue-600);
+    --color-outline-variant: #cdd0d5;
+    --color-link-blue: var(--via-blue-700);
+    --color-border-dim: rgba(192, 199, 211, .2);
+}
+
+html,
+body {
+    font-family: "Inter", "Pretendard", "Noto Sans KR", sans-serif;
+}
+
+body {
+    margin: 0;
+    background: var(--via-background);
+    color: var(--via-ink);
+}
+
+.header + .page-shell {
+    margin-top: 104px;
+    padding-top: 32px;
+}
+
+.site-layout {
+    width: min(100% - 48px, 1280px);
+    min-height: calc(100vh - 104px);
+    margin: 104px auto 0;
+    padding-top: 30px;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 40px;
+}
+
+.site-content,
+.site-content > main {
+    min-width: 0;
+}
+
+/* 공통 레이아웃을 사용하는 대출 화면은 내부 max-width 제한도 해제 */
+.site-content > .bank-policy-page,
+.site-content > .loan-recommendation-page,
+.site-content > .loan-scenario-page,
+.site-content > .debt-priority-page {
+    width: 100%;
+    max-width: none;
+}
+
+/* 금리 시뮬레이션 대출 화면도 동일한 본문 폭을 사용 */
+.site-content > .page-shell {
+    width: 100% !important;
+    max-width: none !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+
+.service-sidebar {
+    top: 134px;
+    margin-top: 0;
+    overflow: hidden;
+    border: 1px solid var(--via-line);
+    border-top: 3px solid var(--via-blue-600);
+    border-radius: 10px;
+    background: var(--via-surface);
+    box-shadow: 0 8px 24px rgba(23, 52, 94, .06);
+}
+
+.sidebar-menu-group + .sidebar-menu-group {
+    border-top-color: var(--via-line);
+}
+
+.sidebar-menu-group summary {
+    border-bottom-color: var(--via-line);
+    background: var(--via-surface);
+    color: var(--via-ink);
+    font-family: inherit;
+    font-weight: 700;
+}
+
+.sidebar-menu-group[open] summary {
+    background: var(--via-blue-50);
+    color: var(--via-navy-900);
+}
+
+.sidebar-menu-group a,
+.sidebar-menu-disabled {
+    color: var(--via-text);
+    font-family: inherit;
+}
+
+.sidebar-menu-group a:hover,
+.sidebar-menu-group a.active {
+    background: var(--via-blue-50);
+    color: var(--via-blue-700);
+}
+
+.site-layout + .site-footer {
+    margin-top: 56px;
+    border-top: 1px solid var(--via-line);
+    background: #eef4fd;
+    color: var(--via-muted);
+}
+
+.site-layout + .site-footer .footer-inner {
+    width: min(100% - 48px, 1180px);
+}
+
+.site-layout + .site-footer .footer-inner p,
+.site-layout + .site-footer .footer-inner p:first-child {
+    color: var(--via-muted);
+    font-family: inherit;
+}
+
+.site-content h1,
+.site-content h2,
+.site-content h3,
+.site-content h4,
+.site-content button,
+.site-content input,
+.site-content select,
+.site-content textarea {
+    font-family: inherit;
+}
+
+.site-content a {
+    transition: color .16s ease, background-color .16s ease, border-color .16s ease;
+}
+
+@media (max-width: 900px) {
+    .site-layout {
+        display: block;
+        width: min(100% - 28px, 760px);
+        padding-top: 18px;
+    }
+
+    .service-sidebar {
+        position: static;
+        margin-bottom: 24px;
+    }
+
+}
+
+/* 내부 서비스 화면: index와 동일한 차분한 네이비·블루 팔레트 */
+body .bank-policy-page,
+body .recommendation-page,
+body .loan-recommendation-page,
+body .debt-priority-page,
+body .loan-scenario-page,
+body .financial-policy-page,
+body .page-shell {
+    color: var(--via-text);
+}
+
+body .bank-policy-page h1,
+body .bank-policy-page h2,
+body .bank-policy-page h3,
+body .recommendation-page h1,
+body .recommendation-page h2,
+body .recommendation-page h3,
+body .loan-recommendation-page h1,
+body .loan-recommendation-page h2,
+body .loan-recommendation-page h3,
+body .debt-priority-page h1,
+body .debt-priority-page h2,
+body .debt-priority-page h3,
+body .loan-scenario-page h1,
+body .loan-scenario-page h2,
+body .loan-scenario-page h3,
+body .financial-policy-page h1,
+body .financial-policy-page h2,
+body .financial-policy-page h3,
+body .page-shell h1,
+body .page-shell h2,
+body .page-shell h3 {
+    color: var(--via-navy-950);
+}
+
+body .bank-policy-page .page-header,
+body .recommendation-header,
+body .loan-recommendation-header,
+body .debt-priority-header,
+body .loan-scenario-header,
+body .financial-policy-header,
+body .page-shell .page-header {
+    border-color: var(--via-line);
+}
+
+body .bank-policy-page .page-header p,
+body .recommendation-header p,
+body .loan-recommendation-header p,
+body .debt-priority-header p,
+body .loan-scenario-header p,
+body .financial-policy-header p,
+body .page-shell .hint {
+    color: var(--via-muted);
+}
+
+body .bank-policy-page .search-panel,
+body .bank-policy-page .result-panel,
+body .bank-policy-page .product-card,
+body .recommendation-page form,
+body .recommendation-financial-profile,
+body .policy-rec-summary-card,
+body .policy-rec-list,
+body .loan-recommendation-panel,
+body .loan-recommendation-card,
+body .debt-priority-panel,
+body .debt-priority-card,
+body .loan-scenario-panel,
+body .loan-scenario-card,
+body .financial-policy-card,
+body .financial-policy-section,
+body .page-shell .card {
+    border-color: var(--via-line);
+    background: var(--via-surface);
+    box-shadow: 0 8px 24px rgba(23, 52, 94, .055);
+}
+
+body .bank-policy-page .search-panel,
+body .bank-policy-page .result-panel,
+body .recommendation-page form,
+body .policy-rec-list,
+body .loan-recommendation-panel,
+body .debt-priority-panel,
+body .loan-scenario-panel,
+body .financial-policy-section,
+body .page-shell .card {
+    border-top-color: var(--via-blue-600);
+}
+
+body .bank-policy-page input,
+body .bank-policy-page select,
+body .recommendation-page input,
+body .recommendation-page select,
+body .recommendation-page textarea,
+body .loan-recommendation-page input,
+body .loan-recommendation-page select,
+body .debt-priority-page input,
+body .debt-priority-page select,
+body .loan-scenario-page input,
+body .loan-scenario-page select,
+body .page-shell input,
+body .page-shell select {
+    border-color: #c8d3e2;
+    background: #fff;
+    color: var(--via-ink);
+}
+
+body .bank-policy-page input:focus,
+body .bank-policy-page select:focus,
+body .recommendation-page input:focus,
+body .recommendation-page select:focus,
+body .recommendation-page textarea:focus,
+body .loan-recommendation-page input:focus,
+body .loan-recommendation-page select:focus,
+body .debt-priority-page input:focus,
+body .debt-priority-page select:focus,
+body .loan-scenario-page input:focus,
+body .loan-scenario-page select:focus,
+body .page-shell input:focus,
+body .page-shell select:focus {
+    border-color: var(--via-blue-600);
+    box-shadow: 0 0 0 3px rgba(47, 124, 246, .13);
+    outline: none;
+}
+
+body .bank-policy-page .primary-button,
+body .bank-policy-page .search-button,
+body .recommendation-page .primary-button,
+body .policy-rec-primary-button,
+body .loan-recommendation-page .primary-button,
+body .debt-priority-page .primary-button,
+body .loan-scenario-page .primary-button,
+body .page-shell .btn-primary {
+    border-color: var(--via-navy-900);
+    background: var(--via-navy-900);
+    color: #fff;
+}
+
+body .bank-policy-page .primary-button:hover,
+body .bank-policy-page .search-button:hover,
+body .recommendation-page .primary-button:hover,
+body .policy-rec-primary-button:hover,
+body .loan-recommendation-page .primary-button:hover,
+body .debt-priority-page .primary-button:hover,
+body .loan-scenario-page .primary-button:hover,
+body .page-shell .btn-primary:hover {
+    border-color: var(--via-blue-700);
+    background: var(--via-blue-700);
+}
+
+body .recommendation-page .secondary-button,
+body .policy-rec-secondary-button,
+body .bank-policy-page .secondary-button,
+body .page-shell .btn-secondary {
+    border-color: #c8d3e2;
+    background: #fff;
+    color: var(--via-text);
+}
+
+body .policy-rec-tab.active,
+body .policy-rec-summary-card.active,
+body .bank-policy-page .category-tab.active,
+body .bank-policy-page .page-button.active {
+    border-color: var(--via-navy-900);
+    background: var(--via-navy-900);
+    color: #fff;
+}
+
+body .policy-rec-summary-card.active strong,
+body .policy-rec-summary-card.active span {
+    color: #fff;
+}
+
+body .policy-rec-tab-count,
+body .product-type-badge,
+body .loan-recommendation-eyebrow,
+body .financial-policy-eyebrow {
+    background: var(--via-blue-50);
+    color: var(--via-blue-700);
+}
+
+body .policy-rec-card:nth-child(even),
+body .bank-policy-page tbody tr:nth-child(even),
+body .debt-priority-page tbody tr:nth-child(even),
+body .loan-scenario-page tbody tr:nth-child(even) {
+    background: #f8fafe;
+}
+
+body .bank-policy-page thead,
+body .debt-priority-page thead,
+body .loan-scenario-page thead,
+body .page-shell thead {
+    background: #eaf1fb;
+    color: var(--via-navy-900);
+}
+
+body .condition-block.satisfied,
+body .policy-rec-condition.satisfied,
+body .recommendation-page .status-badge.eligible {
+    border-color: #bfd4f1;
+    background: #eef5ff;
+    color: #555c66;
+}
+
+body .condition-block.check,
+body .policy-rec-condition.check,
+body .recommendation-page .status-badge.check {
+    border-color: #d4dce8;
+    background: #f5f7fa;
+    color: #59677c;
+}

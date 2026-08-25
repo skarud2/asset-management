@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+
+<head>
+    <title>부채 상환 우선순위 | SHINVIA</title>
+</head>
+
+<body>
+
+<main class="policy-container bank-policy-page debt-priority-page">
+    <link rel="stylesheet" th:href="@{/css/debt-priority.css}">
+
+    <section class="page-header">
+        <p class="page-label">LOAN ANALYSIS</p>
+        <h1>부채 상환 우선순위</h1>
+        <p class="page-description">
+            보유 대출의 금리와 잔액, 연체 여부 및 중도상환 조건을 분석하여 먼저 상환할 대출을 안내합니다.
+        </p>
+    </section>
+
+    <section class="policy-notice debt-notice" aria-label="서비스 안내">
+        <p>
+            분석 결과는 상환 계획 수립을 돕기 위한 참고 정보입니다. 실제 상환 전에는 금융기관의 중도상환수수료와 약정 조건을 확인해 주세요.
+        </p>
+    </section>
+
+    <section class="analysis-summary" aria-label="분석 결과 요약">
+        <div class="summary-title">분석 결과</div>
+        <dl class="summary-item">
+            <dt>분석 대출</dt>
+            <dd id="loanCount">조회 중</dd>
+        </dl>
+        <dl class="summary-item">
+            <dt>우선 상환 대출</dt>
+            <dd id="topLoanType">조회 중</dd>
+        </dl>
+        <dl class="summary-item">
+            <dt>최고 RPS</dt>
+            <dd id="topPriorityScore">조회 중</dd>
+        </dl>
+    </section>
+
+    <details class="score-guide">
+        <summary>RPS 산정 기준 안내</summary>
+        <div class="score-guide-content">
+            <p>RPS는 점수가 높을수록 우선 상환 필요성이 높은 대출임을 의미합니다.</p>
+            <ul>
+                <li>연체 여부</li>
+                <li>적용 금리</li>
+                <li>중도상환수수료</li>
+                <li>소액대출 여부</li>
+                <li>학자금대출 여부</li>
+            </ul>
+        </div>
+    </details>
+
+    <section class="priority-result-section" aria-labelledby="priorityResultTitle">
+        <div class="result-heading">
+            <div>
+                <h2 id="priorityResultTitle">상환 우선순위</h2>
+                <p>분석 점수가 높은 대출부터 표시합니다.</p>
+            </div>
+            <span class="result-unit">단위: 원, 연 %</span>
+        </div>
+
+        <div class="priority-table-head" aria-hidden="true">
+            <span>순위</span>
+            <span>대출 정보</span>
+            <span>잔액</span>
+            <span>금리</span>
+            <span>RPS</span>
+        </div>
+
+        <div id="loadingArea" class="result-message" role="status">
+            대출 정보를 분석하고 있습니다.
+        </div>
+
+        <div id="errorArea" class="result-message error hidden" role="alert">
+            대출 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+        </div>
+
+        <div id="priorityList" class="priority-list"></div>
+    </section>
+
+    <script th:src="@{/js/debt-priority.js}"></script>
+</main>
+
+</body>
+</html>

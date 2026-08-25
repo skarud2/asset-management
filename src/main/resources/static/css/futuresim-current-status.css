@@ -1,0 +1,2534 @@
+/* 미래 금융 시뮬레이터 1~2단계("지금 내 상태", "목표 설정") 공용 스타일 */
+
+.futuresim-current-status-page,
+.futuresim-goal-preset-page {
+    /* lifecycle-survey.css의 어두운 네이비/그레이 톤(#252a31, #dcdfe3, #f2f3f4)에 맞춤 - 주황 없음 */
+    --fcs-accent: #252a31;
+    --fcs-accent-dark: #16191e;
+    --fcs-accent-tint: #f2f3f4;
+    --fcs-ink-primary: #16191e;
+    --fcs-ink-secondary: #545a63;
+    --fcs-ink-muted: #7b8088;
+    --fcs-border: #dcdfe3;
+    --fcs-surface-subtle: #f2f3f4;
+
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 0 60px;
+    font-family: Pretendard, -apple-system, "system-ui", "Segoe UI", sans-serif;
+    color: var(--fcs-ink-primary);
+}
+
+/* 목표 설정(2단계) 전용 확장 팔레트 — 슬라이더/페이스 카드에서만 쓴다.
+   기존 --fcs-* 네이비 톤 위에 데이터 시각화용 색상(금액 온도, 벤치마크 마커)을 얹은 것. */
+.futuresim-goal-preset-page {
+    /* 은행 명세서 톤 — 본문은 무채색으로 차분하게 두되, 실제 조작 가능한 요소(슬라이더, 선택,
+       버튼)와 비교 결과 같은 핵심 수치에만 진한 네이비 한 가지를 아이덴티티 컬러로 얹는다.
+       여러 색을 섞지 않고 "이 파랑 하나"로만 강조해 은행권 문서 같은 딱딱한 인상을 만든다. */
+    --fp-ink: #14171b;
+    --fp-ink-secondary: #52565b;
+    --fp-ink-muted: #94979c;
+    --fp-hairline: #e2e3e5;
+    --fp-surface-sunken: #f2f2f3;
+    --fp-amount-low: #a7aaae;
+    --fp-amount-high: #1b2c52;
+    --fp-benchmark: #6b6e73;
+    --fp-benchmark-tint: #eeeeef;
+    --fp-navy: #1b2c52;
+    --fp-navy-dark: #0f1b34;
+    --fp-navy-tint: #eef1f7;
+    --fp-danger: #a22920;
+    --fp-danger-tint: #fbeeed;
+    /* 3단계 누적구성 영역 차트 — "진한 파랑(원금) + 연한 파랑(투자수익)"만 쓰고 다른 색은 섞지 않는다 */
+    --fp-contribution: #1b2c52;
+    --fp-return: #91b0dd;
+    /* 코딩폰트 느낌의 모노스페이스(IBM Plex Mono) 대신 본문과 같은 Pretendard를 쓰고,
+       숫자 자릿수 정렬은 font-variant-numeric: tabular-nums로만 맞춘다 — 은행 앱들이
+       보통 숫자 전용 서체를 따로 쓰지 않고 하나의 서체로 통일하는 것과 같은 방식. */
+    --fp-mono-font: Pretendard, -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+/* ===== 진행 단계 표시 — 여유자금 운용 가이드(.guide-steps)와 같은 넘버 서클 스테퍼 문법을
+   재사용한다. 그쪽은 한 페이지 안 탭 전환(JS)이라 button이지만, 여기는 실제 페이지 이동이라
+   a 태그로 구현한다. ===== */
+.futuresim-step-nav {
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 20px;
+    border: 1px solid var(--fcs-border);
+    background: #ffffff;
+    overflow: visible;
+}
+
+.futuresim-step-track {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    min-width: 0;
+}
+
+.futuresim-step {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 52px;
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-right: 1px solid var(--fcs-border);
+    color: #7b8088;
+    font-size: 11.5px;
+    font-weight: 800;
+    text-decoration: none;
+    text-align: center;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.futuresim-step:last-child {
+    border-right: 0;
+}
+
+.futuresim-step span {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 auto;
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid #aeb5bf;
+    border-radius: 50%;
+    font-size: 11px;
+}
+
+.futuresim-step.completed {
+    color: #1b2c52;
+    background: #eef1f7;
+}
+
+.futuresim-step.completed span {
+    border-color: #1b2c52;
+    background: #ffffff;
+}
+
+.futuresim-step.active {
+    color: #ffffff;
+    background: #1b2c52;
+    cursor: default;
+    pointer-events: none;
+}
+
+.futuresim-step.active span {
+    border-color: #ffffff;
+}
+
+/* 1단계에서 비교 기준(연령별/가구원별)을 아직 안 골랐으면 2단계 탭을 잠근다 —
+   여유자금 가이드의 guide-step:disabled와 같은 색 조합 */
+.futuresim-step.locked {
+    color: #9aa1aa;
+    background: #f4f5f7;
+    cursor: not-allowed;
+}
+
+/* 5개 단계를 같은 폭으로 유지하되, 좁은 화면에서는 글자와 여백만 조밀하게 한다. */
+@media (max-width: 520px) {
+    .futuresim-step {
+        min-height: 50px;
+        padding: 8px 2px;
+        gap: 4px;
+        font-size: clamp(9px, 2.7vw, 11px);
+        line-height: 1.2;
+    }
+
+    .futuresim-step span {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+    }
+}
+
+.fcs-summary-card {
+    margin-bottom: 20px;
+    background: var(--fcs-surface-subtle);
+    border-color: var(--fcs-accent);
+}
+
+.fcs-summary-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--fcs-ink-primary);
+}
+
+.fcs-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 720px) {
+    .fcs-panels {
+        grid-template-columns: 1fr;
+    }
+}
+
+.fcs-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid var(--fcs-border);
+    border-radius: 10px;
+}
+
+.futuresim-goal-preset-page .fcs-panel + .fcs-panel {
+    margin-top: 20px;
+}
+
+.fcs-panel-title {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.fcs-panel-sub {
+    margin: 0 0 16px;
+    font-size: 13px;
+    color: var(--fcs-ink-muted);
+}
+
+.fcs-unavailable {
+    padding: 16px;
+    border-radius: 8px;
+    background: var(--fcs-surface-subtle);
+    color: var(--fcs-ink-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.fcs-household-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px;
+    padding: 10px 12px;
+    border: 1px solid var(--fcs-border);
+    border-radius: 8px;
+    background: var(--fcs-surface-subtle);
+}
+
+.fcs-household-select label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fcs-ink-secondary);
+}
+
+.fcs-household-select select {
+    flex: 1;
+    height: 30px;
+    padding: 0 8px;
+    border: 1px solid var(--fcs-border);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--fcs-ink-primary);
+    font-size: 12px;
+}
+
+/* 연령별 비교(좌측)에서 가구원수 select 자리를 대신하는 고정 안내 박스 —
+   .fcs-household-select처럼 라벨+값을 한 줄에 나란히 두면 좁은 컬럼 폭에서
+   문장 끝 단어(예: "계산")만 다음 줄로 밀려 어색해지므로, 라벨을 위에 따로 두고
+   값은 박스 전체 너비로 줄바꿈되게 세로로 쌓는다. */
+.fcs-age-basis-note {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0 0 16px;
+    padding: 10px 12px;
+    border: 1px solid var(--fcs-border);
+    border-radius: 8px;
+    background: var(--fcs-surface-subtle);
+}
+
+.fcs-age-basis-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fcs-ink-secondary);
+}
+
+.fcs-age-basis-value {
+    color: var(--fcs-ink-primary);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.fcs-age-basis-info-title {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--fcs-ink-secondary);
+}
+
+.fcs-age-basis-info-list {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--fcs-ink-secondary);
+}
+
+.fcs-compare-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--fcs-border);
+    font-size: 13px;
+}
+
+.fcs-compare-row:last-of-type {
+    border-bottom: none;
+}
+
+.fcs-compare-label {
+    color: var(--fcs-ink-muted);
+}
+
+.fcs-compare-value {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.fcs-compare-highlight {
+    margin-bottom: 4px;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--fcs-accent-tint);
+}
+
+.fcs-compare-highlight .fcs-compare-label {
+    color: var(--fcs-accent-dark);
+    font-weight: 600;
+}
+
+.fcs-compare-highlight .fcs-compare-value {
+    color: var(--fcs-accent-dark);
+    font-size: 15px;
+}
+
+.fcs-detail-table {
+    width: 100%;
+    margin: 16px 0 20px;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.fcs-detail-table th,
+.fcs-detail-table td {
+    padding: 8px 10px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.fcs-detail-table th:first-child,
+.fcs-detail-table td:first-child {
+    text-align: left;
+}
+
+.fcs-detail-table thead th {
+    background: var(--fcs-surface-subtle);
+    color: var(--fcs-ink-secondary);
+    font-weight: 700;
+    border-bottom: 1px solid var(--fcs-border);
+}
+
+.fcs-detail-table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid var(--fcs-border);
+}
+
+.fcs-continue-form {
+    margin-top: auto;
+    padding-top: 8px;
+}
+
+.fcs-continue-button {
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 8px;
+    background: var(--fcs-accent);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.fcs-continue-button:hover {
+    background: var(--fcs-accent-dark);
+}
+
+/* 목표 설정(2단계) 전용 — "이전"(1단계로) + "다음"(제출)을 반반으로 나눈 줄.
+   fcs-continue-form 자체는 그대로 두고(1단계의 "이 기준으로 계속" 버튼과 공유),
+   이 줄이 대신 margin-top:auto로 카드 하단에 붙는다. */
+.fcs-continue-row {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 8px;
+}
+
+.fcs-continue-row > a,
+.fcs-continue-row > form,
+.fcs-continue-row > button {
+    flex: 1 1 0;
+}
+
+.fcs-back-button {
+    display: flex;
+    box-sizing: border-box;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--fp-navy);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--fp-navy);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.fcs-back-button:hover {
+    background: var(--fp-navy-tint);
+}
+
+.fcs-skip {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.fcs-skip a {
+    font-size: 12px;
+    color: var(--fcs-ink-muted);
+    text-decoration: underline;
+}
+
+.fcs-household-members {
+    margin: 0 0 16px;
+    padding: 12px;
+    border: 1px solid var(--fcs-border);
+    border-radius: 8px;
+    background: var(--fcs-surface-subtle);
+}
+
+.fcs-member-list {
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.fcs-member-list li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 0;
+    font-size: 12px;
+    border-bottom: 1px solid var(--fcs-border);
+}
+
+.fcs-member-list li:last-child {
+    border-bottom: none;
+}
+
+.fcs-member-list li span:first-child {
+    font-weight: 700;
+}
+
+.fcs-member-list li span:nth-child(2) {
+    flex: 1;
+    color: var(--fcs-ink-muted);
+}
+
+.fcs-member-remove-button {
+    border: 1px solid var(--fcs-border);
+    background: #ffffff;
+    color: var(--fcs-ink-muted);
+    font-size: 11px;
+    border-radius: 6px;
+    padding: 3px 8px;
+    cursor: pointer;
+}
+
+.fcs-member-add-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 14px;
+}
+
+.fcs-member-field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fcs-member-field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fcs-ink-secondary);
+}
+
+.fcs-member-add-form input {
+    min-width: 0;
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--fcs-border);
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* "없으면 비워두기" 같은 긴 예시 문구가 좁은 칸에서 잘리지 않도록 플레이스홀더만 줄인다 */
+.fcs-member-add-form input::placeholder {
+    font-size: 12px;
+    color: var(--fcs-ink-muted);
+}
+
+.fcs-member-add-button {
+    grid-column: 1 / -1;
+    height: 38px;
+    margin-top: 4px;
+    border: 1px dashed var(--fcs-accent);
+    background: #ffffff;
+    color: var(--fcs-accent);
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* ===== 추천 목표 — 카드 갤러리 대신 은행 상품 목록/명세서에 가까운 줄 목록 형태.
+   테두리로 감싼 하나의 목록 안에 행을 나열하고, 선택은 좌측 굵은 바 + 옅은 배경 틴트 +
+   체크 표시로만 나타낸다. 그림자·호버 리프트·컬러 배지 같은 장식은 쓰지 않는다. */
+.fp-preset-list {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 28px;
+    border: 1px solid var(--fp-hairline);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.fp-preset-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px 14px 13px;
+    border: 0;
+    border-bottom: 1px solid var(--fp-hairline);
+    border-left: 3px solid transparent;
+    background: #ffffff;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color .12s ease, border-left-color .12s ease;
+}
+
+.fp-preset-row:last-child {
+    border-bottom: 0;
+}
+
+.fp-preset-row:hover {
+    background: var(--fp-surface-sunken);
+}
+
+.fp-preset-row.selected {
+    background: var(--fp-surface-sunken);
+    border-left-color: var(--fp-ink);
+}
+
+.fp-preset-row-icon {
+    flex: 0 0 auto;
+    color: var(--fp-ink-muted);
+    font-size: 20px;
+    font-variation-settings: "FILL" 0, "wght" 400;
+}
+
+.fp-preset-row.selected .fp-preset-row-icon {
+    color: var(--fp-ink);
+}
+
+.fp-preset-row-copy {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
+
+.fp-preset-row-label {
+    color: var(--fp-ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.fp-preset-row-caption {
+    margin-top: 2px;
+    color: var(--fp-ink-muted);
+    font-size: 11px;
+}
+
+.fp-preset-row-amount {
+    flex: 0 0 auto;
+    color: var(--fp-ink);
+    font-family: var(--fp-mono-font);
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.fp-preset-row-check {
+    flex: 0 0 16px;
+    color: var(--fp-ink);
+    font-size: 16px;
+    visibility: hidden;
+}
+
+.fp-preset-row.selected .fp-preset-row-check {
+    visibility: visible;
+}
+
+/* ================================================================
+   목표 금액 직접 입력 (fp- 프리픽스 = futuresim goal-preset 전용)
+   ================================================================ */
+.fp-amount-block {
+    margin-bottom: 28px;
+}
+
+.fp-amount-field {
+    display: block;
+    margin: 0 auto 8px;
+    max-width: 320px;
+}
+
+.fp-amount-field-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--fp-ink-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.fp-amount-field-input-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 4px;
+    border: 0;
+    border-bottom: 2px solid var(--fp-navy);
+}
+
+.fp-amount-field-input-row input {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--fp-ink);
+    font-family: Inter, Pretendard, sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.fp-amount-field-input-row input:focus {
+    outline: none;
+}
+
+.fp-amount-field-input-row span {
+    flex: 0 0 auto;
+    color: var(--fp-ink-muted);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.fp-amount-magnitude {
+    margin: 0 0 18px;
+    color: var(--fp-ink-muted);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.fp-amount-magnitude strong {
+    color: var(--fp-ink);
+    font-weight: 800;
+}
+
+.fp-amount-quick-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    gap: 12px;
+}
+
+.fp-amount-quick-picks {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.fp-amount-quick-pick {
+    padding: 8px 14px;
+    border: 1px solid var(--fp-hairline);
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--fp-ink-secondary);
+    font-family: Pretendard, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.fp-amount-quick-pick:hover {
+    border-color: var(--fp-navy);
+    color: var(--fp-navy);
+}
+
+.fp-amount-quick-pick:disabled {
+    border-color: var(--fp-hairline);
+    background: var(--fp-surface-sunken);
+    color: var(--fp-ink-muted);
+    cursor: not-allowed;
+}
+
+.fp-amount-quick-pick.active {
+    background: var(--fp-navy);
+    border-color: var(--fp-navy);
+    color: #ffffff;
+}
+
+.fp-amount-reset-button {
+    position: absolute;
+    right: 0;
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    border: 1px solid var(--fp-hairline);
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--fp-ink-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.fp-age-comparison-values { display: flex; justify-content: space-between; gap: 12px; color: var(--fp-ink-secondary); font-size: 12px; }
+.fp-age-comparison-values strong { display: block; margin-bottom: 3px; color: var(--fp-ink); font-size: 16px; font-variant-numeric: tabular-nums; }
+.fp-age-comparison-values span:last-child { text-align: right; }
+.fp-age-comparison-track { position: relative; height: 16px; margin: 14px 0 4px; border-radius: 999px; background: var(--fp-surface-sunken); overflow: hidden; }
+.fp-age-comparison-benchmark { position: absolute; inset: 0; background: #d9dce1; }
+.fp-age-comparison-goal { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--fp-navy); transition: width .2s ease; }
+
+.fp-amount-reset-button:hover {
+    border-color: var(--fp-navy);
+    color: var(--fp-navy);
+}
+
+/* ================================================================
+   결과 카드 — 페이스 타임라인 스파크라인 + 또래 비교 막대
+   ================================================================ */
+.fp-pace-card {
+    margin-bottom: 24px;
+    padding: 22px 20px;
+    border: 1px solid var(--fp-hairline);
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.fp-pace-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.fp-pace-label {
+    color: var(--fp-ink-muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+.fp-pace-number {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.fp-pace-number-magnitude {
+    color: var(--fp-navy);
+    font-family: Inter, Pretendard, sans-serif;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    font-variant-numeric: tabular-nums;
+}
+
+.fp-pace-number-unit {
+    color: var(--fp-ink-secondary);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* ===== 진행률 막대 — 흔들리는 대각선 스파크라인 대신, 은행 적금 진행률처럼
+   "지금까지 채운 만큼"을 직관적으로 보여주는 두꺼운 트랙 하나로 정리한다. ===== */
+.fp-pace-progress-track {
+    position: relative;
+    height: 10px;
+    margin: 2px 0 8px;
+    background: var(--fp-hairline);
+    overflow: hidden;
+}
+
+.fp-pace-progress-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--fp-navy);
+    transition: width .2s ease;
+}
+
+.fp-pace-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    color: var(--fp-ink-muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.fp-pace-progress-labels strong {
+    color: var(--fp-navy);
+    font-weight: 800;
+}
+
+.fp-pace-divider {
+    height: 1px;
+    margin: 16px 0 14px;
+    background: var(--fp-hairline);
+}
+
+/* 목표 비교표: 정보 밀도는 높이고, 딱 하나의 네이비 아이덴티티 컬러로 상태·선택을 짚어준다. */
+.futuresim-goal-preset-page {
+    --fcs-accent: #1b2c52;
+    --fcs-accent-dark: #0f1b34;
+    --fcs-accent-tint: #eef1f7;
+    --fcs-ink-primary: #1f2023;
+    --fcs-ink-secondary: #6b6e73;
+    --fcs-border: #dcdde0;
+    --fcs-surface-subtle: #f5f5f6;
+}
+
+.futuresim-goal-preset-page .fcs-panel,
+.futuresim-goal-preset-page .fp-pace-card,
+.futuresim-goal-preset-page .fp-preset-list {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.fp-goal-table-wrap { margin: 0 0 24px; overflow: visible; border: 1px solid #dcdde0; }
+.fp-goal-table { width: 100%; min-width: 0; table-layout: fixed; border-collapse: collapse; background: #fff; }
+.fp-goal-table th { padding: 11px 8px; border-bottom: 2px solid var(--fp-navy); background: #f5f5f6; color: #6b6e73; font-size: 11.5px; font-weight: 700; letter-spacing: .02em; text-align: left; }
+.fp-goal-table td { padding: 13px 8px; border-bottom: 1px solid #dcdde0; color: #1f2023; font-size: 13px; vertical-align: middle; overflow-wrap: anywhere; }
+.fp-goal-table th:nth-child(1), .fp-goal-table td:nth-child(1) { width: 25%; }
+.fp-goal-table th:nth-child(2), .fp-goal-table td:nth-child(2) { width: 34%; }
+.fp-goal-table th:nth-child(3), .fp-goal-table td:nth-child(3) { width: 16%; }
+.fp-goal-table th:nth-child(4), .fp-goal-table td:nth-child(4) { width: 13%; }
+.fp-goal-table th:nth-child(5), .fp-goal-table td:nth-child(5) { width: 12%; text-align: center; }
+.fp-goal-table tbody tr:last-child td { border-bottom: 0; }
+.fp-goal-row { cursor: pointer; }
+.fp-goal-row:hover { background: #f5f5f6; }
+/* box-shadow를 <tr>에 직접 걸면 브라우저마다 테이블 행 박스를 다르게 취급해서
+   네이비 강조선이 행 높이만큼 안 이어지고 잘려 보인다 — <td>(진짜 박스) 쪽에 걸어야
+   행 전체 높이로 깔끔하게 이어진다. */
+.fp-goal-row.selected { background: var(--fp-navy-tint); }
+.fp-goal-row.selected td:first-child { box-shadow: inset 4px 0 var(--fp-navy); }
+/* td 자체에 display:flex를 걸면 그 셀이 표 레이아웃(table-cell)에서 빠져버려서
+   같은 행의 다른 셀(목표 금액 인풋 등)과 높이가 안 맞고 구분선이 어긋난다 —
+   td는 table-cell로 그대로 두고, 안쪽 래퍼(.fp-goal-name-cell)에만 flex를 건다. */
+.fp-goal-table td:first-child { min-width: 0; }
+.fp-goal-name-cell { display: flex; min-width: 0; align-items: center; gap: 7px; height: 100%; }
+.fp-goal-table strong { display: block; font-weight: 700; }
+.fp-goal-table small { display: block; margin-top: 2px; color: #6b6e73; font-size: 11px; }
+.fp-goal-icon { color: var(--fp-navy); font-size: 20px; }
+/* 금융 라이프 플랜(생애주기 설문) 기본정보 입력의 "금액 + 단위" 인풋 그룹(.lifecycle-input-unit)과
+   같은 문법 — 바깥 박스가 보더를 갖고, 안쪽 input은 보더를 지운 채로 얹히고, 단위(원)는
+   구분선 + 옅은 회색 배경의 부착형 라벨로 붙는다. focus는 input이 아니라 박스 전체에 건다. */
+.fp-amount-input {
+    display: inline-flex;
+    width: 100%;
+    align-items: stretch;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #cdd6e0;
+    border-radius: 8px;
+    background: #fbfcfd;
+    transition: border-color .18s ease, box-shadow .18s ease;
+}
+.fp-amount-input:focus-within {
+    border-color: var(--fp-navy);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(27, 44, 82, .12);
+}
+.fp-amount-input input {
+    min-width: 0;
+    flex: 1 1 auto;
+    padding: 9px 6px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #1f2023;
+    font: 700 13px var(--fp-mono-font);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.fp-amount-input span {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    padding: 0 6px;
+    border-left: 1px solid #dce3eb;
+    background: #f1f4f7;
+    color: #687381;
+    font-size: 11.5px;
+    font-weight: 700;
+}
+.fp-goal-duration { font-family: var(--fp-mono-font); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fp-goal-status { display: inline-block; padding: 4px 7px; background: #e5e5e7; color: #3a3c40; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.fp-goal-status[data-status="normal"] { background: var(--fp-navy-tint); color: var(--fp-navy); }
+.fp-goal-status[data-status="long"] { background: #d8d9dc; }
+.fp-goal-status[data-status="very-long"] { background: #cbccd0; }
+.fp-goal-status[data-status="insufficient"] { background: #bfc1c5; color: #1f2023; }
+.fp-goal-status-guide { margin: -14px 0 22px; color: var(--fp-ink-muted); font-size: 11px; line-height: 1.55; }
+.fp-goal-status-guide strong { color: var(--fp-ink-secondary); font-weight: 700; }
+.fp-rate-risk-path-wrap { margin-top: 16px; overflow-x: auto; }
+.fp-rate-risk-path-table { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 12px; }
+.fp-rate-risk-path-table th, .fp-rate-risk-path-table td { padding: 9px; border-top: 1px solid var(--fp-hairline); text-align: right; }
+.fp-rate-risk-path-table th:first-child, .fp-rate-risk-path-table td:first-child { text-align: left; }
+.fp-lever-best-insight { margin: 16px 0 0; padding: 12px 14px; border-radius: 10px; background: #eef5ff; color: var(--fp-navy); font-size: 13px; font-weight: 700; }
+.fp-return-rate-control { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 16px 0 20px; padding: 12px; border-radius: 10px; background: var(--fp-surface-sunken); font-size: 13px; }
+.fp-return-rate-control label { font-weight: 700; }
+.fp-return-rate-control select, .fp-return-rate-control input { height: 34px; border: 1px solid var(--fp-hairline); border-radius: 7px; background: #fff; padding: 0 8px; }
+.fp-return-rate-control input { width: 70px; }
+.fp-return-rate-control p { width: 100%; margin: 0; color: var(--fp-ink-secondary); font-size: 11px; }
+.fp-lever-loan-comparison { margin-top: 24px; }
+.fp-lever-loan-vertical-list { display: grid; gap: 10px; }
+.fp-lever-loan-summary { border: 1px solid var(--fp-hairline); border-radius: 12px; padding: 14px; background: #fff; }
+.fp-lever-loan-summary h4 { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 12px; color: var(--fp-ink); font-size: 14px; }
+.fp-lever-loan-summary h4 span { color: var(--fp-ink-secondary); font-size: 12px; font-weight: 500; text-align: right; }
+.fp-lever-loan-summary dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.fp-lever-loan-summary dl div { min-width: 0; padding: 10px; border-radius: 8px; background: var(--fp-surface-sunken); }
+.fp-lever-loan-summary dt { margin-bottom: 4px; color: var(--fp-ink-secondary); font-size: 11px; }
+.fp-lever-loan-summary dd { margin: 0; color: var(--fp-ink); font-size: 13px; font-weight: 700; overflow-wrap: anywhere; line-height: 1.45; }
+.fp-loan-baseline-row { background: #f8fbff; border-color: #cfe0f4; }
+.fp-loan-diff { margin-left: 4px; font-weight: 700; font-size: 11px; }
+.fp-loan-diff.increase { color: #c44141; }
+.fp-loan-diff.decrease { color: #16805c; }
+.fp-loan-unchanged { color: var(--fp-ink-tertiary); font-size: 12px; }
+.fp-loan-benefit { color: #16805c; font-size: 13px; }
+.fp-lever-card-selected-summary { margin: 10px 0 0; padding: 9px 10px; border-left: 3px solid var(--fp-navy); border-radius: 0 8px 8px 0; background: #f3f7fc; color: var(--fp-ink); font-size: 12px; font-weight: 700; line-height: 1.5; }
+@media (max-width: 540px) { .fp-lever-loan-summary dl { grid-template-columns: 1fr; } }
+.fp-goal-choice { width: 16px; height: 16px; accent-color: var(--fp-navy); cursor: pointer; }
+
+/* ===== 저축 계산 명세 — dl 그리드 대신 은행 통장정리/명세서 형태의 표로 바꿔
+   "딱딱한" 정보 위계를 준다: 라벨은 좌측, 금액은 우측 정렬 고정폭 숫자. ===== */
+.fp-goal-detail { padding-top: 18px; border-top: 1px solid #dcdde0; }
+.fp-detail-table { width: 100%; border-collapse: collapse; }
+.fp-detail-table tr { border-bottom: 1px solid var(--fp-hairline); }
+.fp-detail-table tr:last-child { border-bottom: 0; }
+.fp-detail-table th { padding: 11px 0; color: #6b6e73; font-size: 12.5px; font-weight: 600; text-align: left; }
+.fp-detail-table td { padding: 11px 0; color: #1f2023; font-family: var(--fp-mono-font); font-size: 13.5px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* 5단계 타임라인 탐색기 — 기존 페이스/레버 적용 두 값을 나란히 비교하는 표. th(값 헤더)도
+   그 아래 td처럼 우측 정렬해야 열이 맞는다. */
+.fp-detail-table-compare thead th {
+    padding: 0 0 8px;
+    color: var(--fp-ink-muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-align: right;
+}
+.fp-detail-table-compare thead th:first-child { text-align: left; }
+.fp-goal-detail-note { margin: 14px 0 0; padding-top: 14px; border-top: 1px dashed var(--fp-hairline); color: #6b6e73; font-size: 12px; line-height: 1.5; }
+
+/* 3단계 — 240개월(20년) 안에 목표에 못 미치는 경우의 경고 톤. 평소엔 무채색+네이비만 쓰지만
+   "위험/미도달" 신호는 danger 톤 하나로만 예외를 둔다. */
+.fp-goal-detail-note-danger {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border: 1px solid var(--fp-danger);
+    border-top: 1px solid var(--fp-danger);
+    background: var(--fp-danger-tint);
+    color: var(--fp-danger);
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+/* ===== 월 저축 가능액 계산 명세 — 소득/생활비/원리금상환액을 각 줄로 짚어주고
+   마지막 줄(= 월 저축 가능액)만 위 구분선 + 굵게로 "합계" 느낌을 준다. ===== */
+.fp-savings-breakdown {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #dcdde0;
+}
+
+.fp-savings-breakdown-title {
+    margin: 0 0 4px;
+    color: #6b6e73;
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.fp-detail-table-breakdown th,
+.fp-detail-table-breakdown td {
+    padding: 8px 0;
+    font-size: 12.5px;
+}
+
+.fp-detail-table-breakdown th {
+    color: #858e99;
+    font-weight: 500;
+}
+
+.fp-detail-table-breakdown td {
+    color: #52565b;
+    font-weight: 600;
+}
+
+.fp-detail-table-total {
+    border-top: 1px solid #1f2023 !important;
+}
+
+.fp-detail-table-total th {
+    color: #1f2023 !important;
+    font-weight: 700 !important;
+}
+
+.fp-detail-table-total td {
+    color: var(--fp-navy) !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+}
+
+/* ================================================================
+   연령대별 순자산 스펙트럼 (Age Cohort Strip)
+   ================================================================ */
+.fp-age-spectrum-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.fp-age-spectrum-toggle {
+    display: inline-flex;
+    padding: 2px;
+    border: 1px solid var(--fp-hairline);
+    border-radius: 7px;
+    background: var(--fp-surface-sunken);
+}
+
+.fp-age-toggle-btn {
+    border: 0;
+    border-radius: 5px;
+    padding: 5px 10px;
+    background: transparent;
+    color: var(--fp-ink-muted);
+    font-family: Pretendard, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.fp-age-toggle-btn:hover {
+    color: var(--fp-ink-secondary);
+}
+
+.fp-age-toggle-btn.active {
+    background: #ffffff;
+    color: var(--fp-navy);
+    box-shadow: 0 1px 3px rgba(18, 21, 26, .12);
+}
+
+.fp-age-toggle-btn:disabled {
+    color: var(--fp-hairline);
+    cursor: not-allowed;
+}
+
+.fp-age-spectrum-svg {
+    width: 100%;
+    height: 220px;
+    overflow: visible;
+}
+
+/* Y축 눈금선 + 금액 라벨 — 곡선의 값 차이를 감으로만 보지 않고 실제 금액 단위로 읽을 수 있게 */
+.fp-age-spectrum-yaxis-line {
+    stroke: var(--fp-hairline);
+    stroke-width: 1;
+    stroke-dasharray: 2 2;
+}
+
+.fp-age-spectrum-yaxis-label {
+    fill: var(--fp-ink-muted);
+    font-family: var(--fp-mono-font);
+    font-size: 9px;
+    font-weight: 500;
+}
+
+/* 절제된 단색 음영 — 그라데이션 없이 낮은 불투명도로만 "지형" 느낌을 낸다 */
+.fp-age-spectrum-area {
+    fill: var(--fp-amount-high);
+    opacity: .06;
+    stroke: none;
+}
+
+.fp-age-spectrum-curve {
+    fill: none;
+    stroke: var(--fp-amount-high);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.fp-age-spectrum-cohort-dot {
+    fill: #ffffff;
+    stroke: var(--fp-amount-high);
+    stroke-width: 1.6;
+}
+
+.fp-age-spectrum-cohort-dot.active {
+    fill: var(--fp-amount-high);
+    r: 4.5;
+}
+
+.fp-age-spectrum-cohort-guide {
+    stroke: var(--fp-hairline);
+    stroke-width: 1;
+    stroke-dasharray: 2 2;
+}
+
+/* 목표 금액 마커 — 색이 아니라 "사각형" 형태로 또래 중앙값(원형 점)과 구분한다(색맹 접근성) */
+.fp-age-spectrum-goal-marker {
+    fill: var(--fp-benchmark);
+    stroke: #ffffff;
+    stroke-width: 1.5;
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: rotate(45deg);
+}
+
+.fp-age-spectrum-goal-tick {
+    stroke: var(--fp-benchmark);
+    stroke-width: 1;
+    stroke-dasharray: 2 2;
+    opacity: .6;
+}
+
+.fp-age-spectrum-labels {
+    position: relative;
+    height: 15px;
+    margin-top: 2px;
+}
+
+.fp-age-spectrum-label {
+    position: absolute;
+    transform: translateX(-50%);
+    color: var(--fp-ink-muted);
+    font-family: var(--fp-mono-font);
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color .15s ease, font-weight .15s ease;
+}
+
+.fp-age-spectrum-label.active {
+    color: var(--fp-ink);
+    font-weight: 700;
+}
+
+.fp-age-spectrum-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.fp-age-spectrum-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--fp-ink-muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.fp-age-spectrum-legend-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1.6px solid var(--fp-amount-high);
+}
+
+.fp-age-spectrum-legend-mark {
+    width: 7px;
+    height: 7px;
+    background: var(--fp-benchmark);
+    transform: rotate(45deg);
+}
+
+/* 또래 대비 비교 결과 — 이 화면에서 가장 중요한 한 줄이므로 카드 안에 별도 박스로
+   띄우고 숫자를 크게 키운다(26px → 44px). 네이비 좌측 바 + 옅은 틴트로 "핵심 지표
+   콜아웃" 인상을 준다. */
+.fp-age-spectrum-result {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
+    margin-top: 16px;
+    padding: 18px 20px;
+    background: var(--fp-navy-tint);
+    border-left: 4px solid var(--fp-navy);
+}
+
+.fp-age-spectrum-percent {
+    color: var(--fp-navy);
+    font-family: Inter, Pretendard, sans-serif;
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.fp-age-spectrum-percent-text {
+    color: var(--fp-ink);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.fp-age-spectrum-caption {
+    flex-basis: 100%;
+    margin: 4px 0 0;
+    color: var(--fp-ink-muted);
+    font-size: 10.5px;
+    line-height: 1.5;
+}
+
+/* ================================================================
+   가구원수별 구성비 막대 (Household Composition Bar, 마리메코형) — 연령대 스펙트럼과
+   일부러 다른 문법. 막대 폭=전체 가구 중 비중, 막대 높이=순자산 중앙값(공유 축).
+   그 축 위에 "내 목표" 점선을 가로로 그어서 각 가구 규모 막대와 내 목표를 한 눈에 비교시킨다
+   — 연령대 스펙트럼의 "곡선 위 마커"와 같은 역할을 하는, 가구원별 버전의 위치 표시.
+   .fp-age-spectrum-toggle/-result/-percent/-percent-text/-caption은 연령대 섹션과 공유해서
+   상호작용 언어는 통일하고 그래프 문법만 다르게 만든다. */
+.fp-household-callout {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    min-height: 18px;
+    margin-bottom: 10px;
+    color: var(--fp-ink);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.fp-household-callout-pct {
+    color: var(--fp-ink-muted);
+    font-family: var(--fp-mono-font);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.fp-household-bar-wrap {
+    padding: 4px;
+    border: 1px solid var(--fp-hairline);
+    border-radius: 4px;
+}
+
+.fp-household-bar {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    height: 128px;
+}
+
+.fp-household-segment {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 5px;
+    border: 0;
+    border-right: 2px solid #ffffff;
+    background: var(--fp-surface-sunken);
+    cursor: pointer;
+    transition: background-color .12s ease;
+}
+
+.fp-household-segment:last-child {
+    border-right: 0;
+}
+
+.fp-household-segment:hover {
+    background: var(--fp-hairline);
+}
+
+.fp-household-segment.selected {
+    background: var(--fp-amount-high);
+}
+
+.fp-household-segment-check {
+    color: var(--fp-ink);
+    font-size: 14px;
+    opacity: 0;
+}
+
+.fp-household-segment.selected .fp-household-segment-check {
+    color: #ffffff;
+    opacity: 1;
+}
+
+/* 공유 축 위의 "내 목표" 기준선 — 색이 아니라 점선+라벨이라는 형태로 구분(색맹 접근성) */
+.fp-household-goal-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0;
+    border-top: 2px dashed var(--fp-benchmark);
+    z-index: 2;
+    transition: bottom .2s ease;
+    pointer-events: none;
+}
+
+.fp-household-goal-line-label {
+    position: absolute;
+    right: 0;
+    bottom: 3px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: var(--fp-benchmark);
+    color: #ffffff;
+    font-family: var(--fp-mono-font);
+    font-size: 9.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.fp-household-bar-labels {
+    display: flex;
+    margin-top: 6px;
+}
+
+.fp-household-bar-label {
+    flex: 0 0 auto;
+    color: var(--fp-ink-muted);
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    transition: color .15s ease, font-weight .15s ease;
+}
+
+.fp-household-bar-label.active {
+    color: var(--fp-ink);
+    font-weight: 700;
+}
+
+.fp-household-bar-caption {
+    margin: 8px 0 0;
+    color: var(--fp-ink-muted);
+    font-size: 10.5px;
+}
+
+.fcs-continue-button:disabled {
+    background: var(--fcs-border);
+    color: var(--fcs-ink-muted);
+    cursor: not-allowed;
+}
+
+.fcs-continue-button:disabled:hover {
+    background: var(--fcs-border);
+}
+
+/* 다른 .fcs-* 클래스(예: .fcs-panel의 display:flex)와 같이 붙어도 항상 숨겨지도록 파일 맨 끝에 둔다 */
+.hidden {
+    display: none;
+}
+
+/* 2단계 목표 화면은 장식적 라운딩을 쓰지 않는다. (파일 후반의 공용 규칙보다 우선 적용) */
+.futuresim-goal-preset-page .fcs-panel,
+.futuresim-goal-preset-page .fp-pace-card,
+.futuresim-goal-preset-page .fp-age-spectrum-card,
+.futuresim-goal-preset-page .fp-household-spectrum-card,
+.futuresim-goal-preset-page .fp-amount-quick-pick,
+.futuresim-goal-preset-page .fp-household-goal-line-label {
+    border-radius: 0;
+}
+
+/* ================================================================
+   3단계("성장 곡선") — 순자산 성장 곡선 차트 + 마일스톤 리스트 + 4단계 미리보기 카드.
+   1~2단계와 같은 --fp-* 토큰(.futuresim-goal-preset-page 스코프 재사용)을 그대로 쓴다.
+   ================================================================ */
+.fp-growth-chart-wrap {
+    position: relative;
+    margin-bottom: 8px;
+}
+.fp-goal-journey { margin: 18px 0; padding: 16px; border: 1px solid #cfe0f4; border-radius: 14px; background: #f8fbff; }
+.fp-goal-journey-head { display: flex; justify-content: space-between; gap: 12px; color: var(--fp-ink-secondary); font-size: 12px; }
+.fp-goal-journey-head strong { color: var(--fp-navy); font-size: 15px; }
+.fp-goal-journey-progress { height: 12px; margin: 12px 0 10px; overflow: hidden; border-radius: 999px; background: #dce6f1; }
+.fp-goal-journey-progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--fp-navy); transition: width .35s ease; }
+.fp-goal-journey > p { margin: 0; color: var(--fp-ink); font-size: 13px; font-weight: 700; }
+.fp-goal-journey-milestones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.fp-goal-journey-milestones div { min-width: 0; padding: 10px; border-radius: 9px; background: #fff; }
+.fp-goal-journey-milestones span { display: block; margin-bottom: 4px; color: var(--fp-ink-secondary); font-size: 11px; }
+.fp-goal-journey-milestones strong { display: block; color: var(--fp-ink); font-size: 13px; overflow-wrap: anywhere; }
+@media (max-width: 540px) { .fp-goal-journey-milestones { grid-template-columns: 1fr; } }
+
+.fp-growth-chart-svg {
+    width: 100%;
+    height: 220px;
+    overflow: visible;
+    cursor: crosshair;
+}
+
+.fp-growth-curve {
+    fill: none;
+    stroke: var(--fp-navy);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* 누적구성 영역 — 원금(진한 파랑)을 바닥부터, 투자수익(연한 파랑)을 그 위에 쌓는다 */
+.fp-growth-area-contribution {
+    fill: var(--fp-contribution);
+    stroke: none;
+}
+
+.fp-growth-area-return {
+    fill: var(--fp-return);
+    stroke: none;
+}
+
+.fp-growth-scrubber-line {
+    stroke: var(--fp-navy);
+    stroke-width: 1.5;
+}
+
+.fp-growth-scrubber-dot {
+    fill: #ffffff;
+    stroke: var(--fp-navy);
+    stroke-width: 2.5;
+}
+
+.fp-growth-goal-line,
+.fp-growth-benchmark-line {
+    stroke-width: 1.5;
+    stroke-dasharray: 5 4;
+}
+
+.fp-growth-goal-line {
+    stroke: var(--fp-ink-muted);
+}
+
+.fp-growth-benchmark-line {
+    stroke: var(--fp-benchmark);
+}
+
+.fp-growth-goal-marker,
+.fp-growth-benchmark-marker {
+    stroke: #ffffff;
+    stroke-width: 2;
+}
+
+.fp-growth-goal-marker {
+    fill: var(--fp-navy);
+}
+
+.fp-growth-benchmark-marker {
+    fill: var(--fp-benchmark);
+}
+
+.fp-growth-hover-line {
+    stroke: var(--fp-hairline);
+    stroke-width: 1;
+}
+
+.fp-growth-hover-dot {
+    fill: var(--fp-navy);
+    stroke: #ffffff;
+    stroke-width: 2;
+}
+
+.fp-growth-tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -130%);
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: var(--fp-ink);
+    color: #ffffff;
+    font-family: var(--fp-mono-font);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .12s ease;
+}
+
+.fp-growth-tooltip.visible {
+    opacity: 1;
+}
+
+.fp-growth-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.fp-growth-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--fp-ink-muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.fp-growth-legend-swatch {
+    width: 14px;
+    height: 2px;
+    border-radius: 1px;
+}
+
+.fp-growth-legend-swatch-curve {
+    background: var(--fp-navy);
+    height: 3px;
+}
+
+.fp-growth-legend-swatch-contribution {
+    background: var(--fp-contribution);
+    height: 8px;
+    border-radius: 2px;
+}
+
+.fp-growth-legend-swatch-return {
+    background: var(--fp-return);
+    height: 8px;
+    border-radius: 2px;
+}
+
+.fp-growth-legend-swatch-goal {
+    background: repeating-linear-gradient(to right, var(--fp-ink-muted) 0 4px, transparent 4px 7px);
+}
+
+.fp-growth-legend-swatch-benchmark {
+    background: repeating-linear-gradient(to right, var(--fp-benchmark) 0 4px, transparent 4px 7px);
+}
+
+/* ===== 마일스톤 리스트 — fp-detail-table과 같은 톤(구분선, 우측 강조)을 리스트 문법으로 재사용 ===== */
+.fp-milestone-list {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.fp-milestone-item {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--fp-hairline);
+    font-size: 13px;
+}
+
+.fp-milestone-item:last-child {
+    border-bottom: 0;
+}
+
+.fp-milestone-dot {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--fp-hairline);
+    align-self: center;
+}
+
+.fp-milestone-item.reached .fp-milestone-dot {
+    background: var(--fp-navy);
+}
+
+.fp-milestone-label {
+    flex: 0 0 auto;
+    min-width: 72px;
+    color: var(--fp-ink-muted);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.fp-milestone-text {
+    flex: 1 1 auto;
+    color: var(--fp-ink);
+    font-weight: 600;
+}
+
+/* ===== 타임라인 탐색기 — 슬라이더로 timeline의 임의 시점을 골라 그 시점 상세를 즉시 본다 ===== */
+.fp-scrubber-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.fp-scrubber-month {
+    color: var(--fp-navy);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.fp-scrubber-input {
+    width: 100%;
+    height: 20px;
+    margin: 0 0 16px;
+    accent-color: var(--fp-navy);
+    cursor: pointer;
+}
+
+/* ===== 목표 도달 시점 기준 원금/투자수익 요약 카드 ===== */
+.fp-growth-summary-card {
+    padding: 14px 16px;
+    background: var(--fp-navy-tint);
+    border-left: 3px solid var(--fp-navy);
+}
+
+.fp-growth-summary-card p {
+    margin: 0;
+    color: var(--fp-ink);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.fp-growth-summary-card strong {
+    color: var(--fp-navy);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ===== 4단계 미리보기 카드 — 3단계(성장 곡선)에서 4단계(레버 랭킹)로 넘어가는 링크형 카드 ===== */
+.fp-preview-card {
+    display: block;
+    margin-bottom: 24px;
+    padding: 20px;
+    border: 1px solid var(--fp-hairline);
+    background: #fbfcfd;
+    text-decoration: none;
+}
+
+.fp-preview-card-link {
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.fp-preview-card-link:hover {
+    border-color: var(--fp-navy);
+    background: var(--fp-navy-tint);
+}
+
+.fp-preview-card-title {
+    margin: 0 0 16px;
+    color: var(--fp-ink);
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.fp-preview-methods {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.fp-preview-method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 8px;
+    border: 1px solid var(--fp-hairline);
+    background: #ffffff;
+    color: var(--fp-ink-secondary);
+    font-size: 11.5px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.fp-preview-method .material-symbols-outlined {
+    color: var(--fp-navy);
+    font-size: 22px;
+}
+
+@media (max-width: 640px) {
+    .fp-preview-methods {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ================================================================
+   4단계("레버 랭킹") 전용 스타일
+   ================================================================ */
+.fp-lever-hero-sub {
+    margin: 4px 0 0;
+    color: var(--fp-ink-secondary);
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+.fp-lever-section {
+    margin-bottom: 4px;
+}
+
+.fp-lever-section-title {
+    margin: 0 0 4px;
+    color: var(--fp-ink);
+    font-size: 14.5px;
+    font-weight: 800;
+}
+
+.fp-lever-section-sub {
+    margin: 0 0 14px;
+    color: var(--fp-ink-muted);
+    font-size: 12px;
+}
+
+.fp-lever-loading {
+    padding: 24px 0;
+    color: var(--fp-ink-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+.fp-lever-ranking-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 방법별 효과 비교 — 막대그래프+슬라이더 대신, 바로 실행할 수 있는 추천 문장 카드 하나씩.
+   강도는 드래그가 아니라 몇 개의 정해진 칩 중에서 고르는 방식이라 조작이 훨씬 단순하다. */
+.fp-lever-card {
+    padding: 16px;
+    border: 1px solid var(--fp-hairline);
+    background: #ffffff;
+}
+
+.fp-lever-card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.fp-lever-card-icon {
+    color: var(--fp-navy);
+    font-size: 20px;
+}
+
+.fp-lever-card-name {
+    color: var(--fp-ink-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.fp-lever-card-headline {
+    margin: 0 0 10px;
+    color: var(--fp-ink);
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.fp-lever-card-effect {
+    color: var(--fp-navy);
+    font-size: 19px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.fp-lever-card-effect.fp-lever-card-effect-negative {
+    color: var(--fp-danger);
+}
+
+.fp-lever-card-detail {
+    margin: 0 0 8px;
+    color: var(--fp-ink);
+    font-size: 12.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.fp-lever-card-explanation {
+    margin: 0 0 14px;
+    color: var(--fp-ink-secondary);
+    font-size: 12.5px;
+    line-height: 1.6;
+}
+
+.fp-lever-card-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.fp-lever-chip {
+    padding: 8px 14px;
+    border: 1px solid var(--fp-hairline);
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--fp-ink-secondary);
+    font-size: 12.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+}
+
+.fp-lever-chip.active {
+    border-color: var(--fp-navy);
+    background: var(--fp-navy);
+    color: #ffffff;
+}
+
+/* 프리셋 칩 3개 옆에 붙는 "직접 입력" 칸 — 모양은 칩과 맞추되 안에 입력창을 둔다 */
+.fp-lever-chip-custom {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px 4px 14px;
+    border: 1px solid var(--fp-hairline);
+    border-radius: 999px;
+    background: #ffffff;
+    transition: border-color .15s ease, background .15s ease;
+}
+
+.fp-lever-chip-custom.active {
+    border-color: var(--fp-navy);
+    background: var(--fp-navy-tint);
+}
+
+.fp-lever-chip-custom.loading {
+    opacity: .6;
+}
+
+.fp-lever-chip-custom-input {
+    width: 74px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--fp-ink);
+    font-size: 12.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+.fp-lever-chip-custom-input::placeholder {
+    color: var(--fp-ink-muted);
+    font-weight: 600;
+}
+
+.fp-lever-chip-custom-unit {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--fp-surface-sunken);
+    color: var(--fp-ink-secondary);
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.fp-lever-card-assumption {
+    margin: 14px 0 0;
+    padding: 10px 12px;
+    background: var(--fp-navy-tint);
+    color: var(--fp-ink-secondary);
+    font-size: 11.5px;
+    line-height: 1.5;
+}
+
+/* ===== 섹션2. 금리 리스크 참고 카드 ===== */
+.fp-rate-risk-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.fp-rate-risk-tab {
+    flex: 1 1 0;
+    padding: 9px 4px;
+    border: 1px solid var(--fp-hairline);
+    background: #ffffff;
+    color: var(--fp-ink-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.fp-rate-risk-tab.active {
+    border-color: var(--fp-navy);
+    background: var(--fp-navy);
+    color: #ffffff;
+}
+
+.fp-rate-risk-card {
+    padding: 16px;
+    border: 1px solid var(--fp-hairline);
+}
+
+.fp-rate-risk-empty {
+    margin: 0;
+    padding: 12px 0;
+    color: var(--fp-ink-muted);
+    font-size: 12.5px;
+    text-align: center;
+}
+
+.fp-rate-risk-insight {
+    margin: 14px 0 0;
+    padding: 12px 14px;
+    background: var(--fp-navy-tint);
+    border-left: 3px solid var(--fp-navy);
+    color: var(--fp-ink);
+    font-size: 12.5px;
+    line-height: 1.6;
+}
+
+.fp-rate-risk-insight.fp-rate-risk-insight-danger {
+    background: var(--fp-danger-tint);
+    border-left-color: var(--fp-danger);
+}
+
+.fp-rate-risk-insight strong {
+    color: var(--fp-navy);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ===== 조합 추천 카드 — 레버 여러 개를 동시에 썼을 때 최선인 조합(DP 결과) ===== */
+.fp-lever-combination-card {
+    margin-top: 12px;
+    padding: 16px;
+    background: var(--fp-navy-tint);
+    border-left: 3px solid var(--fp-navy);
+}
+
+.fp-lever-combination-title {
+    margin: 0 0 10px;
+    color: var(--fp-navy);
+    font-size: 13.5px;
+    font-weight: 800;
+}
+
+.fp-lever-combination-note {
+    margin: 0 0 10px;
+    color: var(--fp-ink-muted);
+    font-size: 11.5px;
+}
+
+.fp-lever-combination-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.fp-lever-combination-item {
+    padding: 6px 10px;
+    background: #ffffff;
+    border: 1px solid var(--fp-navy);
+    color: var(--fp-navy);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.fp-lever-combination-effect {
+    margin: 0 0 8px;
+    color: var(--fp-ink);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.fp-lever-combination-reason {
+    margin: 0;
+    padding-top: 8px;
+    border-top: 1px dashed var(--fp-hairline);
+    color: var(--fp-ink-muted);
+    font-size: 11.5px;
+    line-height: 1.5;
+}
+
+/* ===== 대출 우선순위 카드 — loananalysis/DebtPriorityService 재사용 결과 ===== */
+.fp-debt-priority-card {
+    margin-top: 24px;
+}
+
+.fp-debt-priority-list {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.fp-debt-priority-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--fp-hairline);
+}
+
+.fp-debt-priority-item:last-child {
+    border-bottom: 0;
+}
+
+.fp-debt-priority-rank {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--fp-navy);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.fp-debt-priority-body {
+    flex: 1 1 auto;
+}
+
+.fp-debt-priority-name {
+    margin: 0 0 4px;
+    color: var(--fp-ink);
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+.fp-debt-priority-balance {
+    margin-left: 8px;
+    color: var(--fp-ink-muted);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.fp-debt-priority-reason {
+    margin: 0 0 4px;
+    color: var(--fp-ink-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.fp-debt-priority-score {
+    margin: 0;
+    color: var(--fp-ink-muted);
+    font-size: 11px;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ================================================================
+   5단계("레버 조합해보기") 전용 스타일
+   ================================================================ */
+
+/* ===== 레버 체크박스 + 인라인 강도 패널 ===== */
+.fp-combo-lever-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fp-combo-lever-item {
+    border: 1px solid var(--fp-hairline);
+    background: #ffffff;
+}
+
+.fp-combo-lever-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+}
+
+.fp-combo-lever-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--fp-navy);
+    cursor: pointer;
+}
+
+.fp-combo-lever-icon {
+    color: var(--fp-navy);
+    font-size: 20px;
+}
+
+.fp-combo-lever-name {
+    flex: 1 1 auto;
+    color: var(--fp-ink);
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+.fp-combo-lever-effect {
+    color: var(--fp-navy);
+    font-size: 12.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 체크 시 펼쳐지는 강도 입력 패널 — 4단계와 같은 칩(fp-lever-chip*) 스타일을 그대로 재사용한다 */
+.fp-combo-lever-panel {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height .2s ease, opacity .2s ease;
+}
+
+.fp-combo-lever-panel.expanded {
+    max-height: 200px;
+    opacity: 1;
+}
+
+.fp-combo-lever-panel-body {
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--fp-hairline);
+}
+
+.fp-combo-lever-panel-body .fp-lever-card-chips {
+    margin-top: 12px;
+}
+
+/* ===== 오버레이 차트 ===== */
+.fp-combo-chart-section {
+    margin-top: 4px;
+}
+
+.fp-combo-baseline-curve {
+    fill: none;
+    stroke: var(--fp-ink-muted);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.fp-combo-result-curve {
+    fill: none;
+    stroke: var(--fp-navy);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.fp-combo-legend-swatch-baseline {
+    background: var(--fp-ink-muted);
+    height: 2px;
+}
+
+.fp-combo-legend-swatch-result {
+    background: var(--fp-navy);
+    height: 3px;
+}
+
+.fp-combo-summary {
+    margin: 4px 0 0;
+    padding: 12px 14px;
+    background: var(--fp-navy-tint);
+    border-left: 3px solid var(--fp-navy);
+    color: var(--fp-ink);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+/* ===== 5단계 실행 계획 최종 확인 ===== */
+.fp-plan-summary {
+    border: 1px solid var(--fp-hairline);
+    background: #f8fafc;
+    padding: 18px;
+}
+
+.fp-plan-edit-toggle {
+    align-self: flex-start;
+    margin: 0 0 16px;
+    border: 1px solid var(--fp-hairline);
+    background: #fff;
+    color: var(--fp-navy);
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.fp-plan-summary-note { margin: 10px 0 0; color: var(--fp-ink-muted); font-size: 12px; }
+
+/* 5단계 현재 페이스 히어로 */
+.fp-plan-hero { margin-bottom: 24px; padding: 22px 20px; background: var(--fp-navy); color: #fff; }
+.fp-plan-hero-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.fp-plan-hero-eyebrow { color: #b9c9df; font-size: 12px; font-weight: 700; }
+.fp-plan-hero-top h3 { margin: 5px 0 0; font-size: 16px; color: #fff; }
+.fp-plan-hero-icon { padding: 8px; background: rgba(255,255,255,.12); font-size: 21px; }
+.fp-plan-hero-time { display: flex; align-items: baseline; gap: 5px; margin: 23px 0 18px; }
+.fp-plan-hero-number { font: 800 40px/1 Inter, Pretendard, sans-serif; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.fp-plan-hero-unit { font-size: 18px; font-weight: 700; }
+.fp-plan-hero-suffix { color: #c9d6e7; font-size: 13px; }
+.fp-plan-hero-route { display: flex; align-items: center; gap: 10px; color: #c9d6e7; font-size: 11px; }
+.fp-plan-hero-route i { height: 2px; flex: 1; background: linear-gradient(90deg,#7ca3d5 0 92%,#fff 92%); }
+.fp-plan-hero-footer { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; padding-top: 13px; border-top: 1px solid rgba(255,255,255,.18); color: #c9d6e7; font-size: 12px; }
+.fp-plan-hero-footer strong { color: #fff; }.fp-plan-hero-dot { margin: 0 3px; }
+
+.fp-plan-loan-impact-list { display: grid; gap: 10px; }
+.fp-plan-loan-impact-card { border: 1px solid var(--fp-hairline); background: #fff; padding: 14px; }
+.fp-plan-loan-impact-head { display: flex; align-items: center; gap: 7px; color: var(--fp-navy); }
+.fp-plan-impact-badge { margin-left: auto; padding: 4px 7px; background: #ecfdf5; color: #047857; font-size: 11px; }
+.fp-plan-impact-badge.warning { background: #fff7ed; color: #c2410c; }
+.fp-plan-loan-impact-values { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 13px 0 8px; }
+.fp-plan-loan-impact-values div { display: grid; gap: 3px; }
+.fp-plan-loan-impact-values div:last-child { text-align: right; }
+.fp-plan-loan-impact-values span, .fp-plan-loan-fee-note { color: var(--fp-ink-muted); font-size: 12px; }
+.fp-plan-loan-impact-values b { color: var(--fp-ink); font-size: 15px; }
+.fp-plan-loan-fee-note { display: flex; align-items: center; gap: 7px; margin: 8px 0 0; padding: 10px 12px; background: #fff7ed; }
+.fp-plan-loan-impact-period { margin: 0 0 8px; color: var(--fp-ink-muted); font-size: 12px; }
+.fp-plan-loan-impact-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.fp-plan-impact-badge.fee { background: var(--fp-navy-tint); color: var(--fp-navy); }
+
+.fp-lever-combination-loading { display: flex; align-items: center; gap: 12px; margin: 20px 0; padding: 16px; border: 1px dashed var(--fp-hairline); background: #f8fafc; }
+.fp-lever-combination-loading strong { color: var(--fp-ink); font-size: 13px; }
+.fp-lever-combination-loading p { margin: 4px 0 0; color: var(--fp-ink-muted); font-size: 12px; }
+/* .hidden(1373행)이 파일 앞쪽에 있어 이 rule의 display:flex에 소스 순서상 밀린다 — 로딩 완료 후
+   JS가 hidden을 붙여도 스피너가 계속 보이던 원인. 결합 선택자로 이 요소만 명시적으로 다시 이긴다. */
+.fp-lever-combination-loading.hidden { display: none; }
+.fp-combination-spinner { color: var(--fp-navy); animation: fp-combination-spin 1s linear infinite; }
+@keyframes fp-combination-spin { to { transform: rotate(360deg); } }
+
+.fp-plan-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.fp-plan-summary-grid div {
+    background: #fff;
+    padding: 12px;
+}
+
+.fp-plan-summary-grid dt,
+.fp-plan-summary-levers span {
+    color: var(--fp-ink-muted);
+    font-size: 12px;
+}
+
+.fp-plan-summary-grid dd {
+    margin: 5px 0 0;
+    color: var(--fp-ink);
+    font-weight: 700;
+}
+
+.fp-plan-summary-levers {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border-top: 1px solid var(--fp-hairline);
+    padding-top: 12px;
+}
+
+.fp-plan-summary-lever-list {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fp-plan-summary-lever-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid var(--fp-hairline);
+    padding: 8px 10px;
+}
+
+.fp-plan-summary-lever-icon {
+    color: var(--fp-navy);
+    font-size: 18px;
+}
+
+.fp-plan-summary-lever-name {
+    color: var(--fp-ink);
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.fp-plan-summary-lever-value {
+    color: var(--fp-ink-muted);
+    font-size: 12px;
+}
+
+.fp-plan-summary-lever-effect {
+    margin-left: auto;
+    color: var(--fp-navy);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.fp-plan-summary-lever-empty {
+    color: var(--fp-ink-muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+@media (max-width: 520px) {
+    .fp-plan-summary-grid { grid-template-columns: 1fr; }
+}
+
+/* "실행 전후 비교" — 흰 배경에 숫자 두 개를 늘어놓는 대신, 네이비 카드 하나 안에서 전/후/단축량이
+   한 세트로 읽히게 한다. 카드에서 가장 먼저 눈에 들어와야 하는 건 개별 숫자가 아니라 하단 배지라서,
+   배지는 흰 배경(단축) 또는 --fp-danger 톤(지연)의 알약 형태로 나머지 텍스트보다 대비를 강하게 준다. */
+.fp-plan-compare-card {
+    margin: 14px 0;
+    padding: 22px 20px;
+    background: var(--fp-navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.fp-plan-compare-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.fp-plan-compare-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.fp-plan-compare-label {
+    color: #b9c9df;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.fp-plan-compare-value {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.fp-plan-compare-value-after {
+    font-size: 26px;
+    font-weight: 800;
+}
+
+.fp-plan-compare-arrow {
+    color: #7ca3d5;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.fp-plan-compare-badge {
+    padding: 9px 20px;
+    background: #fff;
+    color: var(--fp-navy);
+    font-size: 22px;
+    font-weight: 800;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.fp-plan-compare-badge-warning {
+    background: var(--fp-danger-tint);
+    color: var(--fp-danger);
+}
+
+@media (max-width: 480px) {
+    .fp-plan-compare-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .fp-plan-compare-arrow {
+        transform: rotate(90deg);
+    }
+
+    .fp-plan-compare-badge {
+        font-size: 19px;
+    }
+}
+
+.fp-combo-plan-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 10px;
+}
+
+.fp-combo-plan-name-row label {
+    flex: 0 0 auto;
+    color: var(--fp-ink-secondary);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.fp-combo-plan-name-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--fp-hairline);
+    background: #fff;
+    color: var(--fp-ink);
+    font-size: 13.5px;
+}
+
+.fp-combo-plan-name-input:focus {
+    outline: none;
+    border-color: var(--fp-navy);
+}
+
+.fp-combo-plan-list-link {
+    flex: 0 0 auto;
+    color: var(--fp-navy);
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: underline;
+}
+
+.fp-combo-save-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0 0 10px;
+    padding: 12px;
+    background: var(--fp-navy-tint);
+    color: var(--fp-navy);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.fp-combo-save-note .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.fp-combo-save-note.error {
+    background: var(--fp-danger-tint);
+    color: var(--fp-danger);
+}
+
+/* ===== 저장된 계획 목록(별도 페이지) ===== */
+.fp-plan-list-empty {
+    margin: 20px 0;
+    padding: 16px;
+    border: 1px dashed var(--fp-hairline);
+    color: var(--fp-ink-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+.fp-plan-list {
+    list-style: none;
+    margin: 12px 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fp-plan-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid var(--fp-hairline);
+    background: #fff;
+}
+
+.fp-plan-list-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.fp-plan-list-info strong {
+    color: var(--fp-ink);
+    font-size: 15px;
+}
+
+.fp-plan-list-info span {
+    color: var(--fp-ink-muted);
+    font-size: 12.5px;
+}
+
+.fp-plan-list-updated {
+    font-size: 11px;
+}
+
+.fp-plan-list-load {
+    flex: 0 0 auto;
+    padding: 9px 16px;
+    border: 1px solid var(--fp-navy);
+    color: var(--fp-navy);
+    font-size: 13px;
+    font-weight: 700;
+}

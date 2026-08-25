@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.via.shinvia.policy.loan.repository.PolicySupportProgramRepository">
+
+    <sql id="searchCondition">
+        WHERE p.active = TRUE
+
+        <if test="keyword != null and keyword != ''">
+            AND CONCAT_WS(' ', p.program_name, p.target_description,
+                p.eligibility_description, p.offering_institution_name,
+                p.handling_institution, p.usage_description,
+                p.support_area, p.interest_rate_type)
+                LIKE CONCAT('%',
+                    REPLACE(REPLACE(REPLACE(#{keyword}, '=', '=='), '%', '=%'), '_', '=_'),
+                    '%') ESCAPE '='
+        </if>
+
+        <choose>
+            <when test="target == 'WORKER'">
+                AND (p.target_description REGEXP '근로자|직장인|재직자'
+                    OR p.eligibility_description REGEXP '근로자|직장인|재직자')
+            </when>
+            <when test="target == 'BUSINESS'">
+                AND (p.target_description REGEXP '사업자|자영업자'
+                    OR p.eligibility_description REGEXP '사업자|자영업자')
+            </when>
+            <when test="target == 'SMALL_BIZ'">
+                AND (p.target_description REGEXP '소상공인|영세사업자'
+                    OR p.eligibility_description REGEXP '소상공인|영세사업자')
+            </when>
+            <when test="target == 'YOUTH'">
+                AND (p.target_description REGEXP '청년|대학생|대학원생|취업준비생'
+                    OR p.eligibility_description REGEXP '청년|대학생|대학원생|취업준비생')
+            </when>
+            <when test="target == 'VULNERABLE'">
+                AND (p.target_description REGEXP '저소득|저신용|취약계층|차상위|기초생활수급'
+                    OR p.eligibility_description REGEXP '저소득|저신용|취약계층|차상위|기초생활수급')
+            </when>
+            <when test="target == 'FARMER'">
+                AND (p.target_description REGEXP '농업인|어업인|농림어업인'
+                    OR p.eligibility_description REGEXP '농업인|어업인|농림어업인')
+            </when>
+            <when test="target == 'ETC'">
+                AND (p.target_description IS NULL OR TRIM(p.target_description) = ''
+                    OR p.target_description LIKE '%기타%')
+            </when>
+        </choose>
+
+        <choose>
+            <when test="usage == 'STARTUP'">
+                AND p.usage_description LIKE '%창업%'
+            </when>
+            <when test="usage == 'OPERATION'">
+                AND p.usage_description REGEXP '운영|시설|경영|사업'
+            </when>
+            <when test="usage == 'LIVING'">
+                AND p.usage_description REGEXP '생계|생활'
+            </when>
+            <when test="usage == 'HOUSING'">
+                AND p.usage_description REGEXP '주거|전세|임차|보증금'
+            </when>
+            <when test="usage == 'REFINANCE'">
+                AND (p.usage_description REGEXP '대환|전환|고금리'
+                    OR p.program_name REGEXP '대환|전환')
+            </when>
+            <when test="usage == 'TUITION'">
+                AND (p.usage_description REGEXP '학자금|등록금'
+                    OR p.program_name LIKE '%학자금%')
+            </when>
+            <when test="usage == 'ETC'">
+                AND (p.usage_description IS NULL OR TRIM(p.usage_description) = ''
+                    OR p.usage_description LIKE '%기타%')
+            </when>
+        </choose>
+
+        <choose>
+            <when test="amount == 'UNDER_1000'">
+                AND p.max_support_amount IS NOT NULL AND p.max_support_amount &lt; 10000000
+            </when>
+            <when test="amount == 'OVER_1000'">
+                AND p.max_support_amount &gt;= 10000000
+            </when>
+            <when test="amount == 'OVER_3000'">
+                AND p.max_support_amount &gt;= 30000000
+            </when>
+            <when test="amount == 'OVER_5000'">
+                AND p.max_support_amount &gt;= 50000000
+            </when>
+            <when test="amount == 'OVER_10000'">
+                AND p.max_support_amount &gt;= 100000000
+            </when>
+        </choose>
+
+        <choose>
+            <when test="ageGroup == 'YOUTH'">
+                AND (p.target_description REGEXP '청년|대학생|만 19세|만 34세|만 39세'
+                    OR p.eligibility_description REGEXP '청년|대학생|만 19세|만 34세|만 39세')
+            </when>
+            <when test="ageGroup == 'MIDDLE'">
+                AND (p.target_description REGEXP '중장년|중년|장년|만 40세|만 50세|만 60세'
+                    OR p.eligibility_description REGEXP '중장년|중년|장년|만 40세|만 50세|만 60세')
+            </when>
+        </choose>
+
+        <if test="region != null and region != ''">
+            AND (p.support_area LIKE CONCAT('%', #{region}, '%')
+                OR p.eligibility_description LIKE CONCAT('%', #{region}, '%'))
+        </if>
+    </sql>
+
+    <select id="findByExternalSeq" resultType="com.via.shinvia.policy.loan.entity.PolicySupportProgram">
+        SELECT * FROM policy_support_program WHERE external_seq = #{externalSeq}
+    </select>
+
+    <select id="findById" resultType="com.via.shinvia.policy.loan.entity.PolicySupportProgram">
+        SELECT * FROM policy_support_program WHERE policy_support_program_id = #{programId}
+    </select>
+
+    <select id="searchPrograms" resultType="com.via.shinvia.policy.loan.entity.PolicySupportProgram">
+        SELECT p.*
+        FROM policy_support_program p
+        <include refid="searchCondition"/>
+        ORDER BY p.policy_support_program_id ASC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countPrograms" resultType="long">
+        SELECT COUNT(*)
+        FROM policy_support_program p
+        <include refid="searchCondition"/>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="policySupportProgramId">
+        INSERT INTO policy_support_program (
+            external_seq, program_name, target_description, max_support_amount,
+            min_interest_rate, max_interest_rate, interest_rate_type,
+            interest_rate_description, support_period_description, repayment_method,
+            usage_description, institution_category, offering_institution_name,
+            handling_institution, support_area, eligibility_description,
+            application_method, contact_description, application_url, operation_period,
+            eligibility_json, effective_from, effective_to, active
+        ) VALUES (
+            #{externalSeq}, #{programName}, #{targetDescription}, #{maxSupportAmount},
+            #{minInterestRate}, #{maxInterestRate}, #{interestRateType},
+            #{interestRateDescription}, #{supportPeriodDescription}, #{repaymentMethod},
+            #{usageDescription}, #{institutionCategory}, #{offeringInstitutionName},
+            #{handlingInstitution}, #{supportArea}, #{eligibilityDescription},
+            #{applicationMethod}, #{contactDescription}, #{applicationUrl}, #{operationPeriod},
+            #{eligibilityJson}, #{effectiveFrom}, #{effectiveTo}, #{active}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE policy_support_program
+        SET program_name = #{programName},
+            target_description = #{targetDescription},
+            max_support_amount = #{maxSupportAmount},
+            min_interest_rate = #{minInterestRate},
+            max_interest_rate = #{maxInterestRate},
+            interest_rate_type = #{interestRateType},
+            interest_rate_description = #{interestRateDescription},
+            support_period_description = #{supportPeriodDescription},
+            repayment_method = #{repaymentMethod},
+            usage_description = #{usageDescription},
+            institution_category = #{institutionCategory},
+            offering_institution_name = #{offeringInstitutionName},
+            handling_institution = #{handlingInstitution},
+            support_area = #{supportArea},
+            eligibility_description = #{eligibilityDescription},
+            application_method = #{applicationMethod},
+            contact_description = #{contactDescription},
+            application_url = #{applicationUrl},
+            operation_period = #{operationPeriod},
+            eligibility_json = #{eligibilityJson},
+            effective_from = #{effectiveFrom},
+            effective_to = #{effectiveTo},
+            active = #{active}
+        WHERE policy_support_program_id = #{policySupportProgramId}
+    </update>
+</mapper>

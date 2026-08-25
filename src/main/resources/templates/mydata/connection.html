@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic2 :: layout(~{::title}, ~{::main}, ~{::script}, ${serviceName})}">
+<head>
+    <meta charset="UTF-8">
+    <title>마이데이터 연동</title>
+    <link rel="stylesheet" th:href="@{/css/mydata-connection.css}">
+    <script th:src="@{/js/mydata.js}" defer></script>
+</head>
+
+<body>
+
+<main id="connection_main">
+    <section id="connection">
+        <h1>마이데이터 연동</h1>
+
+        <p>
+            흩어져 있는 계좌, 카드, 대출 정보를 한 번에 확인해보세요.
+        </p>
+
+        <form th:action="@{/api/mydata/oauth/authorize}">
+            <button class="connect-button" type="submit">마이데이터 연동하기</button>
+        </form>
+    </section>
+</main>
+
+</body>
+</html>

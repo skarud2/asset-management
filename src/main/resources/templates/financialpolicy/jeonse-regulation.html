@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head><title>전세대출 규제 | SHINVIA</title></head>
+<body>
+<main class="policy-container bank-policy-page financial-policy-page">
+    <link rel="stylesheet" th:href="@{/css/financial-policy.css}">
+    <header class="page-header financial-policy-header"><p class="page-label financial-policy-eyebrow">FINANCIAL POLICY</p><h1>전세대출 규제</h1><p class="page-description financial-policy-lead">전세자금대출의 보증 심사, 주택 보유 여부와 계약 전 확인사항을 알기 쉽게 안내합니다.</p></header>
+    <nav class="financial-policy-index" aria-label="페이지 주요 내용"><strong>주요 내용</strong><a href="#policy-overview">한눈에 보기</a><a href="#policy-guarantee">보증과 대출</a><a href="#policy-check">계약 전 확인</a><a href="#policy-faq">자주 묻는 질문</a></nav>
+
+    <section class="policy-summary-section"><span id="policy-overview" class="policy-anchor" aria-hidden="true"></span><div class="policy-section-title"><h2>한눈에 보기</h2><p>전세대출은 임대차계약과 보증기관 심사를 함께 봅니다.</p></div><div class="policy-summary-grid">
+        <article class="policy-summary-card"><span class="policy-summary-number">01</span><h3>보증이 핵심입니다</h3><p>주택금융공사·HUG·SGI 등 보증기관의 요건과 금융회사 심사를 함께 충족해야 합니다.</p></article>
+        <article class="policy-summary-card"><span class="policy-summary-number">02</span><h3>주택 보유 여부를 봅니다</h3><p>무주택·1주택 여부와 보유주택 가격 등에 따라 보증과 대출 가능 여부가 달라질 수 있습니다.</p></article>
+        <article class="policy-summary-card"><span class="policy-summary-number">03</span><h3>계약 안전성도 확인합니다</h3><p>임대차계약, 선순위 권리, 보증금과 주택가격을 확인해야 보증금 반환 위험을 줄일 수 있습니다.</p></article>
+    </div></section>
+
+    <section id="policy-guarantee" class="policy-content-section"><div class="policy-section-title"><h2>전세대출과 전세보증은 다릅니다</h2></div><div class="policy-example-comparison">
+        <div class="policy-example-column"><span class="policy-example-label">자금 조달</span><h3>전세자금대출 보증</h3><p>은행이 임차인에게 전세자금을 빌려줄 때 보증기관이 대출 상환 위험을 보증합니다.</p></div>
+        <div class="policy-example-arrow" aria-hidden="true">≠</div>
+        <div class="policy-example-column"><span class="policy-example-label">보증금 보호</span><h3>전세보증금 반환보증</h3><p>계약 종료 후 임대인이 보증금을 돌려주지 못할 때 임차인의 보증금 반환을 보장합니다.</p></div>
+    </div><div class="policy-warning-box"><strong>중요</strong><p>전세자금대출을 받았다고 반환보증에 자동 가입되는 것은 아닙니다. 가입 여부와 보증 범위를 별도로 확인하세요.</p></div></section>
+
+    <section class="policy-content-section"><div class="policy-section-title"><h2>심사에서 무엇을 보나요?</h2></div><div class="policy-table-wrap"><table class="policy-table"><thead><tr><th>심사 항목</th><th>주요 내용</th></tr></thead><tbody>
+        <tr><th>임차인</th><td>소득, 신용도, 기존 대출, 주택 보유 수와 실수요 여부</td></tr>
+        <tr><th>임대차계약</th><td>계약금 납부, 확정일자, 전입 가능 여부와 계약의 진위</td></tr>
+        <tr><th>대상 주택</th><td>주택 유형, 가격, 권리관계, 선순위채권과 위반건축물 여부</td></tr>
+        <tr><th>보증기관</th><td>기관별 보증한도, 보증비율, 보증료와 가입 가능 요건</td></tr>
+    </tbody></table></div></section>
+
+    <section id="policy-check" class="policy-content-section"><div class="policy-section-title"><h2>계약 전에 확인하세요</h2></div><div class="policy-step-list">
+        <article class="policy-step-card"><span>1단계</span><div><h3>등기와 권리관계 확인</h3><p>등기부등본의 소유자, 근저당권·압류 등 선순위 권리를 확인합니다.</p></div></article>
+        <article class="policy-step-card"><span>2단계</span><div><h3>대출·보증 사전상담</h3><p>계약 전 금융회사와 보증기관에 대상 주택과 본인의 자격을 확인합니다.</p></div></article>
+        <article class="policy-step-card"><span>3단계</span><div><h3>특약과 반환보증 확인</h3><p>대출 거절 시 계약금 반환 특약을 검토하고 반환보증 가입 가능 여부를 확인합니다.</p></div></article>
+        <article class="policy-step-card"><span>4단계</span><div><h3>전입신고·확정일자</h3><p>잔금 지급과 입주 후 대항력과 우선변제권 확보 절차를 빠르게 진행합니다.</p></div></article>
+    </div></section>
+
+    <section id="policy-faq" class="policy-content-section"><div class="policy-section-title"><h2>자주 묻는 질문</h2></div><div class="policy-faq-list">
+        <details class="policy-faq-item"><summary>전세대출은 현재 모두 DSR에 포함되나요?</summary><div class="policy-faq-answer"><p>아닙니다. 2026년 1월 금융위원회는 구체적인 DSR 적용대상 확대방안이 확정되지 않았다고 설명했습니다. 이후 변경 여부는 신청 시 공식 발표를 확인해야 합니다.</p></div></details>
+        <details class="policy-faq-item"><summary>1주택자도 전세대출을 받을 수 있나요?</summary><div class="policy-faq-answer"><p>주택 가격, 보유 사유와 실수요 요건 등에 따라 제한 또는 예외가 적용될 수 있습니다. 보증기관별 조건을 확인해야 합니다.</p></div></details>
+        <details class="policy-faq-item"><summary>대출이 승인되면 반환보증도 승인된 것인가요?</summary><div class="policy-faq-answer"><p>두 보증은 목적과 심사기준이 다릅니다. 반환보증은 별도 가입 여부를 반드시 확인하세요.</p></div></details>
+    </div></section>
+
+    <section class="policy-related-section"><div class="policy-section-title"><h2>함께 확인하면 좋은 내용</h2></div><div class="policy-related-links">
+        <a th:href="@{/financial-policy/policy-loan}" class="policy-related-link"><strong>정책대출 제도</strong><span>버팀목 등 정책 전세자금 상품을 확인합니다.</span></a>
+        <a th:href="@{/loans/recommendations}" class="policy-related-link"><strong>대출 상품 추천</strong><span>전세자금 목적에 맞는 대출 상품을 찾아봅니다.</span></a>
+        <a th:href="@{/financial-policy/household-dsr}" class="policy-related-link"><strong>가계대출·DSR 규제</strong><span>전세대출과 기존 부채의 심사 관계를 확인합니다.</span></a>
+    </div></section>
+    <aside class="policy-notice"><h2>확인해 주세요</h2><p>보증기관과 금융회사별 기준이 다르고 정책이 변경될 수 있습니다. 임대차계약을 체결하기 전에 대출과 반환보증의 가능 여부를 각각 확인하세요.</p><p>공식 자료: <a href="https://www.fsc.go.kr/no010102/86030" target="_blank" rel="noopener noreferrer">전세대출 DSR 확대 관련 금융위원회 설명</a> · <a href="https://www.hf.go.kr/ko/sub02/sub02_01_01.do" target="_blank" rel="noopener noreferrer">한국주택금융공사 전세자금보증</a></p><p class="policy-updated-date">최종 확인일: 2026년 8월 10일</p></aside>
+</main>
+</body>
+</html>

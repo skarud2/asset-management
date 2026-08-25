@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<!-- AccountMapper Interface에 정의한 메서드들이 실행할 SQL을 구현하는 부분!
+namespace = "Mapper 인터페이스 있는 전체 패키지 경로 써주기"
+id =Mapper method명
+
+@Mapper를 발견한 MyBatis 구현 프록시를 Spring Bean에 등록
+Service 에서 생성자 주입이 가능
+-->
+<mapper namespace="com.via.shinvia.account.mapper.AccountMapper">
+
+    <insert id="upsertAccount"
+            parameterType="com.via.shinvia.account.model.Account">
+
+        INSERT INTO account (
+        account_name,
+        account_status,
+        account_type,
+        current_balance,
+        data_as_of_at,
+        external_account_key,
+        maturity_at,
+        opened_at,
+        connection_id,
+        org_code
+        )
+        VALUES (
+        #{accountName},
+        #{accountStatus},
+        #{accountType},
+        #{currentBalance},
+        #{dataAsOfAt},
+        #{externalAccountKey},
+        #{maturityAt},
+        #{openedAt},
+        #{connectionId},
+        #{orgCode}
+        )
+        ON DUPLICATE KEY UPDATE
+        org_code = VALUES(org_code),
+        account_name = VALUES(account_name),
+        account_status = VALUES(account_status),
+        account_type = VALUES(account_type),
+        current_balance = VALUES(current_balance),
+        data_as_of_at = VALUES(data_as_of_at),
+        maturity_at = VALUES(maturity_at),
+        opened_at = VALUES(opened_at)
+
+    </insert>
+
+    <!--resultType : sql 실행후 받아오는 결과 타입, 여기선 account_id 가 long 타입이므로-->
+    <select id="findAccountIdByExternalKey"
+            resultType="long">
+
+        SELECT account_id
+        FROM account
+        WHERE external_account_key = #{externalAccountKey}
+
+    </select>
+
+
+    <!--parameterType은 현재 모델의 객체를 SQL에 전달하겠다, 즉 DB에 넣겠다-->
+    <insert id="insertTransactionIfAbsent"
+            parameterType="com.via.shinvia.account.model.AccountTransaction">
+
+        INSERT INTO account_transaction (
+        amount,
+        balance_after,
+        category_code,
+        description,
+        external_transaction_id,
+        merchant_name,
+        transaction_at,
+        transaction_type,
+        account_id
+        )
+        SELECT
+        #{amount},
+        #{balanceAfter},
+        #{categoryCode},
+        #{description},
+        #{externalTransactionId},
+        #{merchantName},
+        #{transactionAt},
+        #{transactionType},
+        #{accountId}
+        FROM DUAL
+        WHERE NOT EXISTS (
+        SELECT 1
+        FROM account_transaction
+        WHERE account_id = #{accountId}
+        AND external_transaction_id = #{externalTransactionId}
+        )
+
+    </insert>
+
+    <select id="findAllByConnectionId">
+
+        SELECT
+            account_id,
+            external_account_key,
+            account_type,
+            account_name,
+            current_balance,
+            account_status,
+            opened_at,
+            maturity_at,
+            data_as_of_at,
+            updated_at,
+            connection_id,
+            org_code
+        FROM account
+        WHERE connection_id = #{connectionId}
+        ORDER BY account_id ASC
+
+    </select>
+
+    <select id="findOrgCodesByConnectionId"
+            resultType="string">
+
+        SELECT DISTINCT org_code
+        FROM account
+        WHERE connection_id = #{connectionId}
+        AND org_code IS NOT NULL
+
+    </select>
+</mapper>

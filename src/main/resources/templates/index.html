@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Via | 금융생활을 한 번에</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap">
+    <link rel="stylesheet" th:href="@{/css/frame.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<th:block th:replace="~{fragments/main-header :: mainHeader}"></th:block>
+
+<main class="main-content">
+    <section class="hero-section" aria-label="VIA 주요 서비스">
+        <div class="hero-carousel" data-carousel>
+            <div class="hero-slides" aria-live="off">
+                <figure class="hero-slide active"><img th:src="@{/img/loan.png}" src="/img/loan.png" alt="내 대출을 더 똑똑하게 관리하는 VIA 서비스"></figure>
+                <figure class="hero-slide"><img th:src="@{/img/analsyis.png}" src="/img/analsyis.png" alt="한눈에 보는 맞춤형 대출 진단 서비스"></figure>
+                <figure class="hero-slide"><img th:src="@{/img/finance.png}" src="/img/finance.png" alt="대출 상환 전략 비교 서비스"></figure>
+                <figure class="hero-slide"><img th:src="@{/img/ana.png}" src="/img/ana.png" alt="대출과 자산관리를 한 번에 제공하는 서비스"></figure>
+            </div>
+
+            <button class="hero-control hero-control-prev" type="button" data-carousel-prev aria-label="이전 배너"><span class="material-symbols-outlined">chevron_left</span></button>
+            <button class="hero-control hero-control-next" type="button" data-carousel-next aria-label="다음 배너"><span class="material-symbols-outlined">chevron_right</span></button>
+
+            <div class="hero-pagination" role="group" aria-label="배너 선택">
+                <button class="hero-page active" type="button" data-carousel-page="0" aria-label="1번 배너" aria-current="true"></button>
+                <button class="hero-page" type="button" data-carousel-page="1" aria-label="2번 배너"></button>
+                <button class="hero-page" type="button" data-carousel-page="2" aria-label="3번 배너"></button>
+                <button class="hero-page" type="button" data-carousel-page="3" aria-label="4번 배너"></button>
+                <button class="hero-page" type="button" data-carousel-page="4" aria-label="5번 배너"></button>
+            </div>
+        </div>
+    </section>
+
+    <div class="service-overview">
+    <section class="content-container" id="loan-services" data-service-tabs>
+        <aside class="sidebar">
+            <div class="sidebar-header"><h2>대출</h2><p>대출 진단부터 상환 전략까지</p></div>
+            <nav class="sidebar-nav" aria-label="대출 서비스 분류">
+                <button type="button" class="sidebar-link"
+                        th:each="category, status : ${loanServiceMenus}"
+                        th:classappend="${status.index == 1} ? ' active' : ''"
+                        th:attr="data-service-tab=${category.id}">
+                    <span class="material-symbols-outlined" th:text="${category.icon}">payments</span>
+                    <span th:text="${category.name}">대출</span>
+                </button>
+            </nav>
+        </aside>
+
+        <div class="product-area">
+            <section th:each="category, status : ${loanServiceMenus}"
+                     th:attr="data-service-panel=${category.id}"
+                     th:hidden="${status.index != 1}">
+                <div class="product-header">
+                    <h3 th:text="${category.name}">대출</h3>
+                </div>
+                <div class="product-grid">
+                    <th:block th:each="item : ${category.items}">
+                        <a class="product-card" th:if="${item.enabled}" th:href="@{${item.path}}">
+                            <div><h4 th:text="${item.name}">서비스</h4><p th:text="${item.description}">설명</p></div>
+                            <div class="card-action"><span class="material-symbols-outlined arrow-icon">arrow_forward</span></div>
+                        </a>
+                        <div class="product-card product-card-disabled" th:unless="${item.enabled}">
+                            <div><h4 th:text="${item.name}">서비스</h4><p th:text="${item.description}">설명</p><small>준비중</small></div>
+                        </div>
+                    </th:block>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <section class="content-container" id="asset-services" data-service-tabs>
+        <aside class="sidebar">
+            <div class="sidebar-header"><h2>자산관리</h2><p>미래를 준비하는 개인 금융계획</p></div>
+            <nav class="sidebar-nav" aria-label="자산관리 서비스">
+                <button type="button" class="sidebar-link"
+                        th:each="category, status : ${assetServiceMenus}"
+                        th:classappend="${status.first} ? ' active' : ''"
+                        th:attr="data-service-tab=${category.id}">
+                    <span class="material-symbols-outlined" th:text="${category.icon}">timeline</span>
+                    <span th:text="${category.name}">금융 라이프 플랜</span>
+                </button>
+            </nav>
+        </aside>
+
+        <div class="product-area">
+            <section th:each="category, status : ${assetServiceMenus}"
+                     th:attr="data-service-panel=${category.id}"
+                     th:hidden="${!status.first}">
+                <div class="product-header"><h3 th:text="${category.name}">자산관리</h3></div>
+                <div class="product-grid">
+                    <th:block th:each="item : ${category.items}">
+                        <a class="product-card" th:if="${item.enabled}" th:href="@{${item.path}}">
+                            <div><h4 th:text="${item.name}">서비스</h4><p th:text="${item.description}">설명</p></div>
+                            <div class="card-action"><span class="material-symbols-outlined arrow-icon">arrow_forward</span></div>
+                        </a>
+                        <div class="product-card product-card-disabled" th:unless="${item.enabled}">
+                            <div><h4 th:text="${item.name}">서비스</h4><p th:text="${item.description}">설명</p><small>준비중</small></div>
+                        </div>
+                    </th:block>
+                </div>
+            </section>
+        </div>
+    </section>
+    </div>
+</main>
+
+<th:block th:replace="~{fragments/main-footer :: mainFooter}"></th:block>
+<script th:src="@{/js/script.js}" src="/js/script.js"></script>
+</body>
+</html>

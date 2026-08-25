@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.surplusfund.calculation.mapper.SurplusFundMapper">
+
+    <!-- 계좌에서 직접 발생한 생활성 지출 -->
+    <select id="sumAccountLivingExpense"
+            resultType="java.math.BigDecimal">
+
+        SELECT COALESCE(SUM(ABS(t.amount)), 0)
+        FROM account_transaction t
+        JOIN account a
+        ON a.account_id = t.account_id
+        WHERE a.connection_id = #{connectionId}
+        AND t.transaction_at >= #{from}
+        AND t.transaction_at &lt; #{to}
+        AND t.transaction_type = '02'
+        AND t.category_code IN (
+            'FOOD',
+            'UTILITIES',
+            'HEALTHCARE',
+            'SHOPPING',
+            'TRANSPORT',
+            'CAFE',
+            'HOUSING',
+            'ENTERTAINMENT',
+            'EDUCATION'
+        )
+
+    </select>
+
+
+    <!-- 카드 실제 사용액 -->
+    <select id="sumCardLivingExpense"
+            resultType="java.math.BigDecimal">
+
+        SELECT COALESCE(SUM(ABS(t.amount)), 0)
+        FROM card_transaction t
+        JOIN card_account c
+        ON c.card_account_id = t.card_account_id
+        WHERE c.connection_id = #{connectionId}
+        AND t.transaction_at >= #{from}
+        AND t.transaction_at &lt; #{to}
+
+    </select>
+
+    <select id="findLatestSalaryIncomeDate"
+            resultType="java.time.LocalDateTime">
+
+        SELECT MAX(t.transaction_at)
+        FROM account_transaction t
+        JOIN account a
+        ON a.account_id = t.account_id
+        WHERE a.connection_id = #{connectionId}
+            AND t.transaction_type = '03'
+            AND t.category_code = 'INCOME'
+            AND t.description LIKE '%급여%'
+            AND t.transaction_at &lt;= CURRENT_TIMESTAMP
+
+    </select>
+
+    <insert id="insertCalculation"
+            parameterType="com.via.shinvia.surplusfund.calculation.entity.SurplusFundCalculation"
+            useGeneratedKeys="true"
+            keyProperty="surplusFundCalculationId">
+
+        INSERT INTO surplus_fund_calculation (
+            user_id,
+            connection_id,
+
+            total_current_balance,
+            selected_account_balance,
+            selected_account_ids,
+
+            estimated_next_income_date,
+            adjusted_next_income_date,
+
+            estimated_living_expense,
+            adjusted_living_expense,
+
+            estimated_scheduled_expense,
+            adjusted_scheduled_expense,
+
+            recommended_emergency_fund,
+            adjusted_emergency_fund,
+
+            calculated_surplus_amount,
+            final_surplus_amount
+        )
+        VALUES (
+            #{userId},
+            #{connectionId},
+
+            #{totalCurrentBalance},
+            #{selectedAccountBalance},
+            #{selectedAccountIds},
+
+            #{estimatedNextIncomeDate},
+            #{adjustedNextIncomeDate},
+
+            #{estimatedLivingExpense},
+            #{adjustedLivingExpense},
+
+            #{estimatedScheduledExpense},
+            #{adjustedScheduledExpense},
+
+            #{recommendedEmergencyFund},
+            #{adjustedEmergencyFund},
+
+            #{calculatedSurplusAmount},
+            #{finalSurplusAmount}
+        )
+
+    </insert>
+
+    <select id="findLatestCalculationByUserId"
+            resultType="com.via.shinvia.surplusfund.calculation.entity.SurplusFundCalculation">
+
+        SELECT
+            surplus_fund_calculation_id AS surplusFundCalculationId,
+            user_id AS userId,
+            connection_id AS connectionId,
+
+            total_current_balance AS totalCurrentBalance,
+            selected_account_balance AS selectedAccountBalance,
+            selected_account_ids AS selectedAccountIds,
+
+            estimated_next_income_date AS estimatedNextIncomeDate,
+            adjusted_next_income_date AS adjustedNextIncomeDate,
+
+            estimated_living_expense AS estimatedLivingExpense,
+            adjusted_living_expense AS adjustedLivingExpense,
+
+            estimated_scheduled_expense AS estimatedScheduledExpense,
+            adjusted_scheduled_expense AS adjustedScheduledExpense,
+
+            recommended_emergency_fund AS recommendedEmergencyFund,
+            adjusted_emergency_fund AS adjustedEmergencyFund,
+
+            calculated_surplus_amount AS calculatedSurplusAmount,
+            final_surplus_amount AS finalSurplusAmount
+
+        FROM surplus_fund_calculation
+        WHERE user_id = #{userId}
+        ORDER BY surplus_fund_calculation_id DESC
+        LIMIT 1
+
+    </select>
+</mapper>

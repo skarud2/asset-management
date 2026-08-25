@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic2 :: layout(~{::title}, ~{::main}, ~{::script}, ${serviceName})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>비밀번호 찾기</title>
+
+    <link rel="stylesheet" th:href="@{/css/find-idpw.css}">
+</head>
+
+<body>
+
+<main class="page">
+    <section class="wrap">
+
+        <h1 class="title">비밀번호 찾기</h1>
+
+        <div class="line"></div>
+        <p class="description">가입한 이메일을 입력하고 인증해주세요.</p>
+
+        <div class="box">
+            <div id="findPasswordForm"
+                 class="form">
+
+                <div class="form-group">
+                    <label for="loginEmail">이메일</label>
+
+                    <div class="input-button-row">
+                        <input type="email"
+                               id="loginEmail"
+                               placeholder="example@email.com"
+                               autocomplete="email"
+                               required>
+
+                        <button type="button"
+                                id="sendCodeButton"
+                                class="verification-button">
+                            인증번호 전송
+                        </button>
+                    </div>
+                </div>
+
+                <div id="verificationArea"
+                     class="form-group"
+                     hidden>
+
+                    <label for="verificationCode">
+                        인증번호
+                    </label>
+
+                    <div class="input-button-row">
+                        <input type="text"
+                               id="verificationCode"
+                               placeholder="인증번호를 입력해주세요"
+                               inputmode="numeric"
+                               autocomplete="one-time-code">
+
+                        <button type="button"
+                                id="verifyCodeButton"
+                                class="verification-button">
+                            인증하기
+                        </button>
+                    </div>
+                </div>
+
+                <p id="emailVerificationMessage"
+                   class="field-error">
+                    이메일 인증을 먼저 완료해주세요.
+                </p>
+
+                <button type="button"
+                        id="nextButton"
+                        class="submit-button">
+                    다음
+                </button>
+
+            </div>
+        </div>
+
+        <div class="link-group">
+            <a id="loginLink"
+               class="primary-link"
+               th:href="@{/login}">
+                로그인하기
+            </a>
+
+            <a id="findIdLink"
+               class="secondary-link"
+               th:href="@{/find/id}">
+                아이디 찾기
+            </a>
+        </div>
+
+    </section>
+</main>
+<script th:src="@{/js/find-pw.js}"></script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>지금 내 상태 | 미래 금융 시뮬레이터 | Via</title>
+</head>
+<body>
+<main class="futuresim-current-status-page">
+    <!-- lifecycle-survey.css의 .lifecycle-sidebar-menu 스타일(사이드바 불릿/active 하이라이트)이
+         layout/basic.html에는 전역으로 안 걸려있고 lifecycle-survey.html에서만 개별 로드되고 있어서,
+         같은 "금융 라이프 플랜" 프레임을 쓰는 이 페이지에서도 링크만 추가한다 (파일 자체는 미수정). -->
+    <link rel="stylesheet" th:href="@{/css/lifecycle-survey.css}">
+    <link rel="stylesheet" th:href="@{/css/futuresim-current-status.css}">
+
+    <!-- lifecycle-survey.html의 상단 헤더(.lifecycle-survey-header)와 위치/색상을 그대로 맞춘다 -->
+    <header class="lifecycle-survey-header">
+        <span>미래 금융 시뮬레이터 · 1단계</span>
+        <h1>먼저, 지금 나를 알아야 해요</h1>
+        <p>미래를 시뮬레이션하려면 지금 상태부터 알아야겠죠? 비슷한 조건의 사람들과 비교해보세요</p>
+    </header>
+
+    <!-- 여유자금 운용 가이드(guide-steps)와 같은 넘버 서클 스테퍼 문법 — 페이지 이동 기반 흐름이라
+         버튼 대신 링크(a)로 구현한다. 3단계(시뮬레이션 결과)가 생기면 이 트랙에 항목만 추가하면 된다. -->
+    <nav class="futuresim-step-nav" aria-label="미래 금융 시뮬레이터 진행 단계">
+        <div class="futuresim-step-track">
+            <a th:href="@{/futuresim}" class="futuresim-step active" aria-current="step"><span>1</span>지금 내 상태</a>
+            <span class="futuresim-step locked" aria-disabled="true"><span>2</span>목표 설정</span>
+            <a th:if="${goalAmountSaved}" th:href="@{/futuresim/growth}" class="futuresim-step"><span>3</span>성장 곡선</a>
+            <span th:unless="${goalAmountSaved}" class="futuresim-step locked" aria-disabled="true"><span>3</span>성장 곡선</span>
+            <a th:if="${goalAmountSaved}" th:href="@{/futuresim/levers}" class="futuresim-step"><span>4</span>목표 앞당기기</a>
+            <span th:unless="${goalAmountSaved}" class="futuresim-step locked" aria-disabled="true"><span>4</span>목표 앞당기기</span>
+            <a th:if="${goalAmountSaved}" th:href="@{/futuresim/combo}" class="futuresim-step"><span>5</span>나만의 실행 계획</a>
+            <span th:unless="${goalAmountSaved}" class="futuresim-step locked" aria-disabled="true"><span>5</span>나만의 실행 계획</span>
+        </div>
+    </nav>
+
+    <section class="fcs-panels">
+
+        <!-- 좌측: 연령별 비교 -->
+        <article class="fcs-panel">
+            <h2 class="fcs-panel-title">연령별 비교</h2>
+
+            <div th:if="${!status.agePanel().available()}" class="fcs-unavailable">
+                본인인증 정보가 없어 연령대 비교를 볼 수 없어요
+            </div>
+
+            <th:block th:if="${status.agePanel().available()}">
+                <p class="fcs-panel-sub">
+                    <span th:text="${status.agePanel().benchmark().ageGroupLabel()}">30~39세</span> 기준
+                    (만 <span th:text="${status.agePanel().userAge()}">35</span>세)
+                </p>
+
+                <!-- 가구원별 비교(우측)엔 가구원수 선택 + 가구원 관리 영역이 있어서 "내 순자산"이
+                     한참 아래에서 시작한다. 연령대는 본인인증 생년월일로 자동 결정돼 바꿀 게 없으니,
+                     대신 비교 기준을 설명하는 정적 안내를 채워서 좌우 "내 순자산" 위치를 맞춘다. -->
+                <div class="fcs-age-basis-note">
+                    <span class="fcs-age-basis-label">비교 연령대</span>
+                    <span class="fcs-age-basis-value"
+                          th:text="${status.agePanel().benchmark().ageGroupLabel()} + ' · 본인인증 생년월일 기준 자동 계산'">30~39세 · 본인인증 생년월일 기준 자동 계산</span>
+                </div>
+
+                <div class="fcs-household-members">
+                    <p class="fcs-age-basis-info-title">이 비교는 이렇게 이뤄져요</p>
+                    <ul class="fcs-age-basis-info-list">
+                        <li>같은 연령대(<span th:text="${status.agePanel().benchmark().ageGroupLabel()}">30~39세</span>) 전체 응답자와 비교해요</li>
+                        <li>통계청 KOSIS 가계금융복지조사 <span th:text="${status.agePanel().benchmark().surveyYear()}">2025</span>년 기준 자료를 사용해요</li>
+                        <li>가구원수와 달리 직접 바꿀 수 없고, 본인인증 정보로만 정해져요</li>
+                    </ul>
+                </div>
+
+                <div class="fcs-compare-row fcs-compare-highlight">
+                    <span class="fcs-compare-label">내 순자산</span>
+                    <span class="fcs-compare-value"
+                          th:text="${status.mySnapshot().netWorth() != null}
+                                    ? ${#numbers.formatInteger(status.mySnapshot().netWorth(), 0, 'COMMA')} + '원'
+                                    : '데이터 없음'">-</span>
+                </div>
+                <div class="fcs-compare-row">
+                    <span class="fcs-compare-label">연령대 평균</span>
+                    <span class="fcs-compare-value"
+                          th:text="${#numbers.formatInteger(status.agePanel().benchmark().avgNetWorth(), 0, 'COMMA')} + '원'">-</span>
+                </div>
+                <div class="fcs-compare-row">
+                    <span class="fcs-compare-label">연령대 중앙값</span>
+                    <span class="fcs-compare-value"
+                          th:text="${#numbers.formatInteger(status.agePanel().benchmark().medianNetWorth(), 0, 'COMMA')} + '원'">-</span>
+                </div>
+
+                <table class="fcs-detail-table">
+                    <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>내 값</th>
+                        <th>연령대 평균</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>자산</td>
+                        <td th:text="${status.mySnapshot().liquidAsset() != null}
+                                     ? ${#numbers.formatInteger(status.mySnapshot().liquidAsset(), 0, 'COMMA')} + '원'
+                                     : '데이터 없음'">-</td>
+                        <td th:text="${#numbers.formatInteger(status.agePanel().benchmark().avgAsset(), 0, 'COMMA')} + '원'">-</td>
+                    </tr>
+                    <tr>
+                        <td>부채</td>
+                        <td th:text="${#numbers.formatInteger(status.mySnapshot().totalDebt(), 0, 'COMMA')} + '원'">-</td>
+                        <td th:text="${#numbers.formatInteger(status.agePanel().benchmark().avgDebt(), 0, 'COMMA')} + '원'">-</td>
+                    </tr>
+                    <tr>
+                        <td>소득</td>
+                        <td th:text="${status.mySnapshot().annualIncome() != null}
+                                     ? ${#numbers.formatInteger(status.mySnapshot().annualIncome(), 0, 'COMMA')} + '원'
+                                     : '데이터 없음'">-</td>
+                        <td th:text="${#numbers.formatInteger(status.agePanel().benchmark().avgIncome(), 0, 'COMMA')} + '원'">-</td>
+                    </tr>
+                    <tr>
+                        <td>원리금상환액</td>
+                        <td th:text="${#numbers.formatInteger(status.mySnapshot().annualDebtRepayment(), 0, 'COMMA')} + '원'">-</td>
+                        <td th:text="${#numbers.formatInteger(status.agePanel().benchmark().avgDebtRepayment(), 0, 'COMMA')} + '원'">-</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <form th:action="@{/futuresim/comparison-basis}" method="post" class="fcs-continue-form">
+                    <input type="hidden" name="basis" value="AGE">
+                    <button type="submit" class="fcs-continue-button">이 기준으로 계속</button>
+                </form>
+            </th:block>
+        </article>
+
+        <!-- 우측: 가구원별 비교 -->
+        <article class="fcs-panel">
+            <h2 class="fcs-panel-title">가구원별 비교</h2>
+
+            <p class="fcs-panel-sub">
+                <span th:text="${status.householdBenchmark().householdSizeLabel()}">전체</span> 기준
+            </p>
+
+            <!-- 본인(1인)은 이미 있는 정보라, 가구원수는 더 이상 직접 고르지 않고 아래에서
+                 가구원을 추가/삭제하는 대로 자동 계산된다 — 숫자만 보여주는 정적 표시. -->
+            <div class="fcs-age-basis-note">
+                <span class="fcs-age-basis-label">가구원수</span>
+                <span class="fcs-age-basis-value"
+                      th:text="${status.householdBenchmark().householdSizeLabel()} + ' · 본인 포함, 아래에서 추가한 가구원 수로 자동 계산'">2인 · 본인 포함, 아래에서 추가한 가구원 수로 자동 계산</span>
+            </div>
+
+            <!-- 나머지 가구원 정보를 추가 입력할 수 있게 한다. 이 목록 자체가 가구원수를 결정하므로
+                 1인일 때도 항상 보여준다. DB에 저장하지 않고 세션 초안(HouseholdMemberService)에만 담아둔다. -->
+            <div class="fcs-household-members">
+                <ul th:if="${!householdMembers.isEmpty()}" class="fcs-member-list">
+                    <li th:each="member, iter : ${householdMembers}">
+                        <span th:text="${member.memberName}">배우자</span>
+                        <span th:text="'(' + ${member.relationship} + ' · 만 ' + ${member.age} + '세'
+                                        + (${member.annualIncome} != null ? ' · 연소득 ' + ${#numbers.formatInteger(member.annualIncome, 0, 'COMMA')} + '원' : ' · 소득 없음')
+                                        + ')'">(배우자 · 만 34세 · 연소득 40,000,000원)</span>
+                        <form th:action="@{/futuresim/household-members/remove}" method="post">
+                            <input type="hidden" name="index" th:value="${iter.index}">
+                            <button type="submit" class="fcs-member-remove-button">삭제</button>
+                        </form>
+                    </li>
+                </ul>
+
+                <form th:action="@{/futuresim/household-members}" method="post" class="fcs-member-add-form">
+                    <div class="fcs-member-field">
+                        <label for="memberName">이름</label>
+                        <input type="text" id="memberName" name="memberName" placeholder="예: 배우자" required>
+                    </div>
+                    <div class="fcs-member-field">
+                        <label for="relationship">관계</label>
+                        <input type="text" id="relationship" name="relationship" placeholder="예: 배우자, 자녀" required>
+                    </div>
+                    <div class="fcs-member-field">
+                        <label for="age">나이</label>
+                        <input type="number" id="age" name="age" placeholder="만 나이" min="0" max="120" required>
+                    </div>
+                    <div class="fcs-member-field">
+                        <label for="annualIncome">연소득</label>
+                        <input type="number" id="annualIncome" name="annualIncome" placeholder="없으면 비워두기" min="0">
+                    </div>
+                    <button type="submit" class="fcs-member-add-button">+ 가구원 추가</button>
+                </form>
+            </div>
+
+            <div class="fcs-compare-row fcs-compare-highlight">
+                <span class="fcs-compare-label">내 순자산</span>
+                <span class="fcs-compare-value"
+                      th:text="${status.mySnapshot().netWorth() != null}
+                                ? ${#numbers.formatInteger(status.mySnapshot().netWorth(), 0, 'COMMA')} + '원'
+                                : '데이터 없음'">-</span>
+            </div>
+            <div class="fcs-compare-row">
+                <span class="fcs-compare-label">가구원별 평균</span>
+                <span class="fcs-compare-value"
+                      th:text="${#numbers.formatInteger(status.householdBenchmark().avgNetWorth(), 0, 'COMMA')} + '원'">-</span>
+            </div>
+            <div class="fcs-compare-row">
+                <span class="fcs-compare-label">가구원별 중앙값</span>
+                <span class="fcs-compare-value"
+                      th:text="${#numbers.formatInteger(status.householdBenchmark().medianNetWorth(), 0, 'COMMA')} + '원'">-</span>
+            </div>
+
+            <table class="fcs-detail-table">
+                <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>내 값</th>
+                    <th>가구원별 평균</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>자산</td>
+                    <td th:text="${status.mySnapshot().liquidAsset() != null}
+                                 ? ${#numbers.formatInteger(status.mySnapshot().liquidAsset(), 0, 'COMMA')} + '원'
+                                 : '데이터 없음'">-</td>
+                    <td th:text="${#numbers.formatInteger(status.householdBenchmark().avgAsset(), 0, 'COMMA')} + '원'">-</td>
+                </tr>
+                <tr>
+                    <td>부채</td>
+                    <td th:text="${#numbers.formatInteger(status.mySnapshot().totalDebt(), 0, 'COMMA')} + '원'">-</td>
+                    <td th:text="${#numbers.formatInteger(status.householdBenchmark().avgDebt(), 0, 'COMMA')} + '원'">-</td>
+                </tr>
+                <tr>
+                    <td>소득</td>
+                    <td th:text="${status.mySnapshot().annualIncome() != null}
+                                 ? ${#numbers.formatInteger(status.mySnapshot().annualIncome(), 0, 'COMMA')} + '원'
+                                 : '데이터 없음'">-</td>
+                    <td th:text="${#numbers.formatInteger(status.householdBenchmark().avgIncome(), 0, 'COMMA')} + '원'">-</td>
+                </tr>
+                <tr>
+                    <td>원리금상환액</td>
+                    <td th:text="${#numbers.formatInteger(status.mySnapshot().annualDebtRepayment(), 0, 'COMMA')} + '원'">-</td>
+                    <td th:text="${#numbers.formatInteger(status.householdBenchmark().avgDebtRepayment(), 0, 'COMMA')} + '원'">-</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <form th:action="@{/futuresim/comparison-basis}" method="post" class="fcs-continue-form">
+                <input type="hidden" name="basis" value="HOUSEHOLD">
+                <button type="submit" class="fcs-continue-button">이 기준으로 계속</button>
+            </form>
+        </article>
+
+    </section>
+
+    <p class="fcs-skip">
+        <a th:href="@{/futuresim}">기준을 선택하지 않고 건너뛰기</a>
+    </p>
+</main>
+</body>
+</html>

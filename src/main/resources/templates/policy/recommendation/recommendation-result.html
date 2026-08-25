@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+<head>
+    <title>맞춤 정책금융상품 추천 결과 | SHINVIA</title>
+</head>
+<body>
+<main class="policy-container bank-policy-page recommendation-page recommendation-result-page">
+    <link rel="stylesheet" th:href="@{/css/policy-recommendation.css}">
+
+    <header class="page-header recommendation-header">
+        <span class="page-label">정책금융상품</span>
+        <h1>맞춤 금융지원상품 추천 결과</h1>
+        <p class="page-description">
+            회원 금융정보와 설문 응답을 기준으로 확인 가능한 조건을 비교했습니다.
+            기관 심사나 추가 서류가 필요한 상품은 별도로 표시됩니다.
+        </p>
+        <div class="policy-rec-actions">
+            <a class="policy-rec-secondary-button" th:href="@{/policy/recommendation}">금융 프로필 및 설문 수정하기</a>
+        </div>
+    </header>
+
+    <section class="policy-rec-summary" aria-label="추천 결과 요약">
+        <button type="button" class="policy-rec-summary-card active" data-status="RECOMMENDABLE" aria-pressed="true"><strong id="totalCount">-</strong><span id="totalCountLabel">전체 추천 후보</span></button>
+        <button type="button" class="policy-rec-summary-card policy-rec-summary-card-eligible" data-status="ELIGIBLE" aria-pressed="false"><strong id="eligibleCount">-</strong><span>추천 가능성 높음</span></button>
+        <button type="button" class="policy-rec-summary-card policy-rec-summary-card-check" data-status="NEEDS_CONFIRMATION" aria-pressed="false"><strong id="checkCount">-</strong><span>추가 확인 필요</span></button>
+        <button type="button" class="policy-rec-summary-card policy-rec-summary-card-ineligible" data-status="INELIGIBLE" aria-pressed="false"><strong id="ineligibleCount">-</strong><span>신청 불가</span></button>
+        <button type="button" class="policy-rec-summary-card policy-rec-summary-card-unverifiable" data-status="UNVERIFIABLE" aria-pressed="false"><strong id="unverifiableCount">-</strong><span>판정 불가</span></button>
+    </section>
+
+    <nav class="policy-rec-tabs" aria-label="상품군 필터">
+        <button type="button" class="policy-rec-tab active" data-type="ALL">전체 <span class="policy-rec-tab-count">0</span></button>
+        <button type="button" class="policy-rec-tab" data-type="POLICY_LOAN">서민금융 <span class="policy-rec-tab-count">0</span></button>
+        <button type="button" class="policy-rec-tab" data-type="ASSET">자산형성 <span class="policy-rec-tab-count">0</span></button>
+    </nav>
+
+    <div id="resultLoading" class="policy-rec-message">추천 상품을 분석하고 있습니다.</div>
+    <div id="resultError" class="policy-rec-message policy-rec-error" hidden></div>
+    <section id="recommendationList" class="policy-rec-list" aria-live="polite"></section>
+
+
+
+    <section id="unverifiableSection" class="policy-rec-unverifiable-section" hidden>
+        <div class="policy-rec-unverifiable-heading">
+            <h2>현재 정보로 판정할 수 없는 상품</h2>
+            <p>
+                확인 가능한 가입 조건이 없어 추천 상품으로 분류하지 않았습니다.
+                실제 신청 가능 여부는 해당 기관에서 별도로 확인해 주세요.
+            </p>
+        </div>
+        <div id="unverifiableList" class="policy-rec-list policy-rec-unverifiable-list"></div>
+    </section>
+
+
+
+    <!-- 추천상품 페이지네이션 -->
+    <nav id="resultPagination"
+         class="policy-rec-pagination"
+         aria-label="추천 상품 페이지"
+         hidden>
+
+        <button type="button"
+                id="prevPageButton"
+                class="policy-rec-page-arrow"
+                aria-label="이전 페이지 번호 목록">
+            이전
+        </button>
+
+        <div id="pageNumberContainer"
+             class="policy-rec-page-numbers">
+        </div>
+
+        <button type="button"
+                id="nextPageButton"
+                class="policy-rec-page-arrow"
+                aria-label="다음 페이지 번호 목록">
+            다음
+        </button>
+
+    </nav>
+    <script th:src="@{/js/policy-recommendation-result.js}"></script>
+</main>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::surplusGuide}, ${serviceName})}">
+<head>
+    <title>여유자금 운용 가이드 | SHINVIA</title>
+</head>
+<body>
+<div th:fragment="surplusGuide" class="surplus-guide">
+    <link rel="stylesheet" th:href="@{/css/lifecycle-survey.css}">
+    <link rel="stylesheet" th:href="@{/css/surplus-fund-guide.css}">
+    <link rel="stylesheet" th:href="@{/css/etf-product-explorer.css}">
+    <link rel="stylesheet" th:href="@{/css/surplus-fund-calculator.css}">
+    <p class="breadcrumb">자산관리 &gt; 여유자금 운용</p>
+
+    <section class="hero">
+        <h1 id="guideTitle">여유자금 설정</h1>
+
+        <p id="guideDescription" class="hero-description">
+            마이데이터를 기반으로 실제 운용 가능한 여유자금을 계산합니다.
+        </p>
+
+        <div id="syncWrap" class="sync-wrap">
+            <form th:action="@{/mydata/sync}" method="post">
+                <input type="hidden"
+                       name="returnTo"
+                       value="/surplus-funds/guide">
+
+                <button type="submit" class="sync-btn">
+                    최신 금융데이터 불러오기
+                </button>
+            </form>
+
+            <span class="sync-date">
+            최근 업데이트
+            <b th:text="${lastUpdatedAt != null
+                ? #temporals.format(lastUpdatedAt, 'yyyy.MM.dd HH:mm')
+                : '기록 없음'}">
+            </b>
+        </span>
+        </div>
+    </section>
+
+    <nav class="guide-steps" aria-label="여유자금 운용 진행 단계">
+        <div class="guide-step-track">
+            <button id="stepTab1" class="guide-step active" type="button"
+                    data-step-target="1" aria-controls="stepPanel1" aria-current="step">
+                <span>1</span> 여유자금 설정
+            </button>
+            <button id="stepTab2" class="guide-step" type="button"
+                    data-step-target="2" aria-controls="stepPanel2">
+                <span>2</span> 운용성향 설문
+            </button>
+            <button id="stepTab3" class="guide-step" type="button"
+                    data-step-target="3" aria-controls="resultSection" aria-disabled="true" disabled>
+                <span>3</span> 자산배분 결과
+            </button>
+            <button id="stepTab4" class="guide-step" type="button"
+                    data-step-target="4" aria-controls="productSection" aria-disabled="true" disabled>
+                <span>4</span> 관련 상품 탐색
+            </button>
+            <button id="stepTab5" class="guide-step" type="button"
+                    data-step-target="5" aria-controls="guideSaveSection" aria-disabled="false">
+                <span>5</span> 운용 기록
+            </button>
+        </div>
+    </nav>
+
+    <div class="top-notice">
+        본 설문은 교육용 운용 가이드를 제공하기 위한 내부 기준입니다. 실제 금융상품 투자권유·자문이나 수익 보장을 의미하지 않습니다.
+    </div>
+
+    <div id="errorBox" class="message message-error" role="alert" hidden></div>
+
+    <form id="preferenceForm" novalidate>
+        <section id="stepPanel1" class="guide-step-panel step-card"
+                 data-step-panel="1" aria-labelledby="stepTab1">
+            <div th:replace="~{surplusfund/fragments/surplus-calculator :: calculator}"></div>
+
+            <section id="amountSection" class="amount-section">
+                <div>
+                    <p class="section-number">STEP 1</p>
+                    <h2>운용할 여유자금을 설정해주세요.</h2>
+                    <p>여유자금 계산 기능과 연동 전에는 금액을 직접 입력할 수 있습니다.</p>
+                </div>
+                <label class="amount-input-wrap" for="operationAmount">
+                    <span>운용 가능 금액</span>
+                    <span class="amount-field">
+                        <input id="operationAmount" name="operationAmount" type="number"
+                               min="1" step="1" th:value="${operationAmount}"
+                               placeholder="예: 1500000" required>
+                        <b>원</b>
+                    </span>
+                </label>
+            </section>
+
+            <div class="panel-actions panel-actions-end save-action">
+
+                <p class="save-info">
+                    설정 완료 시 현재 계산 결과가 저장되고 운용성향 설문으로 이동합니다.
+                </p>
+
+                <button id="startSurveyButton"
+                        class="primary-button action-button"
+                        type="button">
+                    여유자금 설정 완료
+                </button>
+
+            </div>
+        </section>
+
+        <section id="stepPanel2" class="guide-step-panel survey-card"
+                 data-step-panel="2" aria-labelledby="stepTab2" hidden>
+            <fieldset class="question-card" data-question-index="0">
+                <legend>
+                    <span class="question-count">질문 1/5</span>
+                    <strong>여유자금의 주된 운용 목적은 무엇인가요?</strong>
+                </legend>
+                <div class="question-progress" role="progressbar" aria-label="설문 진행률"
+                     aria-valuemin="0" aria-valuemax="100" aria-valuenow="20">
+                    <span class="progress-20"></span>
+                </div>
+                <div class="option-grid option-grid-two">
+                    <label class="option">
+                        <input type="radio" name="investmentPurpose" value="PRINCIPAL_PROTECTION" required>
+                        <span><b>원금 보존</b><small>원금 손실 없이 보관하고 싶어요.</small></span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="investmentPurpose" value="STABLE_RETURN">
+                        <span><b>안정적인 수익</b><small>원금을 지키면서 안정적인 수익을 원해요.</small></span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="investmentPurpose" value="BALANCED_GROWTH">
+                        <span><b>균형 성장</b><small>안정성과 수익성을 함께 고려하고 싶어요.</small></span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="investmentPurpose" value="CAPITAL_GROWTH">
+                        <span><b>적극적인 성장</b><small>손실 가능성을 감수하고 높은 성장을 원해요.</small></span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="secondary-button action-button" type="button" data-question-action="previous">이전</button>
+                    <button class="primary-button action-button" type="button" data-question-action="next">다음</button>
+                </div>
+            </fieldset>
+
+            <fieldset class="question-card" data-question-index="1" hidden>
+                <legend>
+                    <span class="question-count">질문 2/5</span>
+                    <strong>예상 운용기간은 얼마인가요?</strong>
+                </legend>
+                <div class="question-progress" role="progressbar" aria-label="설문 진행률"
+                     aria-valuemin="0" aria-valuemax="100" aria-valuenow="40">
+                    <span class="progress-40"></span>
+                </div>
+                <div class="option-grid option-grid-three">
+                    <label class="option option-inline">
+                        <input type="radio" name="investmentPeriodMonths" value="12" required>
+                        <span><b>1년 이하</b></span>
+                    </label>
+                    <label class="option option-inline">
+                        <input type="radio" name="investmentPeriodMonths" value="36">
+                        <span><b>1년 초과 3년 이하</b></span>
+                    </label>
+                    <label class="option option-inline">
+                        <input type="radio" name="investmentPeriodMonths" value="60">
+                        <span><b>3년 초과</b></span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="secondary-button action-button" type="button" data-question-action="previous">이전</button>
+                    <button class="primary-button action-button" type="button" data-question-action="next">다음</button>
+                </div>
+            </fieldset>
+
+            <fieldset class="question-card" data-question-index="2" hidden>
+                <legend>
+                    <span class="question-count">질문 3/5</span>
+                    <strong>감내할 수 있는 손실 수준은 어느 정도인가요?</strong>
+                </legend>
+                <div class="question-progress" role="progressbar" aria-label="설문 진행률"
+                     aria-valuemin="0" aria-valuemax="100" aria-valuenow="60">
+                    <span class="progress-60"></span>
+                </div>
+                <div class="option-grid option-grid-two">
+                    <label class="option">
+                        <input type="radio" name="lossToleranceLevel" value="NO_LOSS" required>
+                        <span><b>원금 손실을 원하지 않음</b></span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lossToleranceLevel" value="WITHIN_5_PERCENT">
+                        <span><b>5% 이내</b><small>소폭의 가격 변동을 감수할 수 있어요.</small></span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lossToleranceLevel" value="WITHIN_15_PERCENT">
+                        <span><b>15% 이내</b><small>일정 수준의 가격 하락을 감수할 수 있어요.</small></span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lossToleranceLevel" value="OVER_15_PERCENT">
+                        <span><b>15% 초과</b><small>높은 변동성과 손실 가능성을 감수할 수 있어요.</small></span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="secondary-button action-button" type="button" data-question-action="previous">이전</button>
+                    <button class="primary-button action-button" type="button" data-question-action="next">다음</button>
+                </div>
+            </fieldset>
+
+            <fieldset class="question-card" data-question-index="3" hidden>
+                <legend>
+                    <span class="question-count">질문 4/5</span>
+                    <strong>이 자금을 단기간에 사용할 가능성이 있나요?</strong>
+                </legend>
+                <div class="question-progress" role="progressbar" aria-label="설문 진행률"
+                     aria-valuemin="0" aria-valuemax="100" aria-valuenow="80">
+                    <span class="progress-80"></span>
+                </div>
+                <div class="option-grid option-grid-three">
+                    <label class="option option-inline">
+                        <input type="radio" name="liquidityNeed" value="HIGH" required>
+                        <span><b>높다</b></span>
+                    </label>
+                    <label class="option option-inline">
+                        <input type="radio" name="liquidityNeed" value="MEDIUM">
+                        <span><b>보통이다</b></span>
+                    </label>
+                    <label class="option option-inline">
+                        <input type="radio" name="liquidityNeed" value="LOW">
+                        <span><b>낮다</b></span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="secondary-button action-button" type="button" data-question-action="previous">이전</button>
+                    <button class="primary-button action-button" type="button" data-question-action="next">다음</button>
+                </div>
+            </fieldset>
+
+            <fieldset class="question-card" data-question-index="4" hidden>
+                <legend>
+                    <span class="question-count">질문 5/5</span>
+                    <strong>ETF·펀드의 가격변동과 원금손실 가능성을 이해하나요?</strong>
+                </legend>
+                <div class="question-progress" role="progressbar" aria-label="설문 진행률"
+                     aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+                    <span class="progress-100"></span>
+                </div>
+                <div class="option-grid option-grid-three">
+                    <label class="option">
+                        <input type="radio" name="experienceLevel" value="NONE" required>
+                        <span><b>투자 경험이 없다</b></span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="experienceLevel" value="LIMITED">
+                        <span><b>경험은 있으나 위험에 대한 이해가 제한적이다</b></span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="experienceLevel" value="UNDERSTANDS_RISK">
+                        <span><b>가격변동과 원금손실 가능성을 이해한다</b></span>
+                    </label>
+                </div>
+
+                <section class="confirmation-card" aria-label="필수 확인">
+                    <label>
+                        <input id="surplusAmountConfirmed" name="surplusAmountConfirmed" type="checkbox" required>
+                        <span>입력한 금액이 생활비와 대출 상환액을 제외한 여유자금임을 확인합니다.</span>
+                    </label>
+                    <label>
+                        <input id="guideNoticeConfirmed" name="guideNoticeConfirmed" type="checkbox" required>
+                        <span>본 결과가 교육용 가이드이며 투자권유·자문이나 수익 보장이 아님을 확인합니다.</span>
+                    </label>
+                </section>
+
+                <div class="question-actions">
+                    <button class="secondary-button action-button" type="button" data-question-action="previous">이전</button>
+                    <button id="submitButton" class="primary-button action-button" type="submit">
+                        자산배분 결과 확인
+                    </button>
+                </div>
+            </fieldset>
+        </section>
+    </form>
+
+    <section id="resultSection" class="guide-step-panel result-section"
+             data-step-panel="3" aria-labelledby="stepTab3" aria-live="polite" hidden>
+        <div class="result-heading">
+            <div>
+                <p class="eyebrow">YOUR GUIDE</p>
+                <h2>운용성향 분석 결과</h2>
+            </div>
+            <span id="styleBadge" class="style-badge"></span>
+        </div>
+
+        <div class="summary-grid">
+            <article>
+                <span>총점</span>
+                <strong><b id="scoreValue">0</b>점</strong>
+            </article>
+            <article>
+                <span>판정 규칙</span>
+                <strong id="ruleVersion">-</strong>
+            </article>
+            <article>
+                <span>운용계획 번호</span>
+                <strong id="planId">-</strong>
+            </article>
+        </div>
+
+        <div>
+            <h3>자산군별 배분</h3>
+            <div id="allocationGrid" class="allocation-visualization"></div>
+        </div>
+
+        <div class="reason-card">
+            <h3>이렇게 판정했어요</h3>
+            <ul id="reasonList"></ul>
+        </div>
+
+        <p id="guideNotice" class="guide-notice"></p>
+
+        <div class="panel-actions result-actions">
+            <button id="reviewSurveyButton" class="secondary-button action-button" type="button">설문 다시 보기</button>
+            <button id="exploreProductsButton" class="primary-button action-button" type="button">관련 상품 살펴보기</button>
+        </div>
+    </section>
+
+    <section id="productSection" class="guide-step-panel product-section step-card"
+             data-step-panel="4" aria-labelledby="stepTab4" hidden>
+        <div class="product-heading">
+            <p class="eyebrow">PRODUCT EXPLORER</p>
+            <h2>관련 상품 탐색</h2>
+            <p>자산배분 결과를 기준으로 살펴볼 상품 영역입니다.</p>
+        </div>
+
+        <div id="productFilter" class="product-filter" role="group" aria-label="관련 상품 자산 필터">
+            <button class="product-filter-button" type="button" data-product-filter="ETF" aria-pressed="true">
+                ETF <span id="productFilterEtfAmount">-</span>
+            </button>
+            <button class="product-filter-button" type="button" data-product-filter="FUND" aria-pressed="false">
+                펀드 <span id="productFilterFundAmount">-</span>
+            </button>
+            <button class="product-filter-button" type="button" data-product-filter="CASH" aria-pressed="false">
+                현금 <span id="productFilterCashAmount">-</span>
+            </button>
+        </div>
+
+        <div id="productGrid" class="product-grid" aria-live="polite">
+            <div id="etfProductArea"></div>
+            <div id="fundProductArea"></div>
+        </div>
+
+        <p id="productEmptyState" class="product-empty-state"></p>
+
+        <div class="panel-actions">
+            <button id="backToResultButton" class="secondary-button action-button" type="button">
+                자산배분 결과로 돌아가기
+            </button>
+            <button id="reviewGuideRecordButton" class="primary-button action-button" type="button">
+                선택 결과 확인하기
+            </button>
+        </div>
+    </section>
+
+    <section id="guideSaveSection" class="guide-step-panel guide-save-section step-card"
+             data-step-panel="5" aria-labelledby="stepTab5" hidden>
+        <div class="guide-save-heading">
+            <div>
+                <p id="guideRecordEyebrow" class="eyebrow">SAVE GUIDE RECORD</p>
+                <h2 id="guideRecordTitle">이번 운용 결과를 저장해주세요.</h2>
+                <p id="guideRecordDescription">
+                    아래 내용은 나중에 통합 금융 레포트의 여유자금 운용 영역을 구성하는 확정 기록입니다.
+                </p>
+            </div>
+            <span id="guideRecordBadge" class="guide-save-badge">완주 기록</span>
+        </div>
+
+        <section class="saved-guide-section saved-guide-section-top" aria-labelledby="savedGuideTitle">
+            <div class="guide-save-block-heading">
+                <h3 id="savedGuideTitle">저장된 운용 기록</h3>
+                <span>기록을 누르면 아래 화면의 값이 변경됩니다.</span>
+            </div>
+            <div id="savedGuideList" class="saved-guide-list" aria-live="polite">
+                <p class="saved-guide-empty">저장된 운용 기록을 불러오는 중입니다.</p>
+            </div>
+        </section>
+
+        <div id="guideRecordEmptyState" class="guide-record-empty" hidden>
+            저장된 운용 기록을 선택하거나 1단계부터 새로운 운용 가이드를 진행해주세요.
+        </div>
+
+        <div id="guideRecordContent">
+            <section class="guide-save-block" aria-labelledby="calculationSnapshotTitle">
+                <div class="guide-save-block-heading">
+                    <h3 id="calculationSnapshotTitle">여유자금 계산 결과</h3>
+                    <span>1단계 저장값</span>
+                </div>
+                <div class="guide-save-summary-grid">
+                    <article>
+                        <span>선택 계좌 잔액</span>
+                        <strong id="saveSelectedBalance">-</strong>
+                    </article>
+                    <article>
+                        <span>예상 생활비</span>
+                        <strong id="saveLivingExpense">-</strong>
+                    </article>
+                    <article>
+                        <span>예정 지출</span>
+                        <strong id="saveScheduledExpense">-</strong>
+                    </article>
+                    <article>
+                        <span>비상금</span>
+                        <strong id="saveEmergencyFund">-</strong>
+                    </article>
+                    <article class="is-emphasis">
+                        <span>최종 운용 가능 금액</span>
+                        <strong id="saveFinalSurplusAmount">-</strong>
+                    </article>
+                </div>
+            </section>
+
+            <section class="guide-save-block" aria-labelledby="allocationSnapshotTitle">
+                <div class="guide-save-block-heading">
+                    <h3 id="allocationSnapshotTitle">자산배분 결과와 판정 이유</h3>
+                    <span>설문 응답 원문은 레포트에 포함하지 않습니다.</span>
+                </div>
+                <div id="saveAllocationList" class="guide-save-allocation-list"></div>
+                <ul id="saveReasonList" class="guide-save-reason-list"></ul>
+            </section>
+
+            <section class="guide-save-block" aria-labelledby="etfSnapshotTitle">
+                <div class="guide-save-block-heading">
+                    <h3 id="etfSnapshotTitle">관심 ETF</h3>
+                    <span id="saveEtfCount">0/4개 선택</span>
+                </div>
+                <div id="saveEtfList" class="guide-save-etf-list"></div>
+                <p class="guide-save-note">
+                    ETF는 비교 담기에 선택한 최대 4개 상품의 선택 당시 정보를 표시합니다.
+                    펀드 상품 정보는 이번 레포트 저장 대상에서 제외됩니다.
+                </p>
+            </section>
+
+            <section id="guideNameCard" class="guide-name-card" aria-labelledby="guideNameTitle">
+                <div>
+                    <h3 id="guideNameTitle">운용 기록 이름</h3>
+                    <p>나중에 기록 목록에서 알아볼 수 있는 이름을 입력해주세요. 비워두면 날짜·성향·금액으로 자동 생성됩니다.</p>
+                </div>
+                <label for="guideName">
+                    <span>기록 이름</span>
+                    <input id="guideName" type="text" maxlength="100"
+                           placeholder="예: 하반기 목돈 운용">
+                </label>
+            </section>
+
+            <div id="guideSaveMessage" class="message" role="status" hidden></div>
+
+            <div id="guideCurrentActions" class="panel-actions guide-save-actions">
+                <button id="backToProductsButton" class="secondary-button action-button" type="button">
+                    상품 선택으로 돌아가기
+                </button>
+                <button id="saveGuideVersionButton" class="primary-button action-button" type="button">
+                    이 운용 기록 저장하기
+                </button>
+            </div>
+
+            <div id="guideHistoryActions" class="panel-actions guide-history-actions" hidden>
+                <button id="backToCurrentGuideButton" class="secondary-button action-button" type="button">
+                    이번 결과로 돌아가기
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <input type="hidden"
+           id="csrfToken"
+           th:value="${_csrf.token}">
+
+    <input type="hidden"
+           id="csrfHeader"
+           th:value="${_csrf.headerName}">
+    <script th:src="@{/js/surplus-fund-guide.js}"></script>
+    <script th:src="@{/js/surplus-fund-calculator.js}"></script>
+    <script th:src="@{/js/etf-product-explorer.js}"></script>
+    <script th:src="@{/js/fund-product-explorer.js}"></script>
+</div>
+</body>
+</html>

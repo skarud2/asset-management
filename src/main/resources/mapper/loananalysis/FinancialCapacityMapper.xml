@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 사용자 재무여력 조회 Mapper -->
+<mapper namespace="com.via.shinvia.loananalysis.mapper.FinancialCapacityMapper">
+
+
+    <!-- 사용자 최신 재무정보 조회 -->
+    <select id="findFinancialCapacityByUserId"
+            parameterType="long"
+            resultType="com.via.shinvia.loananalysis.dto.FinancialCapacityDTO">
+
+        SELECT
+        ufp.user_id,
+        ufp.user_financial_profile_id,
+        ufp.annual_income,
+        ufp.income_type,
+        ufp.employment_status,
+        ufp.credit_score,
+
+        <!-- 현금성 자산 -->
+        COALESCE(
+        ufp.liquid_asset_amount,
+        0
+        ) AS liquid_asset_amount,
+
+        <!-- 최근 월수입 -->
+        COALESCE(
+        ta.total_income,
+        0
+        ) AS total_income,
+
+        <!-- 최근 월지출 -->
+        COALESCE(
+        ta.total_expense,
+        0
+        ) AS total_expense,
+
+        <!-- 최근 월저축액 -->
+        COALESCE(
+        ta.savings_amount,
+        0
+        ) AS savings_amount,
+
+        <!-- 최근 저축률 -->
+        COALESCE(
+        ta.savings_rate,
+        0
+        ) AS savings_rate,
+
+        <!-- 지출 변동계수 -->
+        COALESCE(
+        ta.spending_cv,
+        0
+        ) AS spending_cv,
+
+        <!-- 실제 DSR -->
+        COALESCE(
+        la.actual_dsr,
+        0
+        ) AS actual_dsr,
+
+        <!-- 스트레스 DSR -->
+        COALESCE(
+        la.stress_dsr,
+        0
+        ) AS stress_dsr
+
+        FROM user_financial_profile ufp
+
+
+        <!-- 사용자 최근 거래분석 연결 -->
+        LEFT JOIN transaction_analysis ta
+        ON ta.transaction_analysis_id = (
+
+        SELECT
+        ta2.transaction_analysis_id
+
+        FROM transaction_analysis ta2
+
+        WHERE ta2.user_financial_profile_id
+        = ufp.user_financial_profile_id
+
+        ORDER BY
+        ta2.analysis_year_month DESC,
+        ta2.generated_at DESC
+
+        LIMIT 1
+        )
+
+
+        <!-- 사용자 최근 대출분석 연결 -->
+        LEFT JOIN loan_analysis la
+        ON la.loan_analysis_id = (
+
+        SELECT
+        la2.loan_analysis_id
+
+        FROM loan_analysis la2
+
+        WHERE la2.user_financial_profile_id
+        = ufp.user_financial_profile_id
+
+        ORDER BY
+        la2.analysis_base_date DESC,
+        la2.created_at DESC
+
+        LIMIT 1
+        )
+
+
+        <!-- 회원 기준 조회 -->
+        WHERE ufp.user_id = #{userId}
+
+        <!-- 최신 금융프로필 조회 -->
+        ORDER BY
+        ufp.updated_at DESC,
+        ufp.user_financial_profile_id DESC
+
+        LIMIT 1
+
+    </select>
+
+
+</mapper>

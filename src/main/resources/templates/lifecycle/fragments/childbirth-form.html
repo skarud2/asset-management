@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="childbirthForm">
+
+    <section class="lifecycle-event-detail">
+
+        <!-- 출산 이벤트 제목 -->
+        <div class="lifecycle-event-detail-header">
+
+            <div>
+                <span>출산</span>
+                <h3>출산 계획을 알려주세요.</h3>
+            </div>
+
+            <p>
+                출산 예정 시점과 자녀 정보를 기준으로
+                예상 비용과 이용 가능한 지원제도를 분석합니다.
+            </p>
+
+        </div>
+
+
+        <form id="childbirthSurveyForm"
+              class="lifecycle-form">
+
+            <!-- 출산 예정 시기 -->
+            <div class="lifecycle-form-group">
+
+                <label for="childbirthTargetDate">
+                    출산 예정 시기
+                </label>
+
+                <input type="month"
+                       id="childbirthTargetDate"
+                       name="targetDate"
+                       required>
+
+                <small>
+                    예상 출산 연도와 월을 선택해주세요.
+                </small>
+
+            </div>
+
+
+            <!-- 출생 순서 -->
+            <div class="lifecycle-form-group">
+
+                <label for="childbirthChildOrder">
+                    몇 번째 자녀인가요?
+                </label>
+
+                <select id="childbirthChildOrder"
+                        name="childOrder"
+                        required>
+
+                    <option value="">선택해주세요</option>
+                    <option value="1">첫째</option>
+                    <option value="2">둘째</option>
+                    <option value="3">셋째</option>
+                    <option value="4">넷째 이상</option>
+
+                </select>
+
+            </div>
+
+            <div class="lifecycle-form-group childbirth-repurchase-group"
+                 id="childbirthRepurchaseGroup"
+                 hidden>
+                <span class="lifecycle-form-label">
+                    첫째 때 구매한 육아용품 중 다시 구매하거나 추가로 필요한 품목이 있나요?
+                </span>
+                <small>선택한 품목만 이번 출산의 일회성 비용에 포함됩니다. 선택하지 않은 품목은 기존 제품을 사용하는 것으로 계산합니다.</small>
+
+                <div class="childbirth-repurchase-options">
+                    <label><input type="checkbox" name="repurchaseCarSeat"> 카시트 <strong>약 30만원</strong></label>
+                    <label><input type="checkbox" name="repurchaseStroller"> 유모차 <strong>약 50만원</strong></label>
+                    <label><input type="checkbox" name="repurchaseCrib"> 아기침대 <strong>약 30만원</strong></label>
+                    <label><input type="checkbox" name="repurchaseOtherSetup"> 수유·목욕·침구 등 기타 준비물 <strong>약 40만원</strong></label>
+                </div>
+            </div>
+
+
+            <!-- 양육 수준 -->
+            <div class="lifecycle-form-group">
+
+                <span class="lifecycle-form-label">
+                    예상 양육 수준
+                </span>
+
+                <div class="lifecycle-radio-group">
+                    <th:block th:replace="~{lifecycle/fragments/lifestyle-options :: options('childbirthLifestyleLevel', false)}"></th:block>
+                </div>
+
+            </div>
+
+
+            <!-- 산후조리원 -->
+            <div class="lifecycle-form-group">
+
+                <span class="lifecycle-form-label">
+                    산후조리원을 이용할 예정인가요?
+                </span>
+
+                <label>
+                    <input type="checkbox"
+                           id="childbirthPostpartumCare"
+                           name="postpartumCare">
+
+                    산후조리원 이용 예정
+                </label>
+
+            </div>
+
+
+            <!-- 거주 시도 -->
+            <div class="lifecycle-form-group">
+
+                <label for="childbirthRegionSido">
+                    출산 예정 시점 거주 시·도
+                </label>
+
+                <select id="childbirthRegionSido"
+                        name="regionSido"
+                        data-region-sido
+                        data-region-target="childbirthRegionSigungu"
+                        required>
+                    <option value="">시·도를 선택해주세요</option>
+                </select>
+
+            </div>
+
+
+            <!-- 거주 시군구 -->
+            <div class="lifecycle-form-group">
+
+                <label for="childbirthRegionSigungu">
+                    출산 예정 시점 시·군·구
+                </label>
+
+                <select id="childbirthRegionSigungu"
+                        name="regionSigungu"
+                        data-region-sigungu
+                        required
+                        disabled>
+                    <option value="">먼저 시·도를 선택해주세요</option>
+                </select>
+
+            </div>
+
+
+            <!-- 저장 -->
+            <div class="lifecycle-form-actions">
+
+                <button type="button"
+                        id="saveChildbirthSurveyBtn"
+                        class="lifecycle-primary-button">
+
+                    출산 계획 저장
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</th:block>
+
+</html>

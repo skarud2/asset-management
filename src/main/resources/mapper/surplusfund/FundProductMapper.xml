@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.surplusfund.product.fund.mapper.FundProductMapper">
+
+    <insert id="upsertCatalog"
+            parameterType="com.via.shinvia.surplusfund.product.fund.model.FundProduct"
+            useGeneratedKeys="true"
+            keyProperty="investmentProductId"
+            keyColumn="investment_product_id">
+
+        INSERT INTO investment_product_catalog (
+            product_type,
+            product_code,
+            isin_code,
+            product_name,
+            provider_name,
+            category,
+            source_type,
+            active,
+            last_synced_at
+        ) VALUES (
+            #{productType},
+            #{productCode},
+            #{isinCode},
+            #{productName},
+            #{providerName},
+            #{category},
+            #{sourceType},
+            #{active},
+            #{lastSyncedAt}
+        ) AS incoming
+
+        ON DUPLICATE KEY UPDATE
+            investment_product_id =
+                LAST_INSERT_ID(investment_product_catalog.investment_product_id),
+            isin_code = incoming.isin_code,
+            product_name = incoming.product_name,
+            provider_name = incoming.provider_name,
+            category = incoming.category,
+            source_type = incoming.source_type,
+            active = incoming.active,
+            last_synced_at = incoming.last_synced_at
+
+    </insert>
+
+
+    <insert id="upsertDetail"
+            parameterType="com.via.shinvia.surplusfund.product.fund.model.FundProduct">
+
+        INSERT INTO fund_product_detail (
+            investment_product_id,
+            disclosure_base_date,
+            return_1_month,
+            return_3_months,
+            return_6_months,
+            return_12_months,
+            fund_grade,
+            upfront_fee_rate,
+            total_expense_rate
+        ) VALUES (
+            #{investmentProductId},
+            #{disclosureBaseDate},
+            #{return1Month},
+            #{return3Months},
+            #{return6Months},
+            #{return12Months},
+            #{fundGrade},
+            #{upfrontFeeRate},
+            #{totalExpenseRate}
+        ) AS incoming
+
+        ON DUPLICATE KEY UPDATE
+            return_1_month = incoming.return_1_month,
+            return_3_months = incoming.return_3_months,
+            return_6_months = incoming.return_6_months,
+            return_12_months = incoming.return_12_months,
+            fund_grade = incoming.fund_grade,
+            upfront_fee_rate = incoming.upfront_fee_rate,
+            total_expense_rate = incoming.total_expense_rate
+
+    </insert>
+
+
+    <select id="countActiveFundProducts"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM investment_product_catalog
+        WHERE product_type = 'FUND'
+        AND active = 1
+
+    </select>
+
+
+    <select id="countFundDetailsByBaseDate"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM fund_product_detail
+        WHERE disclosure_base_date = #{baseDate}
+
+    </select>
+
+    <select id="findActiveFundProducts"
+            resultType="com.via.shinvia.surplusfund.product.fund.model.FundProduct">
+
+        SELECT
+            c.investment_product_id AS investmentProductId,
+            c.product_type AS productType,
+            c.product_code AS productCode,
+            c.isin_code AS isinCode,
+            c.product_name AS productName,
+            c.provider_name AS providerName,
+            c.category AS category,
+            c.source_type AS sourceType,
+            c.active AS active,
+            c.last_synced_at AS lastSyncedAt,
+
+            d.disclosure_base_date AS disclosureBaseDate,
+            d.return_1_month AS return1Month,
+            d.return_3_months AS return3Months,
+            d.return_6_months AS return6Months,
+            d.return_12_months AS return12Months,
+            d.fund_grade AS fundGrade,
+            d.upfront_fee_rate AS upfrontFeeRate,
+            d.total_expense_rate AS totalExpenseRate
+
+        FROM investment_product_catalog c
+        JOIN fund_product_detail d
+            ON d.investment_product_id = c.investment_product_id
+        WHERE c.product_type = 'FUND'
+            AND c.active = 1
+        ORDER BY c.investment_product_id ASC
+
+    </select>
+</mapper>

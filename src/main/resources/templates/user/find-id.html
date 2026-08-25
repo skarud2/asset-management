@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic2 :: layout(~{::title}, ~{::main}, ~{}, ${serviceName})}">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>아이디 찾기</title>
+
+  <link rel="stylesheet" th:href="@{/css/find-idpw.css}">
+</head>
+
+<body>
+
+<main class="page">
+  <section class="wrap">
+
+    <h1 class="title">아이디 찾기</h1>
+    <div class="line"></div>
+
+    <p class="description">
+      가입할 때 입력한 이름과 휴대폰 번호를 입력해주세요.
+    </p>
+
+    <div class="box">
+      <form id="findIdForm"
+            class="form"
+            th:action="@{/find/id}"
+            th:object="${findLoginEmailRequest}"
+            method="post">
+
+        <div class="field">
+          <label for="userName">이름</label>
+
+          <input type="text"
+                 id="userName"
+                 th:field="*{userName}"
+                 placeholder="이름을 입력해주세요"
+                 autocomplete="name">
+
+          <p class="error"
+             th:if="${#fields.hasErrors('userName')}"
+             th:errors="*{userName}">
+            이름 오류
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="phoneNumber">휴대폰 번호</label>
+
+          <input type="tel"
+                 id="phoneNumber"
+                 th:field="*{phoneNumber}"
+                 placeholder="01012345678"
+                 autocomplete="tel">
+
+          <p class="error"
+             th:if="${#fields.hasErrors('phoneNumber')}"
+             th:errors="*{phoneNumber}">
+            휴대폰 번호 오류
+          </p>
+        </div>
+
+        <button type="submit"
+                id="findIdButton"
+                class="submit-button">
+          아이디 찾기
+        </button>
+
+      </form>
+    </div>
+
+    <section id="findIdResult"
+             class="result-section-find"
+             th:if="${searched}">
+
+      <div class="result-error"
+           th:if="${result == null}">
+        입력한 정보와 일치하는 계정을 찾을 수 없습니다.
+      </div>
+
+      <div class="result-box"
+           th:if="${result != null}">
+
+        <h2 class="result-title-find">아이디 찾기 결과</h2>
+
+        <div class="result-item">
+          <span>가입 아이디</span>
+
+          <strong th:text="${result.maskedEmail}">
+            exa***@email.com
+          </strong>
+        </div>
+
+        <div class="result-item"
+             th:if="${result.providers != null
+                              and !result.providers.isEmpty()}">
+
+          <span>소셜 로그인</span>
+
+          <strong>
+                        <span th:each="provider, status : ${result.providers}">
+                            <span th:text="${provider}">KAKAO</span><span
+                                th:if="${!status.last}">, </span>
+                        </span>
+          </strong>
+        </div>
+
+        <div class="link-group">
+          <a id="loginLink"
+             class="primary-link"
+             th:href="@{/login}">
+            로그인하기
+          </a>
+
+          <a id="resetPasswordLink"
+             class="secondary-link"
+             th:href="@{/login/password}">
+            비밀번호 재설정
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+  </section>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.loan.recommendation.mapper.LoanRecommendationMapper">
+
+    <select id="findProfileByLoginEmail"
+            resultType="com.via.shinvia.loan.recommendation.model.UserFinancialProfileView">
+        SELECT
+            p.user_financial_profile_id AS userFinancialProfileId,
+            p.user_id AS userId,
+            u.login_email AS loginEmail,
+            u.user_name AS userName,
+            p.annual_income AS annualIncome,
+            p.income_type AS incomeType,
+            p.employment_status AS employmentStatus,
+            p.credit_score AS creditScore,
+            p.liquid_asset_amount AS liquidAssetAmount
+        FROM app_user u
+        INNER JOIN user_financial_profile p
+                ON p.user_id = u.user_id
+        WHERE u.login_email = #{loginEmail}
+        LIMIT 1
+    </select>
+
+    <select id="findRateTypeOptions"
+            resultType="com.via.shinvia.loan.recommendation.model.OptionChoice">
+        SELECT DISTINCT
+            rate_type_code AS code,
+            rate_type_name AS name
+        FROM housing_loan_product_option
+        WHERE NULLIF(TRIM(rate_type_code), '') IS NOT NULL
+        ORDER BY rate_type_code, rate_type_name
+    </select>
+
+    <select id="findRepaymentTypeOptions"
+            resultType="com.via.shinvia.loan.recommendation.model.OptionChoice">
+        SELECT DISTINCT
+            repayment_type_code AS code,
+            repayment_type_name AS name
+        FROM housing_loan_product_option
+        WHERE NULLIF(TRIM(repayment_type_code), '') IS NOT NULL
+        ORDER BY repayment_type_code, repayment_type_name
+    </select>
+
+    <select id="findCollateralTypeOptions"
+            resultType="com.via.shinvia.loan.recommendation.model.OptionChoice">
+        SELECT DISTINCT
+            collateral_type_code AS code,
+            collateral_type_name AS name
+        FROM housing_loan_product_option
+        WHERE NULLIF(TRIM(collateral_type_code), '') IS NOT NULL
+        ORDER BY collateral_type_code, collateral_type_name
+    </select>
+
+    <select id="findCreditCandidates"
+            resultType="com.via.shinvia.loan.recommendation.model.CreditCandidateRow">
+        SELECT
+            d.credit_product_type_name AS creditProductTypeName,
+            c.catalog_product_id AS catalogProductId,
+            c.product_name AS productName,
+            c.loan_type AS loanType,
+            c.min_rate AS catalogMinRate,
+            c.max_rate AS catalogMaxRate,
+            c.max_limit_amount AS maxLimitAmount,
+            c.max_period_months AS maxPeriodMonths,
+            c.target_description AS targetDescription,
+            c.institution_name AS institutionName,
+            c.join_way AS joinWay,
+            o.credit_loan_rate_option_id AS creditLoanRateOptionId,
+            o.rate_category_code AS rateCategoryCode,
+            o.rate_category_name AS rateCategoryName,
+            o.rate_over_900 AS rateOver900,
+            o.rate_801_900 AS rate801To900,
+            o.rate_701_800 AS rate701To800,
+            o.rate_601_700 AS rate601To700,
+            o.rate_501_600 AS rate501To600,
+            o.rate_401_500 AS rate401To500,
+            o.rate_301_400 AS rate301To400,
+            o.rate_300_or_below AS rate300OrBelow,
+            o.average_rate AS averageRate
+
+        FROM loan_product_catalog c
+
+        INNER JOIN credit_loan_product_detail d
+        ON d.catalog_product_id = c.catalog_product_id
+
+        INNER JOIN credit_loan_rate_option o
+        ON o.catalog_product_id = c.catalog_product_id
+        WHERE c.active = TRUE
+          AND c.loan_type = 'CREDIT'
+          AND o.rate_category_code = 'A'
+        ORDER BY c.catalog_product_id, o.credit_loan_rate_option_id
+    </select>
+
+    <select id="findHousingCandidates"
+            resultType="com.via.shinvia.loan.recommendation.model.HousingCandidateRow">
+        SELECT
+            c.catalog_product_id AS catalogProductId,
+            c.product_name AS productName,
+            c.loan_type AS loanType,
+            c.min_rate AS catalogMinRate,
+            c.max_rate AS catalogMaxRate,
+            c.max_limit_amount AS maxLimitAmount,
+            c.max_period_months AS maxPeriodMonths,
+            c.target_description AS targetDescription,
+            c.institution_name AS institutionName,
+            c.join_way AS joinWay,
+            o.housing_loan_product_option_id AS housingLoanProductOptionId,
+            o.collateral_type_code AS collateralTypeCode,
+            o.collateral_type_name AS collateralTypeName,
+            o.repayment_type_code AS repaymentTypeCode,
+            o.repayment_type_name AS repaymentTypeName,
+            o.rate_type_code AS rateTypeCode,
+            o.rate_type_name AS rateTypeName,
+            o.min_rate AS optionMinRate,
+            o.max_rate AS optionMaxRate,
+            o.average_rate AS optionAverageRate,
+            d.loan_limit_text AS loanLimitText
+        FROM loan_product_catalog c
+        INNER JOIN housing_loan_product_option o
+                ON o.catalog_product_id = c.catalog_product_id
+        LEFT JOIN housing_loan_product_detail d
+               ON d.catalog_product_id = c.catalog_product_id
+        WHERE c.active = TRUE
+          AND c.loan_type = #{loanType}
+        ORDER BY c.catalog_product_id,
+                 o.collateral_type_code,
+                 o.repayment_type_code,
+                 o.rate_type_code,
+                 o.housing_loan_product_option_id
+    </select>
+
+    <update id="deactivateRecommendations">
+        UPDATE loan_product
+        SET active = FALSE,
+            updated_at = NOW()
+        WHERE user_financial_profile_id = #{userFinancialProfileId}
+          AND loan_type = #{loanType}
+          AND active = TRUE
+    </update>
+
+    <insert id="upsertRecommendation">
+        INSERT INTO loan_product (
+            catalog_product_id,
+            product_name,
+            loan_type,
+            min_rate,
+            max_rate,
+            max_limit_amount,
+            max_period_months,
+            target_description,
+            active,
+            institution_name,
+            user_financial_profile_id,
+            recommendation_rank,
+            recommended_rate,
+            loan_purpose,
+            requested_amount,
+            requested_term_months,
+            calculation_method,
+            estimated_monthly_payment,
+            estimated_total_interest,
+            estimated_total_cost
+        ) VALUES (
+            #{catalogProductId},
+            #{productName},
+            #{loanType},
+            #{minRate},
+            #{maxRate},
+            #{maxLimitAmount},
+            #{maxPeriodMonths},
+            #{targetDescription},
+            TRUE,
+            #{institutionName},
+            #{userFinancialProfileId},
+            #{recommendationRank},
+            #{recommendedRate},
+            #{loanPurpose},
+            #{requestedAmount},
+            #{requestedTermMonths},
+            #{calculationMethod},
+            #{estimatedMonthlyPayment},
+            #{estimatedTotalInterest},
+            #{estimatedTotalCost}
+        )
+        ON DUPLICATE KEY UPDATE
+            product_name = VALUES(product_name),
+            loan_type = VALUES(loan_type),
+            min_rate = VALUES(min_rate),
+            max_rate = VALUES(max_rate),
+            max_limit_amount = VALUES(max_limit_amount),
+            max_period_months = VALUES(max_period_months),
+            target_description = VALUES(target_description),
+            active = TRUE,
+            institution_name = VALUES(institution_name),
+            recommendation_rank = VALUES(recommendation_rank),
+            recommended_rate = VALUES(recommended_rate),
+            loan_purpose = VALUES(loan_purpose),
+            requested_amount = VALUES(requested_amount),
+            requested_term_months = VALUES(requested_term_months),
+            calculation_method = VALUES(calculation_method),
+            estimated_monthly_payment = VALUES(estimated_monthly_payment),
+            estimated_total_interest = VALUES(estimated_total_interest),
+            estimated_total_cost = VALUES(estimated_total_cost),
+            updated_at = NOW()
+    </insert>
+
+</mapper>

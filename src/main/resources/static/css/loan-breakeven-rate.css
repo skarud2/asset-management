@@ -1,0 +1,10 @@
+/* loan-ratesimulation-common.css의 카드/폼/배지/스탯타일 위에 얹는 이 페이지만의 스타일 */
+
+.stat-tile-critical {
+    background-color: var(--status-critical-tint);
+}
+
+.stat-tile-critical .stat-label,
+.stat-tile-critical .stat-value {
+    color: var(--status-critical);
+}

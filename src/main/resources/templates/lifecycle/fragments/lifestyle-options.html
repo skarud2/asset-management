@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="options(fieldName, includeCustom)">
+    <label th:each="level : ${lifestyleLevels}"
+           th:if="${includeCustom or level.name() != 'CUSTOM'}">
+        <input type="radio"
+               th:name="${fieldName}"
+               th:value="${level.name()}"
+               th:checked="${level.name() == 'AVERAGE'}"
+               required>
+        <span th:text="${level.label}">수준</span>
+    </label>
+</th:block>
+</html>

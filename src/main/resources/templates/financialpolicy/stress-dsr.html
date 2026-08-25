@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+
+<head>
+    <title>스트레스 DSR | SHINVIA</title>
+</head>
+
+<body>
+
+<main class="policy-container bank-policy-page financial-policy-page">
+    <link rel="stylesheet" th:href="@{/css/financial-policy.css}">
+
+    <header class="page-header financial-policy-header">
+        <p class="page-label financial-policy-eyebrow">FINANCIAL POLICY</p>
+        <h1>스트레스 DSR</h1>
+        <p class="page-description financial-policy-lead">
+            금리 상승 가능성을 대출 심사에 미리 반영하는 스트레스 DSR의 개념과
+            대출 이용자에게 미치는 영향을 알기 쉽게 안내합니다.
+        </p>
+    </header>
+
+    <nav class="financial-policy-index" aria-label="페이지 주요 내용">
+        <strong>주요 내용</strong>
+        <a href="#policy-overview">한눈에 보기</a>
+        <a href="#policy-comparison">제도 비교</a>
+        <a href="#policy-applicable">적용 대상</a>
+        <a href="#policy-faq">자주 묻는 질문</a>
+    </nav>
+
+    <section class="policy-summary-section">
+        <span id="policy-overview" class="policy-anchor" aria-hidden="true"></span>
+        <div class="policy-section-title">
+            <h2>한눈에 보기</h2>
+            <p>스트레스 DSR의 핵심 내용을 먼저 확인해 보세요.</p>
+        </div>
+        <div class="policy-summary-grid">
+            <article class="policy-summary-card">
+                        <span class="policy-summary-number">
+                            01
+                        </span>
+                <h3>무엇인가요?</h3>
+                <p>
+                    앞으로 금리가 상승할 가능성을 고려하여
+                    실제 대출금리보다 높은 심사금리를 적용하는 제도입니다.
+                </p>
+
+            </article>
+
+
+            <article class="policy-summary-card">
+
+                        <span class="policy-summary-number">
+                            02
+                        </span>
+
+                <h3>실제 금리가 오르나요?</h3>
+
+                <p>
+                    스트레스 금리는 실제 납부하는 대출금리가 아니라
+                    대출한도를 심사할 때 사용하는 계산용 금리입니다.
+                </p>
+
+            </article>
+
+
+            <article class="policy-summary-card">
+
+                        <span class="policy-summary-number">
+                            03
+                        </span>
+
+                <h3>무엇이 달라지나요?</h3>
+
+                <p>
+                    같은 소득과 같은 대출조건이라도
+                    심사 과정에서 대출 가능 한도가 줄어들 수 있습니다.
+                </p>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- 스트레스 DSR 개념 -->
+    <section class="policy-content-section">
+
+        <div class="policy-section-title">
+            <h2>스트레스 DSR이란?</h2>
+        </div>
+
+        <div class="policy-content-box">
+
+            <p>
+                DSR은 연소득에서 모든 대출의 연간 원리금 상환액이
+                차지하는 비율을 의미합니다.
+            </p>
+
+            <p>
+                스트레스 DSR은 향후 금리가 오를 가능성을 고려하여
+                실제 대출금리에 일정 수준의 스트레스 금리를 더한 뒤
+                상환 부담을 계산하는 제도입니다.
+            </p>
+
+            <div class="policy-example-box">
+
+                <strong>쉽게 설명하면</strong>
+
+                <p>
+                    현재 금리가 낮더라도 앞으로 금리가 상승할 수 있다고 가정하여
+                    대출자가 금리 상승 이후에도 대출을 상환할 수 있는지
+                    미리 확인하는 방식입니다.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- DSR 비교 -->
+    <section id="policy-comparison" class="policy-content-section">
+
+        <div class="policy-section-title">
+            <h2>일반 DSR과 무엇이 다른가요?</h2>
+        </div>
+
+        <div class="policy-table-wrap">
+
+            <table class="policy-table">
+
+                <thead>
+                <tr>
+                    <th scope="col">구분</th>
+                    <th scope="col">일반 DSR</th>
+                    <th scope="col">스트레스 DSR</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr>
+                    <th scope="row">적용 금리</th>
+                    <td>실제 대출금리 기준</td>
+                    <td>실제 금리와 스트레스 금리를 함께 반영</td>
+                </tr>
+
+                <tr>
+                    <th scope="row">계산 목적</th>
+                    <td>현재 상환 부담 확인</td>
+                    <td>향후 금리 상승 시 상환 부담까지 확인</td>
+                </tr>
+
+                <tr>
+                    <th scope="row">대출한도 영향</th>
+                    <td>현재 금리 기준으로 한도 계산</td>
+                    <td>계산상 원리금이 증가해 한도가 줄어들 수 있음</td>
+                </tr>
+
+                <tr>
+                    <th scope="row">실제 납부금리</th>
+                    <td>약정금리 적용</td>
+                    <td>약정금리를 직접 올리는 제도는 아님</td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- 적용 대상 -->
+    <section id="policy-applicable" class="policy-content-section">
+
+        <div class="policy-section-title">
+            <h2>누구에게 적용되나요?</h2>
+        </div>
+
+        <div class="policy-list-box">
+
+            <ul>
+                <li>
+                    주택담보대출 등 적용 대상 대출을 새로 신청하는 경우
+                </li>
+
+                <li>
+                    기존 대출의 한도를 증액하거나 조건을 변경하는 경우
+                </li>
+
+                <li>
+                    변동금리 또는 일정 조건의 혼합형·주기형 대출을 이용하는 경우
+                </li>
+
+                <li>
+                    대환대출 과정에서 새로운 대출 심사를 받는 경우
+                </li>
+
+                <li>
+                    금융권과 시행 시점에 따라 적용 대상에 포함되는 경우
+                </li>
+            </ul>
+
+        </div>
+
+        <div class="policy-warning-box">
+
+            <strong>주의사항</strong>
+
+            <p>
+                실제 적용 여부는 대출 종류, 금융회사, 금리 유형,
+                신청 시점에 따라 달라질 수 있습니다.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- 현재 시행 현황 -->
+    <section class="policy-content-section">
+
+        <div class="policy-section-title">
+            <h2>현재 어떻게 시행되고 있나요?</h2>
+        </div>
+
+        <div class="policy-content-box">
+
+            <p>
+                3단계 스트레스 DSR은 2025년 7월 1일부터 시행됐으며,
+                현재 전 금융권의 DSR 적용 대상 가계대출에 적용되고 있습니다.
+            </p>
+
+            <div class="policy-step-list">
+
+                <article class="policy-step-card">
+
+                    <span>시행 시점</span>
+
+                    <div>
+                        <h3>2025년 7월 1일부터 3단계 시행</h3>
+                        <p>
+                            은행권과 제2금융권을 포함한 전 금융권에서
+                            3단계 스트레스 DSR이 시행되고 있습니다.
+                        </p>
+                    </div>
+
+                </article>
+
+
+                <article class="policy-step-card">
+
+                    <span>적용 범위</span>
+
+                    <div>
+                        <h3>DSR이 적용되는 사실상 모든 가계대출</h3>
+                        <p>
+                            주택담보대출과 신용대출뿐 아니라 기타대출까지
+                            미래 금리변동 위험을 반영합니다.
+                        </p>
+                    </div>
+
+                </article>
+
+
+                <article class="policy-step-card">
+
+                    <span>확인 사항</span>
+
+                    <div>
+                        <h3>일부 대출에는 별도 기준 적용</h3>
+                        <p>
+                            신용대출은 총대출 잔액이 1억원을 초과하는 경우에 적용됩니다.
+                            DSR 제외 대출과 지역·대출유형별 세부 적용 수준은
+                            신청 시점의 공식 안내를 확인해야 합니다.
+                        </p>
+                    </div>
+
+                </article>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- 일반적인 영향 -->
+    <section class="policy-content-section">
+
+        <div class="policy-section-title">
+            <h2>대출 이용자에게 어떤 영향이 있나요?</h2>
+        </div>
+
+        <div class="policy-impact-grid">
+
+            <article class="policy-impact-card">
+
+                <h3>대출 가능 한도</h3>
+
+                <p>
+                    심사에 사용되는 원리금 상환액이 증가하여
+                    기존 방식보다 대출 가능 한도가 감소할 수 있습니다.
+                </p>
+
+            </article>
+
+
+            <article class="policy-impact-card">
+
+                <h3>변동금리 대출</h3>
+
+                <p>
+                    향후 금리 상승 위험이 큰 대출일수록
+                    상환능력 심사가 더 보수적으로 이루어질 수 있습니다.
+                </p>
+
+            </article>
+
+
+            <article class="policy-impact-card">
+
+                <h3>실제 월 상환액</h3>
+
+                <p>
+                    스트레스 금리를 계산에 사용한다고 해서
+                    현재 납부하는 월 상환액이 즉시 증가하는 것은 아닙니다.
+                </p>
+
+            </article>
+
+
+            <article class="policy-impact-card">
+
+                <h3>신규·대환 대출</h3>
+
+                <p>
+                    신규 대출이나 대환 과정에서 새로운 심사를 받으면
+                    신청 시점의 스트레스 DSR 기준이 적용될 수 있습니다.
+                </p>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- 예시 -->
+    <section class="policy-content-section">
+
+        <div class="policy-section-title">
+            <h2>예시로 이해하기</h2>
+        </div>
+
+        <div class="policy-example-comparison">
+
+            <div class="policy-example-column">
+
+                        <span class="policy-example-label">
+                            일반 DSR 심사
+                        </span>
+
+                <h3>현재 대출금리만 반영</h3>
+
+                <p>
+                    현재 적용되는 금리를 기준으로
+                    연간 원리금 상환액을 계산합니다.
+                </p>
+
+            </div>
+
+
+            <div class="policy-example-arrow"
+                 aria-hidden="true">
+                →
+            </div>
+
+
+            <div class="policy-example-column">
+
+                        <span class="policy-example-label">
+                            스트레스 DSR 심사
+                        </span>
+
+                <h3>금리 상승 가능성까지 반영</h3>
+
+                <p>
+                    실제 금리에 스트레스 금리를 추가하여
+                    더 높은 상환 부담을 가정합니다.
+                </p>
+
+            </div>
+
+        </div>
+
+        <p class="policy-example-result">
+            따라서 소득과 기존 대출이 같더라도 스트레스 DSR 적용 후에는
+            계산되는 대출 가능 한도가 줄어들 수 있습니다.
+        </p>
+
+    </section>
+
+
+    <!-- 자주 묻는 질문 -->
+    <section id="policy-faq" class="policy-content-section">
+
+        <div class="policy-section-title">
+            <h2>자주 묻는 질문</h2>
+        </div>
+
+        <div class="policy-faq-list">
+
+            <details class="policy-faq-item">
+
+                <summary>
+                    기존에 받은 대출의 금리도 바로 올라가나요?
+                </summary>
+
+                <div class="policy-faq-answer">
+                    <p>
+                        아닙니다. 스트레스 DSR은 실제 약정금리를 직접 올리는
+                        제도가 아니라 대출한도를 심사할 때 사용하는 제도입니다.
+                    </p>
+                </div>
+
+            </details>
+
+
+            <details class="policy-faq-item">
+
+                <summary>
+                    기존 대출에도 스트레스 DSR이 적용되나요?
+                </summary>
+
+                <div class="policy-faq-answer">
+                    <p>
+                        기존 대출을 그대로 유지하는 경우와 신규·증액·대환 심사를
+                        받는 경우의 적용 기준이 다를 수 있습니다.
+                        신청 시점의 금융회사 안내를 확인해야 합니다.
+                    </p>
+                </div>
+
+            </details>
+
+
+            <details class="policy-faq-item">
+
+                <summary>
+                    모든 대출에 동일하게 적용되나요?
+                </summary>
+
+                <div class="policy-faq-answer">
+                    <p>
+                        금융권, 대출 종류, 금리 유형 및 시행 단계에 따라
+                        적용 여부와 반영 수준이 달라질 수 있습니다.
+                    </p>
+                </div>
+
+            </details>
+
+
+            <details class="policy-faq-item">
+
+                <summary>
+                    고정금리 대출도 영향을 받나요?
+                </summary>
+
+                <div class="policy-faq-answer">
+                    <p>
+                        금리 유형과 구조에 따라 스트레스 금리의 적용 방식이
+                        달라질 수 있습니다. 완전 고정형인지, 혼합형인지,
+                        주기적으로 금리가 바뀌는 상품인지 확인해야 합니다.
+                    </p>
+                </div>
+
+            </details>
+
+
+            <details class="policy-faq-item">
+
+                <summary>
+                    스트레스 DSR이 높으면 대출을 받을 수 없나요?
+                </summary>
+
+                <div class="policy-faq-answer">
+                    <p>
+                        스트레스 DSR은 대출 가능 여부와 한도를 판단하는 여러
+                        심사 기준 중 하나입니다. 소득, 기존 부채, 신용도,
+                        담보가치 등도 함께 심사될 수 있습니다.
+                    </p>
+                </div>
+
+            </details>
+
+        </div>
+
+    </section>
+
+
+    <!-- 관련 메뉴 -->
+    <section class="policy-related-section">
+
+        <div class="policy-section-title">
+            <h2>함께 확인하면 좋은 내용</h2>
+        </div>
+
+        <div class="policy-related-links">
+
+            <a th:href="@{/financial-policy/household-dsr}"
+               class="policy-related-link">
+
+                <strong>가계대출·DSR 규제</strong>
+
+                <span>
+                            DSR 적용 대상과 주요 심사기준을 확인합니다.
+                        </span>
+
+            </a>
+
+
+            <a th:href="@{/loans/breakeven-rate-test}"
+               class="policy-related-link">
+
+                <strong>금리상승 취약도</strong>
+
+                <span>
+                            금리가 올랐을 때 대출 부담이 얼마나 커지는지 점검합니다.
+                        </span>
+
+            </a>
+
+
+            <a th:href="@{/loan-analysis/scenarios}"
+               class="policy-related-link">
+
+                <strong>대출 대응방안 비교</strong>
+
+                <span>
+                            금리 변화에 따른 상환 대응방안을 비교합니다.
+                        </span>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- 안내사항 -->
+    <aside class="policy-notice">
+
+        <h2>확인해 주세요</h2>
+
+        <p>
+            본 페이지는 스트레스 DSR 제도의 이해를 돕기 위한
+            일반적인 안내자료입니다.
+        </p>
+
+        <p>
+            세부 적용 기준과 시행 일정은 정책 발표 및 금융기관에 따라
+            달라질 수 있으므로 실제 대출을 신청할 때에는 금융위원회와
+            취급 금융기관의 공식 안내를 확인해야 합니다.
+        </p>
+
+        <p>
+            공식 자료:
+            <a href="https://www.fsc.go.kr/no010101/84617"
+               target="_blank" rel="noopener noreferrer">3단계 스트레스 DSR 시행방안</a>
+            ·
+            <a href="https://www.fsc.go.kr/no010101/86914"
+               target="_blank" rel="noopener noreferrer">2026년 가계부채 점검회의</a>
+        </p>
+
+        <p class="policy-updated-date">
+            최종 확인일: 2026년 8월 10일
+        </p>
+
+    </aside>
+</main>
+
+</body>
+</html>

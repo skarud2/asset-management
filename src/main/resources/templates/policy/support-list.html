@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/basic :: layout(~{::title}, ~{::main}, ${serviceName})}">
+
+<head>
+    <title>서민금융상품 | SHINVIA</title>
+</head>
+
+<body>
+
+<main class="policy-container bank-policy-page">
+
+    <!-- =====================================================
+         페이지 상단
+    ====================================================== -->
+    <section class="page-header">
+
+        <p class="page-label">
+            POLICY SUPPORT
+        </p>
+
+        <h1>
+            서민금융상품
+        </h1>
+
+        <p class="page-description">
+            소득·연령·자금용도 등 조건에 맞는 서민금융 대출상품을 검색하고 비교할 수 있습니다.
+        </p>
+
+    </section>
+
+    <!-- =====================================================
+         안내 문구
+    ====================================================== -->
+    <section class="policy-notice">
+
+        <p>
+            본 정보는 서민금융진흥원 공공데이터를 기반으로 제공됩니다.
+            실제 신청조건 및 지원 여부는 취급기관의 공식 안내를 확인해 주세요.
+        </p>
+
+    </section>
+
+    <!-- =====================================================
+      검색어 및 상세검색 필터
+ ====================================================== -->
+    <section class="policy-search-area">
+
+        <form th:action="@{/policy-support}"
+              method="get"
+              id="policySearchForm">
+
+            <!-- 검색 또는 필터 변경 시 첫 페이지부터 조회 -->
+            <input type="hidden"
+                   name="page"
+                   value="0">
+
+            <!-- 검색어 영역 -->
+            <div class="policy-filter-section">
+
+                <div class="policy-filter-form">
+
+                    <div class="search-input-group">
+
+                        <label for="keyword"
+                               class="sr-only">
+                            정책상품 검색
+                        </label>
+
+                        <input id="keyword"
+                               class="policy-search-input"
+                               type="search"
+                               name="keyword"
+                               th:value="${keyword}"
+                               placeholder="상품명, 지원대상, 기관, 용도, 지역을 검색하세요"
+                               autocomplete="off">
+
+                    </div>
+
+                    <div class="page-size-group">
+
+                        <label for="size"
+                               class="sr-only">
+                            페이지당 표시 개수
+                        </label>
+
+                        <select id="size"
+                                class="page-size-select"
+                                name="size"
+                                onchange="this.form.submit()">
+
+                            <option value="10"
+                                    th:selected="${size == 10}">
+                                10개씩 보기
+                            </option>
+
+                            <option value="20"
+                                    th:selected="${size == 20}">
+                                20개씩 보기
+                            </option>
+
+                            <option value="30"
+                                    th:selected="${size == 30}">
+                                30개씩 보기
+                            </option>
+
+                            <option value="40"
+                                    th:selected="${size == 40}">
+                                40개씩 보기
+                            </option>
+
+                            <option value="50"
+                                    th:selected="${size == 50}">
+                                50개씩 보기
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <button class="search-button"
+                            type="submit">
+                        검색
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- 상세검색 제목 -->
+            <div class="detail-filter-header">
+
+                <h2>
+                    상세검색 필터
+                </h2>
+
+                <button type="button"
+                        id="detailFilterToggle"
+                        class="detail-filter-toggle collapsed"
+                        aria-expanded="false"
+                        aria-controls="detailFilterPanel">
+
+                <span id="filterToggleText">
+                    펼치기
+                </span>
+
+                    <span class="filter-toggle-icon">
+                    ▲
+                </span>
+
+                </button>
+
+            </div>
+
+            <!-- 상세검색 본문 -->
+            <div id="detailFilterPanel"
+                 class="detail-filter-panel hidden">
+
+                <!-- 지원대상 -->
+                <div class="detail-filter-row">
+
+                    <div class="detail-filter-label">
+                        지원대상
+                    </div>
+
+                    <div class="detail-filter-options">
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="target"
+                                   value=""
+                                   th:checked="${target == null or target == ''}">
+
+                            <span>
+                            전체
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="target"
+                                   value="WORKER"
+                                   th:checked="${target == 'WORKER'}">
+
+                            <span>
+                            근로자
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="target"
+                                   value="BUSINESS"
+                                   th:checked="${target == 'BUSINESS'}">
+
+                            <span>
+                            사업자
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="target"
+                                   value="SMALL_BIZ"
+                                   th:checked="${target == 'SMALL_BIZ'}">
+
+                            <span>
+                            소상공인
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="target"
+                                   value="YOUTH"
+                                   th:checked="${target == 'YOUTH'}">
+
+                            <span>
+                            대학생·청년
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="target"
+                                   value="VULNERABLE"
+                                   th:checked="${target == 'VULNERABLE'}">
+
+                            <span>
+                            금융취약계층
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="target"
+                                   value="FARMER"
+                                   th:checked="${target == 'FARMER'}">
+
+                            <span>
+                            농림어업인
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="target"
+                                   value="ETC"
+                                   th:checked="${target == 'ETC'}">
+
+                            <span>
+                            기타
+                        </span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <!-- 자금용도 -->
+                <div class="detail-filter-row">
+
+                    <div class="detail-filter-label">
+                        자금용도
+                    </div>
+
+                    <div class="detail-filter-options">
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="usage"
+                                   value=""
+                                   th:checked="${usage == null or usage == ''}">
+
+                            <span>
+                            전체
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="usage"
+                                   value="STARTUP"
+                                   th:checked="${usage == 'STARTUP'}">
+
+                            <span>
+                            창업
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="usage"
+                                   value="OPERATION"
+                                   th:checked="${usage == 'OPERATION'}">
+
+                            <span>
+                            운영·시설
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="usage"
+                                   value="LIVING"
+                                   th:checked="${usage == 'LIVING'}">
+
+                            <span>
+                            생계
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="usage"
+                                   value="HOUSING"
+                                   th:checked="${usage == 'HOUSING'}">
+
+                            <span>
+                            주거
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="usage"
+                                   value="REFINANCE"
+                                   th:checked="${usage == 'REFINANCE'}">
+
+                            <span>
+                            저금리전환
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="usage"
+                                   value="TUITION"
+                                   th:checked="${usage == 'TUITION'}">
+
+                            <span>
+                            학자금
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="usage"
+                                   value="ETC"
+                                   th:checked="${usage == 'ETC'}">
+
+                            <span>
+                            기타
+                        </span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <!-- 대출 필요금액 -->
+                <div class="detail-filter-row">
+
+                    <div class="detail-filter-label">
+                        대출 필요금액
+                    </div>
+
+                    <div class="detail-filter-options">
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="amount"
+                                   value=""
+                                   th:checked="${amount == null or amount == ''}">
+
+                            <span>
+                            전체
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="amount"
+                                   value="UNDER_1000"
+                                   th:checked="${amount == 'UNDER_1000'}">
+
+                            <span>
+                            1천만원 미만
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="amount"
+                                   value="OVER_1000"
+                                   th:checked="${amount == 'OVER_1000'}">
+
+                            <span>
+                            1천만원 이상
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="amount"
+                                   value="OVER_3000"
+                                   th:checked="${amount == 'OVER_3000'}">
+
+                            <span>
+                            3천만원 이상
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="amount"
+                                   value="OVER_5000"
+                                   th:checked="${amount == 'OVER_5000'}">
+
+                            <span>
+                            5천만원 이상
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="amount"
+                                   value="OVER_10000"
+                                   th:checked="${amount == 'OVER_10000'}">
+
+                            <span>
+                            1억원 이상
+                        </span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <!-- 연령대 -->
+                <div class="detail-filter-row">
+
+                    <div class="detail-filter-label">
+                        연령대
+                    </div>
+
+                    <div class="detail-filter-options">
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="ageGroup"
+                                   value=""
+                                   th:checked="${ageGroup == null or ageGroup == ''}">
+
+                            <span>
+                            전체
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="ageGroup"
+                                   value="YOUTH"
+                                   th:checked="${ageGroup == 'YOUTH'}">
+
+                            <span>
+                            청년층
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="ageGroup"
+                                   value="MIDDLE"
+                                   th:checked="${ageGroup == 'MIDDLE'}">
+
+                            <span>
+                            중장년층
+                        </span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <!-- 서비스 제공지역 -->
+                <div class="detail-filter-row">
+
+                    <div class="detail-filter-label">
+                        서비스 제공지역
+                    </div>
+
+                    <div class="detail-filter-options">
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value=""
+                                   th:checked="${region == null or region == ''}">
+
+                            <span>
+                            전국
+                        </span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="서울"
+                                   th:checked="${region == '서울'}">
+
+                            <span>서울</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="경기"
+                                   th:checked="${region == '경기'}">
+
+                            <span>경기</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="인천"
+                                   th:checked="${region == '인천'}">
+
+                            <span>인천</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="부산"
+                                   th:checked="${region == '부산'}">
+
+                            <span>부산</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="광주"
+                                   th:checked="${region == '광주'}">
+
+                            <span>광주</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="대구"
+                                   th:checked="${region == '대구'}">
+
+                            <span>대구</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="대전"
+                                   th:checked="${region == '대전'}">
+
+                            <span>대전</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="울산"
+                                   th:checked="${region == '울산'}">
+
+                            <span>울산</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="세종"
+                                   th:checked="${region == '세종'}">
+
+                            <span>세종</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="강원"
+                                   th:checked="${region == '강원'}">
+
+                            <span>강원</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="전남"
+                                   th:checked="${region == '전남'}">
+
+                            <span>전남</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="전북"
+                                   th:checked="${region == '전북'}">
+
+                            <span>전북</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="충남"
+                                   th:checked="${region == '충남'}">
+
+                            <span>충남</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="충북"
+                                   th:checked="${region == '충북'}">
+
+                            <span>충북</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="경남"
+                                   th:checked="${region == '경남'}">
+
+                            <span>경남</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="경북"
+                                   th:checked="${region == '경북'}">
+
+                            <span>경북</span>
+
+                        </label>
+
+                        <label class="filter-chip">
+
+                            <input type="radio"
+                                   name="region"
+                                   value="제주"
+                                   th:checked="${region == '제주'}">
+
+                            <span>제주</span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <!-- 주의 문구 -->
+                <div class="filter-notice">
+
+                    <p>
+                        ※ 공공데이터에 등록된 상품명, 지원대상, 자금용도,
+                        지원지역 및 상세 조건을 기준으로 조회합니다.
+                    </p>
+
+                    <p>
+                        실제 신청 가능 여부와 세부 조건은 해당 상품의
+                        취급기관에 확인해 주세요.
+                    </p>
+
+                </div>
+
+                <!-- 필터 하단 버튼 -->
+                <div class="detail-filter-actions">
+
+                    <a class="filter-reset-button"
+                       th:href="@{/policy-support(page=0, size=${size})}">
+                        초기화
+                    </a>
+
+                    <button type="submit"
+                            class="filter-submit-button">
+                        조건에 맞는 정책상품 검색
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </section>
+    <!-- =====================================================
+         조회 결과 요약
+    ====================================================== -->
+    <section class="policy-result-summary bank-result-summary">
+        <p>
+            총
+            <strong th:text="${programPage.totalElements}">0</strong>개의 상품이 있습니다.
+        </p>
+    </section>
+
+    <!-- =====================================================
+         검색 결과가 없는 경우
+    ====================================================== -->
+    <section class="empty-result"
+             th:if="${programPage.empty}">
+
+        <h2>
+            조회된 정책지원 상품이 없습니다.
+        </h2>
+
+        <p th:if="${keyword != null and !#strings.isEmpty(keyword)}">
+
+            입력한 검색어
+
+            <strong th:text="'“' + ${keyword} + '”'">
+                검색어
+            </strong>
+
+            에 해당하는 상품을 찾지 못했습니다.
+
+        </p>
+
+        <p th:unless="${keyword != null and !#strings.isEmpty(keyword)}">
+            현재 등록된 정책지원 상품이 없습니다.
+        </p>
+
+        <a class="secondary-button"
+           th:href="@{/policy-support(size=${size})}">
+            전체 상품 보기
+        </a>
+
+    </section>
+
+    <!-- =====================================================
+         정책지원 상품 카드 목록
+    ====================================================== -->
+    <div class="program-list-head"
+         th:if="${!programPage.empty}"
+         aria-hidden="true">
+        <span>상품구분</span>
+        <span>상품명 및 지원대상</span>
+        <span>한도·금리</span>
+        <span>제공기관</span>
+        <span>상세</span>
+    </div>
+
+    <section class="program-grid"
+             th:if="${!programPage.empty}">
+
+        <article class="program-card"
+                 th:each="program : ${programs}">
+
+            <div class="program-card-top">
+
+                <span class="policy-badge"
+                      th:text="${program.productBadge}">
+                    대출상품
+                </span>
+
+                <span class="active-badge"
+                      th:if="${program.active}">
+                    운영 중
+                </span>
+
+            </div>
+
+            <!-- 상품명 -->
+            <h2 class="program-title"
+                th:text="${program.programName}">
+                정책지원 상품명
+            </h2>
+
+            <!-- 지원 대상 -->
+            <p class="program-target"
+               th:text="${program.targetDescription != null
+                    and !#strings.isEmpty(program.targetDescription)
+                    ? program.targetDescription
+                    : '지원 대상은 취급기관에 문의해 주세요.'}">
+                지원 대상
+            </p>
+
+            <!-- 제공기관 -->
+            <p class="program-institution"
+               th:if="${program.offeringInstitutionName != null
+                       and !#strings.isEmpty(program.offeringInstitutionName)}">
+
+                <span>
+                    제공기관
+                </span>
+
+                <strong th:text="${program.offeringInstitutionName}">
+                    제공기관명
+                </strong>
+
+            </p>
+
+            <dl class="program-information">
+
+                <!-- 최대 지원금액 -->
+                <div>
+
+                    <dt>
+                        최대 지원금액
+                    </dt>
+
+                    <dd th:if="${program.maxSupportAmount != null}"
+                        th:text="${#numbers.formatDecimal(
+                            program.maxSupportAmount,
+                            0,
+                            'COMMA',
+                            0,
+                            'POINT'
+                        ) + '원'}">
+                        20,000,000원
+                    </dd>
+
+                    <dd th:unless="${program.maxSupportAmount != null}">
+                        별도 확인
+                    </dd>
+
+                </div>
+
+                <!-- 적용 금리 -->
+                <div>
+
+                    <dt>
+                        적용 금리
+                    </dt>
+
+                    <!-- 최저·최고 금리가 모두 있는 경우 -->
+                    <dd th:if="${program.minInterestRate != null
+                               and program.maxInterestRate != null
+                               and program.minInterestRate.compareTo(program.maxInterestRate) != 0}">
+
+                        <span th:text="${#numbers.formatDecimal(
+                            program.minInterestRate,
+                            1,
+                            2
+                        )}">
+                            3.00
+                        </span>
+
+                        %
+
+                        <span>
+                            ~
+                        </span>
+
+                        <span th:text="${#numbers.formatDecimal(
+                            program.maxInterestRate,
+                            1,
+                            2
+                        )}">
+                            5.00
+                        </span>
+
+                        %
+
+                    </dd>
+
+                    <!-- 최저·최고 금리가 동일한 경우 -->
+                    <dd th:if="${program.minInterestRate != null
+                               and program.maxInterestRate != null
+                               and program.minInterestRate.compareTo(program.maxInterestRate) == 0}">
+
+                        <span th:text="${#numbers.formatDecimal(
+                            program.minInterestRate,
+                            1,
+                            2
+                        )}">
+                            3.00
+                        </span>
+
+                        %
+
+                    </dd>
+
+                    <!-- 최고금리만 존재하는 경우 -->
+                    <dd th:if="${program.minInterestRate == null
+                               and program.maxInterestRate != null}">
+
+                        최대
+
+                        <span th:text="${#numbers.formatDecimal(
+                            program.maxInterestRate,
+                            1,
+                            2
+                        )}">
+                            19.99
+                        </span>
+
+                        %
+
+                    </dd>
+
+                    <!-- 숫자 금리가 없는 경우 -->
+                    <dd th:if="${program.minInterestRate == null
+                               and program.maxInterestRate == null}"
+                        th:text="${program.interestRateDescription != null
+                            and !#strings.isEmpty(program.interestRateDescription)
+                            ? program.interestRateDescription
+                            : '별도 확인'}">
+                        별도 확인
+                    </dd>
+
+                </div>
+
+                <!-- 금리 유형 -->
+                <div>
+
+                    <dt>
+                        금리 유형
+                    </dt>
+
+                    <dd th:text="${program.interestRateType != null
+                            and !#strings.isEmpty(program.interestRateType)
+                            ? program.interestRateType
+                            : '별도 확인'}">
+                        고정금리
+                    </dd>
+
+                </div>
+
+                <!-- 용도 -->
+                <div>
+
+                    <dt>
+                        자금 용도
+                    </dt>
+
+                    <dd th:text="${program.usageDescription != null
+                            and !#strings.isEmpty(program.usageDescription)
+                            ? program.usageDescription
+                            : '별도 확인'}">
+                        생계
+                    </dd>
+
+                </div>
+
+                <!-- 지원 지역 -->
+                <div>
+
+                    <dt>
+                        지원 지역
+                    </dt>
+
+                    <dd th:text="${program.supportArea != null
+                            and !#strings.isEmpty(program.supportArea)
+                            ? program.supportArea
+                            : '전국 또는 기관 문의'}">
+                        전국
+                    </dd>
+
+                </div>
+
+                <!-- 운영 기간 -->
+                <div>
+
+                    <dt>
+                        운영 기간
+                    </dt>
+
+                    <dd th:text="${program.operationPeriod != null
+                            and !#strings.isEmpty(program.operationPeriod)
+                            ? program.operationPeriod
+                            : '상시 또는 기관 문의'}">
+                        상시
+                    </dd>
+
+                </div>
+
+            </dl>
+
+            <div class="program-card-actions">
+
+                <button type="button"
+                        class="detail-button open-program-modal"
+                        th:attr="data-program-id=${program.policySupportProgramId}">
+                    상세보기
+                </button>
+
+            </div>
+
+        </article>
+
+    </section>
+
+    <!-- =====================================================
+         페이지네이션
+    ====================================================== -->
+    <nav class="pagination"
+         aria-label="정책지원 상품 페이지"
+         th:if="${programPage.totalPages > 1}">
+        <a class="page-button page-navigation-button"
+           th:classappend="${startPage == 0} ? ' disabled'"
+           th:href="${startPage == 0}
+            ? '#'
+            : @{/policy-support(
+                page=0,
+                size=${size},
+                keyword=${keyword},
+                target=${target},
+                usage=${usage},
+                amount=${amount},
+                ageGroup=${ageGroup},
+                region=${region}
+            )}">
+            처음
+        </a>
+        <a class="page-button page-navigation-button"
+           th:classappend="${startPage == 0} ? ' disabled'"
+           th:href="${startPage == 0}
+            ? '#'
+            : @{/policy-support(
+                page=${startPage - 1},
+                size=${size},
+                keyword=${keyword},
+                target=${target},
+                usage=${usage},
+                amount=${amount},
+                ageGroup=${ageGroup},
+                region=${region}
+            )}">
+            이전
+        </a>
+        <th:block th:if="${endPage >= startPage}">
+            <a class="page-button"
+               th:each="pageNumber :
+                    ${#numbers.sequence(startPage, endPage)}"
+               th:text="${pageNumber + 1}"
+               th:classappend="${pageNumber == currentPage}
+                    ? ' active'"
+               th:href="@{/policy-support(
+                page=${pageNumber},
+                size=${size},
+                keyword=${keyword},
+                target=${target},
+                usage=${usage},
+                amount=${amount},
+                ageGroup=${ageGroup},
+                region=${region}
+           )}">
+                1
+            </a>
+        </th:block>
+        <a class="page-button page-navigation-button"
+           th:classappend="${endPage >= programPage.totalPages - 1} ? ' disabled'"
+           th:href="${endPage >= programPage.totalPages - 1}
+            ? '#'
+            : @{/policy-support(
+                page=${endPage + 1},
+                size=${size},
+                keyword=${keyword},
+                target=${target},
+                usage=${usage},
+                amount=${amount},
+                ageGroup=${ageGroup},
+                region=${region}
+            )}">
+            다음
+        </a>
+    </nav>
+
+    <!-- 모바일용 현재 페이지 -->
+    <p class="mobile-page-status"
+       th:if="${programPage.totalPages > 1}">
+
+        <strong th:text="${programPage.number + 1}">
+            1
+        </strong>
+
+        /
+
+        <span th:text="${programPage.totalPages}">
+            32
+        </span>
+
+        페이지
+
+    </p>
+    <!-- =====================================================
+         정책상품 상세 모달
+    ====================================================== -->
+    <div id="programModal"
+         class="policy-modal"
+         aria-hidden="true">
+
+        <!-- 모달 바깥 배경 -->
+        <div class="policy-modal-backdrop"
+             data-modal-close>
+        </div>
+
+        <!-- 모달 본문 -->
+        <section class="policy-modal-dialog"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="modalProgramName">
+
+            <!-- 모달 상단 -->
+            <header class="policy-modal-header">
+
+                <div>
+
+                <span id="modalPolicyBadge" class="policy-badge">
+                    대출상품
+                </span>
+
+                    <h2 id="modalProgramName">
+                        정책상품 상세정보
+                    </h2>
+
+                </div>
+
+                <button type="button"
+                        class="policy-modal-close"
+                        aria-label="팝업 닫기"
+                        data-modal-close>
+                    ×
+                </button>
+
+            </header>
+
+            <!-- 로딩 -->
+            <div id="modalLoading"
+                 class="modal-loading">
+
+                <div class="loading-spinner"></div>
+
+                <p>
+                    정책상품 정보를 불러오는 중입니다.
+                </p>
+
+            </div>
+
+            <!-- 오류 -->
+            <div id="modalError"
+                 class="modal-error"
+                 hidden>
+
+                <p>
+                    정책상품 정보를 불러오지 못했습니다.
+                </p>
+
+                <button type="button"
+                        class="secondary-button"
+                        data-modal-close>
+                    닫기
+                </button>
+
+            </div>
+
+            <!-- 상세내용 -->
+            <div id="modalContent"
+                 class="policy-modal-content"
+                 hidden>
+
+                <!-- 상품 요약 -->
+                <section class="modal-summary">
+
+                    <p id="modalTargetDescription"
+                       class="modal-target-description">
+                        지원 대상
+                    </p>
+
+                    <div class="modal-badge-list">
+
+                    <span id="modalInterestRateType"
+                          class="modal-information-badge"
+                          hidden>
+                    </span>
+
+                        <span id="modalUsageDescription"
+                              class="modal-information-badge"
+                              hidden>
+                    </span>
+
+                        <span id="modalSupportArea"
+                              class="modal-information-badge"
+                              hidden>
+                    </span>
+
+                    </div>
+
+                </section>
+
+                <!-- 기본 정보 -->
+                <section class="modal-section">
+
+                    <h3>
+                        기본 정보
+                    </h3>
+
+                    <dl class="modal-definition-list">
+
+                        <div>
+                            <dt>
+                                최대 지원금액
+                            </dt>
+
+                            <dd id="modalMaxSupportAmount">
+                                별도 확인
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt>
+                                금리
+                            </dt>
+
+                            <dd id="modalInterestRate">
+                                별도 확인
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt>
+                                대출기간
+                            </dt>
+
+                            <dd id="modalSupportPeriod">
+                                별도 확인
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt>
+                                상환방법
+                            </dt>
+
+                            <dd id="modalRepaymentMethod">
+                                별도 확인
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt>
+                                제공기관
+                            </dt>
+
+                            <dd id="modalOfferingInstitution">
+                                별도 확인
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt>
+                                취급기관
+                            </dt>
+
+                            <dd id="modalHandlingInstitution">
+                                별도 확인
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt>
+                                운영기간
+                            </dt>
+
+                            <dd id="modalOperationPeriod">
+                                기관 문의
+                            </dd>
+                        </div>
+
+                    </dl>
+
+                </section>
+
+                <!-- 상세 지원조건 -->
+                <section class="modal-section">
+
+                    <h3>
+                        상세 지원조건
+                    </h3>
+
+                    <p id="modalEligibilityDescription"
+                       class="modal-text-content">
+                        등록된 상세 지원조건이 없습니다.
+                    </p>
+
+                </section>
+
+                <!-- 신청 및 문의 -->
+                <section class="modal-section">
+
+                    <h3>
+                        신청 및 문의
+                    </h3>
+
+                    <dl class="modal-definition-list">
+
+                        <div>
+                            <dt>
+                                신청방법
+                            </dt>
+
+                            <dd id="modalApplicationMethod">
+                                취급기관 문의
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt>
+                                문의처
+                            </dt>
+
+                            <dd id="modalContactDescription">
+                                취급기관 문의
+                            </dd>
+                        </div>
+
+                    </dl>
+
+                </section>
+
+                <!-- 추가 조건 -->
+                <section id="modalEligibilitySection"
+                         class="modal-section"
+                         hidden>
+
+                    <h3>
+                        추가 조건
+                    </h3>
+
+                    <dl id="modalEligibilityList"
+                        class="modal-definition-list">
+                    </dl>
+
+                </section>
+
+            </div>
+
+            <!-- 모달 하단 -->
+            <footer class="policy-modal-footer">
+
+                <a id="modalApplicationUrl"
+                   class="primary-button"
+                   href="#"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   hidden>
+                    공식 사이트 확인
+                </a>
+
+                <button type="button"
+                        class="secondary-button"
+                        data-modal-close>
+                    닫기
+                </button>
+
+            </footer>
+
+        </section>
+
+    </div>
+
+
+</main>
+
+</body>
+</html>

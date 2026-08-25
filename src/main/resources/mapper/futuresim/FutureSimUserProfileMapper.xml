@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.via.shinvia.futuresim.mapper.FutureSimUserProfileMapper">
+
+    <!-- "지금 내 상태" 비교에 필요한 생년월일/가구원수만 조회 (app_user 최소 조회 전용, user/ 기존 Mapper 미접촉) -->
+    <select id="findByUserId"
+            resultType="com.via.shinvia.futuresim.entity.FutureSimUserProfile">
+
+        SELECT
+        birth_date,
+        household_size
+
+        FROM app_user
+
+        WHERE user_id = #{userId}
+
+    </select>
+
+</mapper>

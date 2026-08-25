@@ -1,0 +1,612 @@
+/* loan/ratesimulation 화면 공용 디자인 토큰 + 컴포넌트 */
+
+:root {
+    --surface-page: #f9f9fd;
+    --surface-card: #ffffff;
+    --surface-subtle: #f3f3f7;
+    --ink-primary: #161D26;
+    --ink-secondary: #45474b;
+    --ink-muted: #7e8590;
+    --border-hairline: #e2e2e6;
+    --grid-hairline: #e8e8ec;
+
+    --accent: #FF9900;
+    --accent-dark: #e08600;
+    --accent-tint: #fff4e0;
+
+    --status-good: #1a8a4a;
+    --status-good-tint: #e3f6ea;
+    --status-warning: #b5790a;
+    --status-warning-tint: #fff3d6;
+    --status-serious: #c85a34;
+    --status-serious-tint: #fdece3;
+    --status-critical: #d03b3b;
+    --status-critical-tint: #fbe6e6;
+    --status-neutral: #45474b;
+    --status-neutral-tint: #e8e8ec;
+
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0;
+    --shadow-card: none;
+}
+
+.site-content .page-shell {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 38px 0 10px;
+    font-family: Pretendard, -apple-system, "system-ui", "Segoe UI", sans-serif;
+    color: #191f2c;
+}
+
+.page-shell .page-header {
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #dcdfe3;
+}
+
+.page-shell .page-header h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -1px;
+    color: #20242a;
+}
+
+.page-shell .page-header .hint {
+    max-width: 760px;
+    margin: 9px 0 0;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: #7b8088;
+}
+
+/* 내 보유 대출 위젯 */
+.my-loans-card .card-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.my-loans-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.my-loan-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 16px;
+    min-width: 200px;
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-md);
+    background: var(--surface-subtle);
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.my-loan-item:hover {
+    border-color: var(--accent);
+}
+
+.my-loan-item.active {
+    border-color: var(--accent);
+    background: var(--accent-tint);
+}
+
+.my-loan-type {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-primary);
+}
+
+.my-loan-detail {
+    font-size: 12px;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.my-loans-empty {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ink-muted);
+}
+
+.my-loans-empty a {
+    color: var(--accent-dark);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.my-loans-empty a:hover {
+    text-decoration: underline;
+}
+
+body .page-shell .card {
+    background-color: var(--surface-card);
+    border: 1px solid #cfd4da;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 28px 30px;
+}
+
+.card + .card,
+.card + .scenario-section,
+.scenario-section + .card {
+    margin-top: 20px;
+}
+
+.card-title {
+    margin: 0 0 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--grid-hairline);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink-primary);
+    letter-spacing: -0.2px;
+}
+
+/* form */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    align-items: end;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-secondary);
+}
+
+.field .field-note {
+    font-size: 11px;
+    color: var(--ink-muted);
+    font-weight: 400;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-card);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--ink-primary);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus,
+select:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--accent-tint);
+}
+
+input[readonly] {
+    background-color: var(--surface-subtle);
+    color: var(--ink-secondary);
+}
+
+.btn-primary {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+    padding: 13px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background-color: var(--accent);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-dark);
+}
+
+.btn-primary:disabled {
+    background-color: var(--ink-muted);
+    cursor: not-allowed;
+}
+
+/* banners */
+.banner {
+    margin-top: 18px;
+    padding: 13px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.banner-error {
+    background-color: var(--status-critical-tint);
+    color: var(--status-critical);
+}
+
+.banner-info {
+    background-color: var(--accent-tint);
+    color: var(--accent-dark);
+}
+
+.banner-warning {
+    background-color: var(--status-warning-tint);
+    color: var(--status-warning);
+}
+
+.banner-neutral {
+    background-color: var(--status-neutral-tint);
+    color: var(--status-neutral);
+}
+
+/* badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.badge-good {
+    background-color: var(--status-good-tint);
+    color: var(--status-good);
+}
+
+.badge-warning {
+    background-color: var(--status-warning-tint);
+    color: var(--status-warning);
+}
+
+.badge-serious {
+    background-color: var(--status-serious-tint);
+    color: var(--status-serious);
+}
+
+.badge-critical {
+    background-color: var(--status-critical-tint);
+    color: var(--status-critical);
+}
+
+.badge-neutral {
+    background-color: var(--status-neutral-tint);
+    color: var(--status-neutral);
+}
+
+/* result header row: title + badge */
+.result-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.result-heading .loan-label {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.result-heading .loan-label .loan-type {
+    color: var(--ink-primary);
+}
+
+.result-heading .loan-label .rate-type {
+    color: var(--ink-muted);
+    font-weight: 500;
+}
+
+/* stat tiles */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.stat-tile {
+    background-color: var(--surface-subtle);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+}
+
+.stat-tile .stat-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+}
+
+.stat-tile .stat-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-primary);
+    white-space: nowrap;
+}
+
+.stat-tile .stat-value .unit {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    margin-left: 2px;
+}
+
+/* table */
+.table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--grid-hairline);
+    border-radius: var(--radius-md);
+    margin-top: 4px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+    padding: 10px 14px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+th:first-child,
+td:first-child {
+    text-align: left;
+}
+
+thead th {
+    background-color: var(--surface-subtle);
+    color: var(--ink-secondary);
+    font-weight: 700;
+    font-size: 12px;
+    border-bottom: 1px solid var(--grid-hairline);
+}
+
+tbody tr:not(:last-child) td {
+    border-bottom: 1px solid var(--grid-hairline);
+}
+
+tbody tr:nth-child(even) {
+    background-color: var(--surface-subtle);
+}
+
+/* 계단/경로형 시나리오 차트를 담는 박스 (staged-rate-simulation, historical-rate-replay 공용) */
+.chart-card {
+    background-color: var(--surface-subtle);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    height: 280px;
+}
+
+/* misc */
+.section-title {
+    margin: 22px 0 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-secondary);
+}
+
+.raw-json {
+    margin-top: 8px;
+    padding: 12px;
+    background-color: var(--surface-subtle);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    font-size: 12px;
+    color: var(--ink-secondary);
+}
+
+details summary {
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    margin-top: 16px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* 시나리오 조건 입력 */
+.scenario-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.scenario-section-heading h2 {
+    margin: 0 0 4px;
+    color: #20242a;
+    font-size: 18px;
+}
+
+.scenario-section-heading p,
+.scenario-section-heading > span {
+    margin: 0;
+    color: #74869e;
+    font-size: 11px;
+}
+
+.scenario-section-heading b {
+    color: #d94a4a;
+}
+
+.scenario-form {
+    border-top: 2px solid #30343b;
+    border-right: 1px solid #d5d8dc;
+    border-bottom: 1px solid #d5d8dc;
+    border-left: 1px solid #d5d8dc;
+    background: #ffffff;
+}
+
+.scenario-form-row {
+    display: grid;
+    grid-template-columns: 125px minmax(0, 1fr) 125px minmax(0, 1fr);
+    border-bottom: 1px solid #e2e4e7;
+}
+
+.scenario-form-row:last-child {
+    border-bottom: 0;
+}
+
+.scenario-form-row > label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 12px;
+    border-right: 1px solid #e2e4e7;
+    background: #f0f1f3;
+    color: #4d545e;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.scenario-field {
+    min-width: 0;
+    padding: 10px 12px;
+    border-right: 1px solid #e2e4e7;
+}
+
+.scenario-field:last-child {
+    border-right: 0;
+}
+
+.scenario-field input,
+.scenario-field select {
+    width: 100%;
+    height: 34px;
+    padding: 0 9px;
+    border: 1px solid #b5bac1;
+    border-radius: 0;
+    background: #ffffff;
+    color: #414750;
+    font-size: 12px;
+    outline: none;
+}
+
+.scenario-field input:focus,
+.scenario-field select:focus {
+    border-color: #30343b;
+    box-shadow: inset 0 0 0 1px #30343b;
+}
+
+.scenario-field small {
+    display: block;
+    margin-top: 5px;
+    color: #8292a7;
+    font-size: 10px;
+}
+
+.field-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.field-with-unit span {
+    flex: 0 0 auto;
+    color: #647992;
+    font-size: 11px;
+}
+
+.single-row .scenario-field {
+    grid-column: 2 / 3;
+}
+
+.scenario-actions {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    padding: 18px;
+    background: #f9fcff;
+}
+
+.scenario-button {
+    min-width: 120px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 0;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.scenario-button.secondary {
+    border: 1px solid #b5bac1;
+    background: #ffffff;
+    color: #405b7c;
+}
+
+.scenario-button.primary {
+    border: 1px solid #30343b;
+    background: #30343b;
+    color: #ffffff;
+}
+
+.scenario-button.primary:hover {
+    border-color: #505761;
+    background: #505761;
+}
+
+.scenario-button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+@media (max-width: 640px) {
+    .scenario-form-row {
+        grid-template-columns: 110px minmax(0, 1fr);
+    }
+
+    .scenario-form-row > label:nth-of-type(2) {
+        border-top: 1px solid #e2e4e7;
+    }
+
+    .scenario-form-row > .scenario-field:nth-of-type(2) {
+        border-top: 1px solid #e2e4e7;
+    }
+
+    .single-row .scenario-field {
+        grid-column: auto;
+    }
+
+    .scenario-field {
+        border-right: 0;
+    }
+}
